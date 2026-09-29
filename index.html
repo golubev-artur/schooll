@@ -4,36 +4,56 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Мой ИИ-репетитор</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0f1020;--card:#1a1b34;--card2:#23244a;--tx:#f3f2ff;--mut:#a3a3c8;--acc:#ff7a59;--acc2:#ffc857;--vio:#8b7bff;--ok:#3ddc97;--bad:#ff5c7a;--r:20px}
-@media(prefers-color-scheme:light){:root:not([data-t=dark]){--bg:#f5f3ff;--card:#fff;--card2:#ede9ff;--tx:#1b1740;--mut:#6b6896}}
-:root[data-t=light]{--bg:#f5f3ff;--card:#fff;--card2:#ede9ff;--tx:#1b1740;--mut:#6b6896}
-*{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:radial-gradient(900px 500px at 85% -10%,#ff7a5933,transparent),radial-gradient(700px 500px at -10% 10%,#8b7bff33,transparent),var(--bg);color:var(--tx);min-height:100vh}
-header{display:flex;align-items:center;gap:12px;padding:14px 16px;position:sticky;top:0;backdrop-filter:blur(14px);background:color-mix(in srgb,var(--bg) 70%,transparent);z-index:5}
-.logo{font-weight:800;font-size:18px;display:flex;gap:8px;align-items:center}.logo svg{width:28px;height:28px}
-nav{display:flex;gap:6px;margin-left:auto;overflow-x:auto}nav button{white-space:nowrap}
-button{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:9px 16px;background:var(--card2);color:var(--tx);transition:.15s}
-button:hover{transform:translateY(-1px)}button.on,button.pri{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#22120a;font-weight:700}
-main{max-width:920px;margin:0 auto;padding:8px 16px 60px}.card{background:var(--card);border-radius:var(--r);padding:20px;margin:14px 0;box-shadow:0 8px 30px #0003}
-h1{font-size:clamp(26px,5vw,40px);margin:.3em 0}h2{margin:.2em 0 .6em}.mut{color:var(--mut)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.stat{background:var(--card2);border-radius:16px;padding:14px}.stat b{font-size:26px;display:block}
-.bar{height:10px;border-radius:9px;background:var(--card2);overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--vio),var(--acc));border-radius:9px}
-input,textarea{font:inherit;width:100%;padding:12px 14px;border-radius:14px;border:2px solid var(--card2);background:var(--bg);color:var(--tx)}input:focus,textarea:focus{outline:0;border-color:var(--vio)}
-.q{font-size:20px;margin:8px 0 14px}.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.row input{flex:1;min-width:140px}
-.hint{background:#ffc85722;border-left:4px solid var(--acc2);padding:10px 14px;border-radius:12px;margin:8px 0}
-.ok{color:var(--ok)}.bad{color:var(--bad)}
+:root{--bg:#130a12;--card:rgba(255,255,255,.06);--card2:rgba(255,255,255,.1);--line:rgba(255,255,255,.12);--tx:#fff4ee;--mut:#c4a9ad;--acc:#ff5a4d;--acc2:#ffc857;--vio:#b06cff;--ok:#3ddc97;--bad:#ff6b81;--r:24px;--fd:'Unbounded','Manrope',system-ui,sans-serif}
+:root[data-t=light]{--bg:#fff6f0;--card:rgba(255,255,255,.85);--card2:rgba(120,40,30,.08);--line:rgba(120,40,30,.14);--tx:#2a0f14;--mut:#8a5f63}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.55 'Manrope',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+body:before,body:after{content:"";position:fixed;z-index:-1;width:60vmax;height:60vmax;border-radius:50%;filter:blur(90px);opacity:.35;animation:drift 18s ease-in-out infinite alternate}
+body:before{background:#ff5a4d;top:-25vmax;right:-20vmax}body:after{background:#b06cff;bottom:-30vmax;left:-25vmax;animation-delay:-9s;opacity:.28}
+@keyframes drift{to{transform:translate(6vmax,4vmax) scale(1.1)}}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes pop{50%{transform:scale(1.04)}}
+header{display:flex;align-items:center;gap:12px;padding:12px 16px;position:sticky;top:0;backdrop-filter:blur(18px);background:color-mix(in srgb,var(--bg) 60%,transparent);border-bottom:1px solid var(--line);z-index:5}
+.logo{font:700 15px var(--fd);display:flex;gap:10px;align-items:center;white-space:nowrap}.logo svg{width:28px;height:28px}
+.ava{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--acc2)}
+nav{display:flex;gap:6px;margin-left:auto;overflow-x:auto;scrollbar-width:none}nav button{white-space:nowrap}
+button{font:600 15px 'Manrope',sans-serif;cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:9px 16px;background:var(--card);color:var(--tx);transition:.18s}
+button:hover{transform:translateY(-2px);background:var(--card2)}
+button.on,button.pri{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#2b0d08;font-weight:800;border-color:transparent;box-shadow:0 8px 24px #ff5a4d44}
+main{max-width:980px;margin:0 auto;padding:8px 16px 70px}main>*{animation:rise .5s both}main>*:nth-child(2){animation-delay:.08s}main>*:nth-child(3){animation-delay:.16s}
+.card{background:var(--card);border:1px solid var(--line);backdrop-filter:blur(14px);border-radius:var(--r);padding:22px;margin:14px 0;box-shadow:0 20px 50px #0004}
+h1{font:700 clamp(24px,5vw,40px)/1.15 var(--fd);margin:.2em 0 .4em}h2{font:700 18px var(--fd);margin:.2em 0 .7em}.mut{color:var(--mut)}
+.hero{position:relative;border-radius:32px;overflow:hidden;margin:14px 0;min-height:400px;display:flex;align-items:flex-end;border:1px solid var(--line);background:linear-gradient(135deg,#3a0d18,#7a1d24 50%,#c2411f);box-shadow:0 30px 70px #0006}
+.hero .bg{position:absolute;inset:0;background-size:cover;background-position:center 30%;transition:opacity .8s;opacity:0}.hero .bg.show{opacity:1}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#130a12ee 8%,#130a1255 55%,transparent)}
+.hero-in{position:relative;z-index:2;padding:26px;width:100%;display:flex;gap:20px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+.hero h1{color:#fff;text-shadow:0 2px 20px #0008}.hero p{color:#ffe9dd;max-width:460px}
+.thumbs{position:absolute;z-index:3;top:16px;right:16px;display:flex;gap:6px}.thumbs img{width:40px;height:40px;object-fit:cover;border-radius:12px;border:2px solid #fff6;cursor:pointer;opacity:.75}.thumbs img.on{border-color:var(--acc2);opacity:1}
+.ring{width:150px;flex:none;filter:drop-shadow(0 6px 20px #0008)}.ring text{fill:#fff;font:700 26px var(--fd)}.ring .lbl{font:600 9px 'Manrope';fill:#ffe9dd}
+.bead{transition:.6s}.hoop-spin{transform-origin:60px 60px;animation:spin 40s linear infinite}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.stat{background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:14px;font-size:14px;color:var(--mut)}.stat b{font:700 26px var(--fd);display:block;color:var(--tx)}
+.bar{height:10px;border-radius:9px;background:var(--card2);overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:9px;transition:width .8s}
+input,textarea{font:inherit;width:100%;padding:13px 16px;border-radius:16px;border:1.5px solid var(--line);background:var(--card);color:var(--tx)}input:focus,textarea:focus{outline:0;border-color:var(--acc2);box-shadow:0 0 0 4px #ffc85722}
+.q{font-size:21px;font-weight:600;margin:8px 0 14px}.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.row input{flex:1;min-width:140px}
+.hint{background:#ffc85718;border:1px solid #ffc85744;border-left:4px solid var(--acc2);padding:10px 14px;border-radius:14px;margin:8px 0;animation:rise .3s}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.win{animation:pop .5s}
 .chat{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow:auto;padding:4px}
-.m{padding:10px 14px;border-radius:16px;max-width:85%;white-space:pre-wrap}.m.u{align-self:flex-end;background:var(--vio);color:#fff}.m.a{background:var(--card2)}
-table{width:100%;border-collapse:collapse}td,th{padding:8px;text-align:left;border-bottom:1px solid var(--card2)}
-.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-size:13px;background:var(--card2)}
-.day{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--card2)}.day b{min-width:64px;color:var(--acc)}
-.hidden{display:none}svg text{fill:var(--mut);font-size:11px}
+.m{padding:11px 15px;border-radius:18px;max-width:85%;white-space:pre-wrap;animation:rise .25s}.m.u{align-self:flex-end;background:linear-gradient(135deg,var(--acc),#d63a5a);color:#fff;border-bottom-right-radius:6px}.m.a{background:var(--card2);border:1px solid var(--line);border-bottom-left-radius:6px}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:9px 8px;text-align:left;border-bottom:1px solid var(--line)}
+.tag{display:inline-block;padding:3px 12px;border-radius:99px;font-size:13px;background:var(--card2);border:1px solid var(--line)}
+.day{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.day b{min-width:64px;color:var(--acc2)}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}.chip{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:12px 14px}.chip small{color:var(--mut)}
+.photos{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}.photos div{position:relative}.photos img{width:90px;height:90px;object-fit:cover;border-radius:16px}.photos button{position:absolute;top:-6px;right:-6px;padding:0;width:26px;height:26px}
+svg text{fill:var(--mut);font-size:11px}
+@media(max-width:560px){.logo span{display:none}.hero{min-height:460px}.ring{width:110px}}
 </style>
 </head>
 <body>
 <header>
- <div class="logo"><svg viewBox="0 0 32 32" fill="none" stroke="url(#g)" stroke-width="3"><defs><linearGradient id="g"><stop stop-color="#ff7a59"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><circle cx="16" cy="18" r="10"/><path d="M16 2v6"/></svg>Мой ИИ-репетитор</div>
+ <div class="logo" id="logo"><svg viewBox="0 0 32 32" fill="none" stroke="url(#g)" stroke-width="3"><defs><linearGradient id="g"><stop stop-color="#ff7a59"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><circle cx="16" cy="18" r="10"/><path d="M16 2v6"/></svg><span>Мой ИИ-репетитор</span></div>
  <nav id="nav"></nav>
 </header>
 <main id="app"></main>
@@ -80,19 +100,28 @@ const acc=k=>{const t=S.topics[k];return t&&t.done?Math.round(100*t.ok/t.done):n
 // Навигация
 const PAGES={home:'Главная',test:'Тест',plan:'План',practice:'Практика',chat:'Чат',parent:'Родителю'};
 let page='home',cur=null,hintN=0;
-function nav(){$('#nav').innerHTML=Object.entries(PAGES).map(([k,v])=>`<button class="${k==page?'on':''}" onclick="go('${k}')">${v}</button>`).join('')+`<button onclick="theme()">◐</button>`}
+function nav(){const lg=$('#logo');lg.innerHTML=(photos[0]?`<img class="ava" src="${photos[0]}">`:'<svg viewBox="0 0 32 32" fill="none" stroke="url(#g)" stroke-width="3"><defs><linearGradient id="g"><stop stop-color="#ff5a4d"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><circle cx="16" cy="18" r="10"/><path d="M16 2v6"/></svg>')+'<span>Мой ИИ-репетитор</span>';$('#nav').innerHTML=Object.entries(PAGES).map(([k,v])=>`<button class="${k==page?'on':''}" onclick="go('${k}')">${v}</button>`).join('')+`<button onclick="theme()">◐</button>`}
 window.go=p=>{page=p;nav();render()};
 window.theme=()=>{const r=document.documentElement;r.dataset.t=r.dataset.t=='light'?'dark':'light'};
 const level=()=>Math.floor(S.xp/100)+1;
 const weak=()=>Object.keys(TOPICS).map(k=>[k,acc(k)]).sort((a,b)=>(a[1]??-1)-(b[1]??-1));
 function render(){({home,test,plan,practice,chat,parent})[page]()}
+let photos=ls.get('photos',[]),heroI=0;const savePh=()=>ls.set('photos',photos);
+const overall=()=>Math.round(100*Object.keys(TOPICS).reduce((z,k)=>{const t=S.topics[k];return z+(t&&t.done?Math.min(1,t.done/4)*t.ok/t.done:0)},0)/Object.keys(TOPICS).length);
+function ringSvg(p){const n=24,on=Math.round(n*p/100);let b='';for(let i=0;i<n;i++){const an=i/n*6.283-1.5708,x=60+50*Math.cos(an),y=60+50*Math.sin(an);b+=`<circle class="bead" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.2" fill="${i%2?'#ffc857':'#ff5a4d'}" opacity="${i<on?1:.22}"/>`}
+ return`<svg class="ring" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="#0006" stroke="#fff5" stroke-width="2"/><g class="hoop-spin">${b}</g><text x="60" y="64" text-anchor="middle">${p}%</text><text class="lbl" x="60" y="80" text-anchor="middle">готовность</text></svg>`}
+function setHero(i){heroI=i;document.querySelectorAll('.hero .bg').forEach((e,j)=>e.classList.toggle('show',j==i));document.querySelectorAll('.thumbs img').forEach((e,j)=>e.classList.toggle('on',j==i))}
+setInterval(()=>{if(page=='home'&&photos.length>1)setHero((heroI+1)%photos.length)},6000);
 function home(){
- const done=Object.values(S.topics).reduce((s,t)=>s+t.done,0),mastered=Object.keys(TOPICS).filter(k=>acc(k)>=80&&S.topics[k].done>=4).length;
- $('#app').innerHTML=`<div class="card"><h1>Привет${S.name?', '+S.name:''}! 🤸</h1><p class="mut">Цель — поступить в физ-мат лицей. Сначала тест: найдём пробелы за 3–5 классы и проверим 6 класс. Потом план на 8 недель: нынешняя тема Петерсона + закрытие пробелов.</p>
- ${S.name?'':`<div class="row"><input id="nm" placeholder="Как тебя зовут?"><button class="pri" onclick="S.name=$('#nm').value.trim();save();home()">Готово</button></div>`}
- <div class="grid" style="margin-top:14px"><div class="stat">Уровень<b>${level()}</b><div class="bar"><i style="width:${S.xp%100}%"></i></div></div><div class="stat">Решено задач<b>${done}</b></div><div class="stat">Освоено тем<b>${mastered}/16</b></div><div class="stat">Минут занятий<b>${Math.round(S.minutes)}</b></div></div>
- <div class="row" style="margin-top:16px"><button class="pri" onclick="go(S.test?.done?'practice':'test')">Начать занятие</button><button onclick="go('practice')" >Повторить слабые темы</button></div></div>
- <div class="card"><h2>Темы</h2>${Object.entries(TOPICS).map(([k,v])=>`<div style="margin:10px 0"><div style="display:flex;justify-content:space-between"><span>${v}</span><span class="mut">${acc(k)==null?'—':acc(k)+'%'}</span></div><div class="bar"><i style="width:${acc(k)||0}%"></i></div></div>`).join('')}</div>`}
+ const done=Object.values(S.topics).reduce((s,t)=>s+t.done,0),mastered=Object.keys(TOPICS).filter(k=>acc(k)>=80&&S.topics[k].done>=4).length,tp=todayPlan(),p=overall();
+ $('#app').innerHTML=`<section class="hero">${photos.map((u,i)=>`<div class="bg ${i==0?'show':''}" style="background-image:url(${u})"></div>`).join('')}
+ ${photos.length>1?`<div class="thumbs">${photos.map((u,i)=>`<img src="${u}" class="${i==0?'on':''}" onclick="setHero(${i})">`).join('')}</div>`:''}
+ <div class="hero-in"><div><span class="tag">Путь в физ-мат лицей</span><h1>Привет${S.name?', '+S.name:''}!<br>Сегодня твой новый элемент</h1>
+ <p>${tp?`Сегодня по плану: <b>${TOPICS[tp.main]}</b> и пробел «${TOPICS[tp.gap]||'мини-контрольная'}».`:'Сначала небольшой тест: найдём пробелы за 3–5 классы и проверим 6 класс. Потом составлю план на 8 недель.'}</p>
+ ${S.name?'':`<div class="row"><input id="nm" placeholder="Как тебя зовут?" style="max-width:240px"><button onclick="S.name=$('#nm').value.trim();save();home()">Готово</button></div>`}
+ <div class="row"><button class="pri" onclick="go(S.test?.done?'practice':'test')">▶ Начать занятие</button><button onclick="go('practice')">Повторить слабые темы</button></div></div>${ringSvg(p)}</div></section>
+ <div class="grid"><div class="stat">Уровень<b>${level()}</b><div class="bar"><i style="width:${S.xp%100}%"></i></div></div><div class="stat">Решено задач<b>${done}</b></div><div class="stat">Освоено тем<b>${mastered}/16</b></div><div class="stat">Минут занятий<b>${Math.round(S.minutes)}</b></div></div>
+ ${[['Закрываем пробелы 3–5 класса',k=>isGap(k)],['Программа 6 класса (Петерсон)',k=>!isGap(k)&&k!='logic'],['Лицей',k=>k=='logic']].map(([h,f])=>`<div class="card"><h2>${h}</h2><div class="chips">${Object.keys(TOPICS).filter(f).map(k=>`<div class="chip"><div style="display:flex;justify-content:space-between"><span>${TOPICS[k]}</span><small>${acc(k)==null?'—':acc(k)+'%'}</small></div><div class="bar" style="margin-top:8px"><i style="width:${acc(k)||0}%"></i></div></div>`).join('')}</div></div>`).join('')}`}
 // Тест
 function test(){
  if(!S.test||S.test.done&&!S.test.redo){if(S.test?.done)return testResult();S.test={i:0,qs:Object.keys(TOPICS).flatMap(k=>(['div','gcd','frac','prop','pct'].includes(k)?[GEN[k](1),GEN[k](2)]:[GEN[k](1)]).map(q=>({...q,t:k}))),res:[],done:false};save()}
@@ -123,7 +152,7 @@ function showHints(){$('#hs').innerHTML=cur.hints.slice(0,hintN).map((h,i)=>`<di
 window.hint=()=>{if(hintN<3){hintN++;T(cur.t).hints++;save()}showHints()};
 window.check=()=>{const u=$('#a').value;if(u.trim()==='')return;const t=T(cur.t);
  if(same(u,cur.a)){const clean=hintN==0&&cur.tries==0;t.done++;t.ok++;t.last=today();t.streak=clean?t.streak+1:0;S.xp+=clean?15:8;if(t.streak>=3&&t.level<3){t.level++;t.streak=0}
-  S.log.push({d:today(),t:cur.t,ok:1});save();$('#fb').innerHTML=`<p class="ok"><b>Верно!</b> ${clean?'С первого раза 🔥':'Ты дошла сама — это важнее скорости.'}</p><button class="pri" onclick="practice()">Следующая</button>`}
+  S.log.push({d:today(),t:cur.t,ok:1});save();$('#fb').innerHTML=`<p class="ok win"><b>Верно!</b> ${clean?'С первого раза 🔥':'Ты дошла сама — это важнее скорости.'}</p><button class="pri" onclick="practice()">Следующая</button>`}
  else{cur.tries++;t.bad++;t.streak=0;S.log.push({d:today(),t:cur.t,ok:0});if(cur.tries%2==0&&t.level>1)t.level--;save();if(hintN<3)hintN++,t.hints++;save();
   $('#fb').innerHTML=`<p class="bad">Пока не то. Ничего, вот подсказка — попробуй ещё раз.</p>`;showHints()}};
 window.reveal=()=>{const t=T(cur.t);t.done++;t.last=today();save();$('#fb').innerHTML=`<p>Решение: <b>${cur.sol}</b>. Эту тему я ещё предложу — так закрепится.</p><button class="pri" onclick="practice()">Следующая</button>`;$('#hs').innerHTML=''};
@@ -146,7 +175,9 @@ function parent(){const rows=Object.entries(TOPICS).map(([k,v])=>{const t=S.topi
  <div class="card"><h2>По темам</h2><div style="overflow:auto"><table><tr><th>Тема<th>Задач<th>Верно<th>Подсказок<th>Уровень<th>Последний раз</tr>${rows}</table></div></div>
  <div class="card"><h2>Динамика</h2>${spark()}</div>
  <div class="card"><h2>Отчёт и рекомендации</h2><textarea id="rp" rows="8" readonly>${reportText()}</textarea><div class="row"><button class="pri" onclick="$('#rp').select();document.execCommand('copy')">Скопировать</button></div></div>
+ <div class="card"><h2>Фото на сайте</h2><p class="mut">Фото хранятся только в браузере этого устройства и никуда не отправляются. До 6 штук.</p><div class="photos">${photos.map((u,i)=>`<div><img src="${u}"><button onclick="photos.splice(${i},1);savePh();parent()">×</button></div>`).join('')}</div><input type="file" accept="image/*" multiple onchange="addPhotos(this)"></div>
  <div class="card"><h2>Настройки</h2><p class="mut">Адрес ИИ (Cloudflare Worker из README):</p><div class="row"><input id="u" value="${S.cfg.url||''}" placeholder="https://….workers.dev"><button onclick="S.cfg.url=$('#u').value.trim();save();parent()">Сохранить</button></div><div class="row"><button onclick="if(confirm('Стереть весь прогресс?')){localStorage.clear();location.reload()}">Сбросить прогресс</button></div></div>`}
+window.addPhotos=async inp=>{for(const f of inp.files){if(photos.length>=6)break;try{const bm=await createImageBitmap(f),k=Math.min(1,1000/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=bm.width*k;c.height=bm.height*k;c.getContext('2d').drawImage(bm,0,0,c.width,c.height);photos.push(c.toDataURL('image/jpeg',.78))}catch{}}savePh();nav();parent()};
 nav();render();
 </script>
 </body>
