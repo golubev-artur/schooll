@@ -48,6 +48,10 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:9px 8px;t
 .chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}.chip{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:12px 14px}.chip small{color:var(--mut)}
 .photos{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}.photos div{position:relative}.photos img{width:90px;height:90px;object-fit:cover;border-radius:16px}.photos button{position:absolute;top:-6px;right:-6px;padding:0;width:26px;height:26px}
 svg text{fill:var(--mut);font-size:11px}
+.els{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:10px}.el{background:var(--card2);border:1px solid var(--acc2);border-radius:18px;padding:10px;text-align:center;display:flex;flex-direction:column;align-items:center}.el b{font-size:14px}.el small{color:var(--mut)}.el.lock{opacity:.4;border-color:var(--line);filter:grayscale(1)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:linear-gradient(135deg,var(--acc),var(--acc2));color:#2b0d08;padding:14px 22px;border-radius:18px;font-weight:700;z-index:20;box-shadow:0 12px 40px #0008;animation:rise .4s;max-width:90vw;text-align:center}
+.tm{position:sticky;top:60px;z-index:4;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;border-radius:18px;background:var(--bg);border:1px solid var(--acc2);margin:10px 0}.tm b{font:700 24px var(--fd)}.tm.warn b{color:var(--bad)}
+.ex{margin:10px 0}.ex .n{font:700 13px var(--fd);color:var(--acc2)}.ex sup,.ex sub,.q sup,.q sub{font-size:.65em}.res{padding:10px 0;border-bottom:1px solid var(--line)}.res.no{border-left:4px solid var(--bad);padding-left:10px}.res.yes{border-left:4px solid var(--ok);padding-left:10px}
 @media(max-width:560px){.logo span{display:none}.hero{min-height:460px}.ring{width:110px}}
 </style>
 </head>
@@ -61,12 +65,26 @@ svg text{fill:var(--mut);font-size:11px}
 const $=s=>document.querySelector(s), ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
 const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)), pick=a=>a[R(0,a.length-1)];
 const gcd=(a,b)=>b?gcd(b,a%b):a;
-const TOPICS={order:'Порядок действий',mul:'Умножение и деление в столбик',units:'Величины и время',motion:'Задачи на движение',geom:'Периметр и площадь',eq:'Уравнения',dec:'Десятичные дроби',fbas:'Смешанные числа и дроби',div:'Признаки делимости',gcd:'НОД и НОК',frac:'Сложение дробей',prop:'Отношения и пропорции',pct:'Проценты',circ:'Окружность и круг',neg:'Отрицательные числа',logic:'Задачи для лицея'};
-const GR={order:'3–4',mul:'3–4',units:'3–4',motion:'4',geom:'4–5',eq:'5',dec:'5',fbas:'5',div:'6',gcd:'6',frac:'6',prop:'6',pct:'5–6',circ:'6',neg:'6',logic:'лицей'};
+const TOPICS={order:'Порядок действий',mul:'Умножение и деление в столбик',units:'Величины и время',motion:'Задачи на движение',geom:'Периметр и площадь',eq:'Уравнения',dec:'Десятичные дроби',fbas:'Смешанные числа и дроби',div:'Признаки делимости',gcd:'НОД и НОК',frac:'Сложение дробей',prop:'Отношения и пропорции',pct:'Проценты',circ:'Окружность и круг',neg:'Отрицательные числа',logic:'Задачи для лицея',calc:'Вычисления: дроби и десятичные',eqm:'Уравнения со смешанными числами',len:'Единицы длины (м, дм, см, мм)',vol:'Объём, проценты и доли',meet:'Движение навстречу и вдогонку',expr:'Упрощение выражений',afrac:'Дроби с буквами',lang:'Математический язык',inv:'Дробь 1/k и число k'};
+const GR={order:'3–4',mul:'3–4',units:'3–4',motion:'4',geom:'4–5',eq:'5',dec:'5',fbas:'5',div:'6',gcd:'6',frac:'6',prop:'6',pct:'5–6',circ:'6',neg:'6',logic:'лицей',calc:'экз',eqm:'экз',len:'экз',vol:'экз',meet:'экз',expr:'экз',afrac:'экз',lang:'экз',inv:'экз'};
+const EXAMT=['calc','eqm','len','vol','meet','expr','afrac','lang','inv'];
 const isGap=k=>['3–4','4','4–5','5'].includes(GR[k]);
 // порядок тем в учебнике Петерсон-6 (ч.1) — примерная неделя за неделей
 const PET=['div','div','gcd','frac','frac','frac','prop','pct'];
 // Генераторы: level 1..3 -> {q, a:"строка ответа", hints:[3], sol}
+
+const fg=(a,b)=>b?fg(b,a%b):Math.abs(a);
+const Fr=(n,d=1)=>{const g=fg(n,d)||1;if(d<0){n=-n;d=-d}return[n/g,d/g]};
+const fadd=(a,b)=>Fr(a[0]*b[1]+b[0]*a[1],a[1]*b[1]),fsub=(a,b)=>Fr(a[0]*b[1]-b[0]*a[1],a[1]*b[1]),fmul=(a,b)=>Fr(a[0]*b[0],a[1]*b[1]),fdiv=(a,b)=>Fr(a[0]*b[1],a[1]*b[0]);
+const fv=a=>a[0]/a[1];
+const fh=(n,d)=>`<sup>${n}</sup>&frasl;<sub>${d}</sub>`;
+const mixH=a=>{const n=a[0],d=a[1];if(d==1)return String(n);const w=Math.trunc(n/d),r=n-w*d;return(w?w:'')+fh(r,d)};
+const mixT=a=>{const n=a[0],d=a[1];if(d==1)return String(n);const w=Math.trunc(n/d),r=n-w*d;return w?`${w} ${r}/${d}`:`${r}/${d}`};
+const dec=x=>String(+x.toFixed(4)).replace('.',',');
+const num=x=>String(+x.toFixed(4));
+const pkT=(k)=>k;
+
+const EX={};
 const GEN={
 frac(l){const d1=pick([2,3,4,5]),d2=pick([6,8,10,12].filter(x=>x%d1==0||l>1)),n1=R(1,d1-1),n2=R(1,d2-1);const den=d1*d2/gcd(d1,d2),num=n1*den/d1+n2*den/d2,g=gcd(num,den);
  return{q:`Акробатка отработала ${n1}/${d1} часа растяжку и ${n2}/${d2} часа элементы на кольце. Сколько часов всего? (ответ дробью)`,a:`${num/g}/${den/g}`,hints:[`Знаменатели разные (${d1} и ${d2}). Сначала приведи дроби к общему знаменателю.`,`Общий знаменатель — ${den}. Домножь числители: ${n1}·${den/d1} и ${n2}·${den/d2}.`,`Сложи числители: ${n1*den/d1}+${n2*den/d2}=${num}, получится ${num}/${den}. Сократи, если можно.`],sol:`${num}/${den} = ${num/g}/${den/g}`}},
@@ -88,8 +106,43 @@ geom(l){const a=R(3,9),b=R(2,8)+0.5,k=+(a*b).toFixed(2);return{q:`Мат для 
 fbas(l){const w=R(2,5),d=R(3,8),n=R(1,d-1);return{q:`Запиши число ${w} ${n}/${d} в виде неправильной дроби. Чему равен числитель?`,a:String(w*d+n),hints:[`Целую часть переведи в доли со знаменателем ${d}.`,`${w}=${w*d}/${d}.`,`Прибавь ${n}: ${w*d}+${n}.`],sol:`${w*d+n}/${d}`}},
 div(l){const a=R(1,9),b=R(1,9);let d=0;while((a+b+d)%9)d++;return{q:`Какую наименьшую цифру нужно поставить вместо * в числе ${a}${b}*, чтобы оно делилось на 9?`,a:String(d),hints:[`Признак делимости на 9: сумма цифр делится на 9.`,`Сумма известных цифр: ${a}+${b}=${a+b}.`,`Сколько добавить, чтобы получить число, кратное 9?`],sol:`${d}`}},
 logic(l){const g=R(6,12),t=g*2+R(2,g-2);return{q:`В студии ${g} групп, в каждой по 2 или по 3 человека, всего ${t} человек. Сколько групп по 3 человека?`,a:String(t-2*g),hints:[`Попробуй: если бы во всех группах было по 2 человека.`,`Тогда всего было бы ${2*g}. А у нас ${t}.`,`Каждая группа из 3 даёт +1. Сколько «лишних»: ${t}−${2*g}.`],sol:`${t-2*g}`}}};
-const parse=s=>{s=String(s).trim().replace(',','.').replace('−','-');const m=s.match(/^(-?\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/);if(m)return +m[1]/+m[2];const v=Number(s);return s===''||isNaN(v)?NaN:v};
+
+EX.calc=()=>{for(;;){const x=pick([1.5,2.5,3.5,0.5,2]),p=pick([2,3,4,5]),qr=pick([[3,8],[5,8],[1,8],[7,8],[3,4],[1,4],[1,2]]),s=pick([3.2,1.6,2.4,4.8,0.8]),tu=pick([[5,8],[3,4],[1,4],[1,2],[3,5]]);
+ const v=(x*p-4*qr[0]/qr[1])*s-s*tu[0]/tu[1];if(v<=0)continue;
+ return{t:'calc',q:`Вычисли: (${dec(x)} : ${fh(1,p)} − ${fh(qr[0],qr[1])} : 0,25) · ${dec(s)} − ${dec(s)} · ${fh(tu[0],tu[1])}`,as:[{a:num(v)}],
+ h:['Сначала скобки. Деление на дробь — это умножение на перевёрнутую дробь.',`${dec(x)} : 1/${p} = ${dec(x)}·${p} = ${dec(x*p)}. Деление на 0,25 — это умножение на 4.`,`Умножь скобку на ${dec(s)} и вычти ${dec(s)}·${qr?tu[0]+'/'+tu[1]:''}.`],sol:num(v)}}};
+EX.eqm=()=>{for(;;){const y=R(2,8),b=pick([[15,4],[5,2],[7,3],[9,4],[11,4]]),c=pick([[35,3],[11,2],[13,2],[17,4],[8,1],[19,3]]),A=pick([[25,9],[7,2],[9,4],[11,3],[13,4]]),d=pick([[13,7],[3,2],[5,3],[7,4]]);
+ const inner=fsub(fmul(b,[y,1]),c);if(fv(inner)<=0)continue;const e=fadd(fdiv(A,inner),d);if(e[1]>60||e[0]>200)continue;
+ return{t:'eqm',q:`Реши уравнение: ${mixH(A)} : (${mixH(b)} y − ${mixH(c)}) + ${mixH(d)} = ${mixH(e)}`,as:[{a:String(y)}],
+ h:[`Сначала вычти ${mixT(d)} из обеих частей: получишь ${mixT(A)} : (…) = ${mixT(fsub(e,d))}.`,`Найди делитель: (…) = ${mixT(A)} : ${mixT(fsub(e,d))} = ${mixT(inner)}.`,`Теперь ${mixT(b)}·y − ${mixT(c)} = ${mixT(inner)}. Перенеси и раздели на ${mixT(b)}.`],sol:`y = ${y}`}}};
+EX.len=()=>{const U=[['м',1000],['дм',100],['см',10],['мм',1]];const term=()=>{const k=R(2,3),st=R(0,4-k),parts=[];let mm=0;for(let i=st;i<st+k;i++){const v=R(1,9);parts.push(v+' '+U[i][0]);mm+=v*U[i][1]}return{t:parts.join(' '),mm}};
+ for(;;){const ts=[...Array(5)].map(term);let tot=ts[0].mm,txt=ts[0].t;for(let i=1;i<5;i++){const sg=i==1||Math.random()<.5?1:-1;tot+=sg*ts[i].mm;txt+=(sg>0?' + ':' − ')+ts[i].t}if(tot<=0)continue;
+ return{t:'len',q:`Вырази в метрах и найди значение выражения: ${txt}`,as:[{a:num(tot/1000)}],h:['Переведи каждое слагаемое в метры: 1 дм = 0,1 м, 1 см = 0,01 м, 1 мм = 0,001 м.','Или переведи всё в миллиметры (1 м = 1000 мм), посчитай и в конце раздели на 1000.','Складывай и вычитай слева направо, следи за знаками.'],sol:num(tot/1000)+' м'}}};
+EX.vol=()=>{for(;;){const L=pick([10,15,20,25,30,40]),p=pick([20,40,50,60,75,80]),f=pick([[3,4],[2,3],[1,2],[3,5],[4,5]]);const W=L*p/100;if(!Number.isInteger(W)||(W*f[0])%f[1])continue;const H=W*f[0]/f[1];
+ return{t:'vol',q:`Длина прямоугольного параллелепипеда ${L} см, ширина составляет ${p} % длины, а высота — ${fh(f[0],f[1])} ширины. Найди объём параллелепипеда (см³).`,as:[{a:String(L*W*H)}],h:[`Найди ширину: ${p} % от ${L} см = ${L}·${p}/100.`,`Ширина ${W} см. Высота — ${f[0]}/${f[1]} от ${W}.`,`Высота ${H} см. Объём = длина·ширина·высота.`],sol:`${L}·${W}·${H} = ${L*W*H}`}}};
+EX.meet=()=>{if(Math.random()<.5){const fk=pick([[3,4],[2,3],[4,5],[3,5]]),m=pick([15,20,25]),v1=fk[0]*m,v2=fk[1]*m,t2=R(2,5),t1=R(1,t2-1),D=(v1+v2)*t2;
+ return{t:'meet',q:`Из двух городов, расстояние между которыми ${D} км, одновременно навстречу друг другу выехали два автобуса. Скорость первого ${v1} км/ч, что составляет ${fh(fk[0],fk[1])} скорости второго. 1) Какое расстояние будет между ними через ${t1} ч после выезда? 2) Через сколько часов они встретятся?`,qp:`Два автобуса одновременно выехали навстречу из городов на расстоянии ${D} км. Скорость первого ${v1} км/ч — это ${fh(fk[0],fk[1])} скорости второго. Через сколько часов они встретятся?`,as:[{a:String(D-(v1+v2)*t1)},{a:String(t2)}],
+ h:[`Найди скорость второго: ${v1} : ${fk[0]}/${fk[1]} = ${v2} км/ч.`,`Скорость сближения — сумма скоростей: ${v1}+${v2} = ${v1+v2} км/ч.`,`Время встречи = расстояние : скорость сближения = ${D} : ${v1+v2}.`],sol:`${D-(v1+v2)*t1} км; ${t2} ч`}}
+ const v=pick([60,80,100,120]),pc=pick([50,60,70,75,80]);const vf=v*pc/100;if(!Number.isInteger(vf)){return EX.meet()}const cl=v-vf,T=R(2,6),t1=R(1,T-1),G=cl*T;
+ return{t:'meet',q:`Пассажирский поезд едет со скоростью ${v} км/ч. Впереди едет товарный, скорость которого ${pc} % скорости пассажирского. Сейчас между ними ${G} км. 1) Какое расстояние будет между ними через ${t1} ч? 2) Сколько времени нужно пассажирскому поезду, чтобы догнать товарный?`,qp:`Пассажирский поезд идёт ${v} км/ч, товарный впереди — ${pc} % этой скорости. Между ними ${G} км. За сколько часов пассажирский догонит товарный?`,as:[{a:String(G-cl*t1)},{a:String(T)}],
+ h:[`Скорость товарного: ${pc} % от ${v} = ${vf} км/ч.`,`При движении вдогонку скорость сближения — разность скоростей: ${v}−${vf} = ${cl} км/ч.`,`Время = расстояние : скорость сближения = ${G} : ${cl}.`],sol:`${G-cl*t1} км; ${T} ч`}};
+EX.expr=()=>{const [x,y]=pick([['a','b'],['x','y'],['m','n'],['p','q']]);const c1=R(11,49)/10,c3=R(2,9),c2=R(2,9)/10,n1=R(11,39)/10,n2=R(11,39)/10;
+ const terms=[`${dec(c1)}${x}`,dec(n1),`${y}`,`${dec(c2)}${y}`,dec(n2),`${c3}${x}`].sort(()=>Math.random()-.5);
+ const lin=`${num(c1+c3)}${x}+${num(1+c2)}${y}+${num(n1+n2)}`;return{t:'expr',q:`Упрости выражение: ${terms.join(' + ')}`,as:[{lin}],h:['Подобные слагаемые — те, что с одной и той же буквой (и числа без букв).',`Сложи коэффициенты при ${x}: ${dec(c1)} + ${c3}. При ${y}: 1 + ${dec(c2)}.`,`Числа без букв: ${dec(n1)} + ${dec(n2)}.`],sol:lin.replace(/\./g,',').replace(/\+/g,' + ')}};
+EX.afrac=()=>{const k1=pick([2,3,4,5,6]),k2=pick([2,3,4,5,6,8,9]),a=R(2,6),b=R(2,6),c=R(2,6);const val=fmul(fmul([a,1],[1,k1*c]),[k2*b*c,a*a]);
+ return{t:'afrac',q:`Выполни действие, сократи и найди значение при a = ${a}, b = ${b}, c = ${c}: ${fh('a',k1+'c')} · ${fh(k2+'bc','a²')}`,as:[{a:val[1]==1?String(val[0]):val[0]+'/'+val[1]}],
+ h:['Сначала сократи буквы: a сокращается с a², c сокращается с c.',`Останется ${fh(k2+'b',k1+'a')}.`,`Подставь a = ${a}, b = ${b} и сократи числа.`],sol:`${k2}b/${k1}a = ${val[0]}/${val[1]}`}};
+EX.lang=()=>{const T=[['Произведение квадрата числа m и суммы кубов чисел n и k','m²(n³+k³)',(m,n,k)=>m*m*(n**3+k**3),'m','n','k'],['Частное куба числа a и квадрата разности чисел b и c','a³ : (b−c)²',(a,b,c)=>a**3/(b-c)**2,'a','b','c'],['Сумма квадратов чисел x и y, делённая на их разность','(x²+y²) : (x−y)',(x,y)=>(x*x+y*y)/(x-y),'x','y'],['Квадрат суммы чисел p и q, умноженный на куб числа r','(p+q)²·r³',(p,q,r)=>(p+q)**2*r**3,'p','q','r']];
+ for(;;){const t=pick(T),v=[R(1,7),R(1,7),R(1,7)];const r=t[2](...v);if(!Number.isInteger(r)||r<0)continue;const n=t[2].length;
+ return{t:'lang',q:`Переведи на математический язык: «${t[0]}». Найди значение выражения при ${t.slice(3,3+n).map((l,i)=>l+' = '+v[i]).join(', ')}.`,as:[{a:String(r)}],h:['Сначала запиши выражение буквами и знаками действий.',`Получится: ${t[1]}.`,'Подставь числа и посчитай по порядку действий.'],sol:`${t[1]} = ${r}`}}};
+EX.inv=()=>{for(;;){const k=R(3,19),d=k<=12?2:3,v=+(1/k).toFixed(d);if(Math.round(1/v)!=k)continue;return{t:'inv',q:`Найди натуральное число k, если ${fh(1,'k')} ≈ ${String(v).replace('.',',')}`,as:[{a:String(k)}],h:['Если 1/k ≈ v, то k ≈ 1 : v.',`Посчитай 1 : ${String(v).replace('.',',')}.`,'Округли до ближайшего натурального числа.'],sol:`k = ${k}`}}};
+EXAMT.forEach(k=>{GEN[k]=()=>{const x=EX[k](),p=x.as[x.as.length-1];return{q:x.qp||x.q,a:p.a,lin:p.lin,alts:p.alts,hints:x.h,sol:x.sol}}});
+const parse=s=>{s=String(s).trim().replace(',','.').replace('−','-');const mx=s.match(/^(-?\d+)\s+(\d+)\/(\d+)$/);if(mx){const w=+mx[1];return w+(w<0?-1:1)*(+mx[2]/+mx[3])}const m=s.match(/^(-?\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/);if(m)return +m[1]/+m[2];const v=Number(s);return s===''||isNaN(v)?NaN:v};
 const same=(u,a)=>Math.abs(parse(u)-parse(a))<1e-6;
+const nrm=t=>String(t).toLowerCase().replace(/[\s*·×]/g,'').replace(/,/g,'.').replace(/−/g,'-');
+const linP=t=>{const m={};(nrm(t).match(/[+-]?\d*\.?\d*[a-z]?/g)||[]).filter(x=>x&&x!='+'&&x!='-').forEach(x=>{const mm=x.match(/^([+-]?)(\d*\.?\d*)([a-z]?)$/);if(!mm)return;let c=mm[2]===''?(mm[3]?1:0):+mm[2];if(mm[1]=='-')c=-c;m[mm[3]]=(m[mm[3]]||0)+c});return m};
+const okAns=(u,it)=>{if(String(u).trim()==='')return false;if(it.lin){const a=linP(u),b=linP(it.lin),ks=new Set([...Object.keys(a),...Object.keys(b)]);return[...ks].every(k=>Math.abs((a[k]||0)-(b[k]||0))<1e-6)}
+ if(it.alts)return it.alts.some(x=>nrm(x)==nrm(u));return same(u,it.a)};
 // состояние
 let S=ls.get('st',{name:'',topics:{},log:[],minutes:0,test:null,plan:null,xp:0,cfg:{url:'https://calm-leaf-7bbb.golubev-artur2021.workers.dev'},msgs:[]});
 const T=k=>S.topics[k]??(S.topics[k]={done:0,ok:0,bad:0,hints:0,level:1,streak:0,last:null});
@@ -98,14 +151,20 @@ const today=()=>new Date().toISOString().slice(0,10);
 setInterval(()=>{if(!document.hidden){S.minutes+=1/6;save()}},10000);
 const acc=k=>{const t=S.topics[k];return t&&t.done?Math.round(100*t.ok/t.done):null};
 // Навигация
-const PAGES={home:'Главная',test:'Тест',plan:'План',practice:'Практика',chat:'Чат',parent:'Родителю'};
+const PAGES={home:'Главная',test:'Тест',plan:'План',practice:'Практика',exam:'Экзамен',chat:'Чат',parent:'Родителю'};
 let page='home',cur=null,hintN=0;
 function nav(){const lg=$('#logo');lg.innerHTML=(photos[0]?`<img class="ava" src="${photos[0]}">`:'<svg viewBox="0 0 32 32" fill="none" stroke="url(#g)" stroke-width="3"><defs><linearGradient id="g"><stop stop-color="#ff5a4d"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><circle cx="16" cy="18" r="10"/><path d="M16 2v6"/></svg>')+'<span>Мой ИИ-репетитор</span>';$('#nav').innerHTML=Object.entries(PAGES).map(([k,v])=>`<button class="${k==page?'on':''}" onclick="go('${k}')">${v}</button>`).join('')+`<button onclick="theme()">◐</button>`}
 window.go=p=>{page=p;nav();render()};
 window.theme=()=>{const r=document.documentElement;r.dataset.t=r.dataset.t=='light'?'dark':'light'};
 const level=()=>Math.floor(S.xp/100)+1;
 const weak=()=>Object.keys(TOPICS).map(k=>[k,acc(k)]).sort((a,b)=>(a[1]??-1)-(b[1]??-1));
-function render(){({home,test,plan,practice,chat,parent})[page]()}
+function render(){({home,test,plan,practice,exam,chat,parent})[page]()}
+
+const ELS=['Ласточка','Ангел','Русалка','Бабочка','Полумесяц','Мельница','Колыбель','Звезда'];
+const elNames=()=>(S.elements&&S.elements.length?S.elements:ELS);
+function eIcon(i){const an=(i*37+20)*Math.PI/180,cx=32,cy=32,x1=cx+22*Math.cos(an),y1=cy+22*Math.sin(an),x2=cx-22*Math.cos(an+.5),y2=cy-22*Math.sin(an+.5);
+ return`<svg viewBox="0 0 64 64" width="56" height="56"><circle cx="32" cy="32" r="24" fill="none" stroke="url(#gg)" stroke-width="3"/><defs><linearGradient id="gg"><stop stop-color="#ff5a4d"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><path d="M${x1.toFixed(1)} ${y1.toFixed(1)} Q32 ${(20+i*4)%44+10} ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><circle cx="${x1.toFixed(1)}" cy="${y1.toFixed(1)}" r="4" fill="#ffc857"/></svg>`}
+function toast(t){const d=document.createElement('div');d.className='toast';d.innerHTML=t;document.body.appendChild(d);setTimeout(()=>d.remove(),4500)}
 let photos=ls.get('photos',[]),heroI=0;const savePh=()=>ls.set('photos',photos);
 const overall=()=>Math.round(100*Object.keys(TOPICS).reduce((z,k)=>{const t=S.topics[k];return z+(t&&t.done?Math.min(1,t.done/4)*t.ok/t.done:0)},0)/Object.keys(TOPICS).length);
 function ringSvg(p){const n=24,on=Math.round(n*p/100);let b='';for(let i=0;i<n;i++){const an=i/n*6.283-1.5708,x=60+50*Math.cos(an),y=60+50*Math.sin(an);b+=`<circle class="bead" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.2" fill="${i%2?'#ffc857':'#ff5a4d'}" opacity="${i<on?1:.22}"/>`}
@@ -119,30 +178,31 @@ function home(){
  <div class="hero-in"><div><span class="tag">Путь в физ-мат лицей</span><h1>Привет${S.name?', '+S.name:''}!<br>Сегодня твой новый элемент</h1>
  <p>${tp?`Сегодня по плану: <b>${TOPICS[tp.main]}</b> и пробел «${TOPICS[tp.gap]||'мини-контрольная'}».`:'Сначала небольшой тест: найдём пробелы за 3–5 классы и проверим 6 класс. Потом составлю план на 8 недель.'}</p>
  ${S.name?'':`<div class="row"><input id="nm" placeholder="Как тебя зовут?" style="max-width:240px"><button onclick="S.name=$('#nm').value.trim();save();home()">Готово</button></div>`}
- <div class="row"><button class="pri" onclick="go(S.test?.done?'practice':'test')">▶ Начать занятие</button><button onclick="go('practice')">Повторить слабые темы</button></div></div>${ringSvg(p)}</div></section>
- <div class="grid"><div class="stat">Уровень<b>${level()}</b><div class="bar"><i style="width:${S.xp%100}%"></i></div></div><div class="stat">Решено задач<b>${done}</b></div><div class="stat">Освоено тем<b>${mastered}/16</b></div><div class="stat">Минут занятий<b>${Math.round(S.minutes)}</b></div></div>
- ${[['Закрываем пробелы 3–5 класса',k=>isGap(k)],['Программа 6 класса (Петерсон)',k=>!isGap(k)&&k!='logic'],['Лицей',k=>k=='logic']].map(([h,f])=>`<div class="card"><h2>${h}</h2><div class="chips">${Object.keys(TOPICS).filter(f).map(k=>`<div class="chip"><div style="display:flex;justify-content:space-between"><span>${TOPICS[k]}</span><small>${acc(k)==null?'—':acc(k)+'%'}</small></div><div class="bar" style="margin-top:8px"><i style="width:${acc(k)||0}%"></i></div></div>`).join('')}</div></div>`).join('')}`}
+ <div class="row"><button class="pri" onclick="go(S.test?.done?'practice':'test')">▶ Начать занятие</button><button onclick="go('practice')">Повторить слабые темы</button><button onclick="go('exam')">⏱ Пробный экзамен 40 мин</button></div></div>${ringSvg(p)}</div></section>
+ <div class="grid"><div class="stat">Уровень<b>${level()}</b><div class="bar"><i style="width:${S.xp%100}%"></i></div></div><div class="stat">Решено задач<b>${done}</b></div><div class="stat">Освоено тем<b>${mastered}/${Object.keys(TOPICS).length}</b></div><div class="stat">Минут занятий<b>${Math.round(S.minutes)}</b></div></div>
+ <div class="card"><h2>Элементы на кольце</h2><p class="mut">Новый уровень открывает новый элемент. Сейчас открыто: ${Math.min(level()-1,elNames().length)} из ${elNames().length}.</p><div class="els">${elNames().map((n,i)=>`<div class="el ${i<level()-1?'':'lock'}">${eIcon(i)}<b>${i<level()-1?n:'🔒'}</b><small>${i<level()-1?'открыт':'уровень '+(i+2)}</small></div>`).join('')}</div></div>
+ ${[['Закрываем пробелы 3–5 класса',k=>isGap(k)],['Программа 6 класса (Петерсон)',k=>!isGap(k)&&k!='logic'&&GR[k]!='экз'],['Как во вступительной работе',k=>GR[k]=='экз'],['Лицей',k=>k=='logic']].map(([h,f])=>`<div class="card"><h2>${h}</h2><div class="chips">${Object.keys(TOPICS).filter(f).map(k=>`<div class="chip"><div style="display:flex;justify-content:space-between"><span>${TOPICS[k]}</span><small>${acc(k)==null?'—':acc(k)+'%'}</small></div><div class="bar" style="margin-top:8px"><i style="width:${acc(k)||0}%"></i></div></div>`).join('')}</div></div>`).join('')}`}
 // Тест
 function test(){
- if(!S.test||S.test.done&&!S.test.redo){if(S.test?.done)return testResult();S.test={i:0,qs:Object.keys(TOPICS).flatMap(k=>(['div','gcd','frac','prop','pct'].includes(k)?[GEN[k](1),GEN[k](2)]:[GEN[k](1)]).map(q=>({...q,t:k}))),res:[],done:false};save()}
+ if(!S.test||S.test.done&&!S.test.redo){if(S.test?.done)return testResult();S.test={i:0,qs:Object.keys(TOPICS).filter(k=>GR[k]!='экз').flatMap(k=>(['div','gcd','frac','prop','pct'].includes(k)?[GEN[k](1),GEN[k](2)]:[GEN[k](1)]).map(q=>({...q,t:k}))),res:[],done:false};save()}
  const t=S.test;if(t.i>=t.qs.length){t.done=true;t.qs.forEach((q,i)=>{const x=T(q.t);x.done++;t.res[i]?x.ok++:x.bad++;x.last=today()});
-  Object.keys(TOPICS).forEach(k=>{const x=T(k),a=acc(k);x.level=a>=80?2:1});makePlan();save();return testResult()}
+  Object.keys(TOPICS).filter(k=>S.topics[k]).forEach(k=>{const x=T(k),a=acc(k);x.level=a>=80?2:1});makePlan();save();return testResult()}
  const q=t.qs[t.i];$('#app').innerHTML=`<div class="card"><span class="tag">Входной тест · ${t.i+1}/${t.qs.length}</span><div class="bar" style="margin:10px 0"><i style="width:${t.i/t.qs.length*100}%"></i></div><div class="q">${q.q}</div><div class="row"><input id="a" autofocus placeholder="Твой ответ" onkeydown="event.key=='Enter'&&ans()"><button class="pri" onclick="ans()">Дальше</button><button onclick="ans(true)">Не знаю</button></div><p class="mut">В тесте подсказок нет — это нормально не знать, я просто пойму, с чего начать.</p></div>`;
- window.ans=skip=>{t.res[t.i]=!skip&&same($('#a').value,q.a);t.i++;save();test()}}
+ window.ans=skip=>{t.res[t.i]=!skip&&okAns($('#a').value,q);t.i++;save();test()}}
 function testResult(){const w=weak();const ok=S.test.res.filter(Boolean).length;
- $('#app').innerHTML=`<div class="card"><h1>Результат: ${ok} из ${S.test.qs.length}</h1>${[['Пробелы 3–5 класса',w.filter(x=>isGap(x[0]))],['Программа 6 класса (Петерсон)',w.filter(x=>!isGap(x[0])&&x[0]!='logic')],['Лицейские задачи',w.filter(x=>x[0]=='logic')]].map(([h,l])=>`<h2 style="margin-top:16px">${h}</h2>${l.map(([k,a])=>`<div style="margin:6px 0">${TOPICS[k]} <span class="tag ${a>=50?'ok':'bad'}">${a}%</span></div>`).join('')}`).join('')}<div class="row"><button class="pri" onclick="go('plan')">Смотреть план занятий</button><button onclick="S.test=null;save();go('test')">Пройти заново</button></div></div>`}
+ $('#app').innerHTML=`<div class="card"><h1>Результат: ${ok} из ${S.test.qs.length}</h1>${[['Пробелы 3–5 класса',w.filter(x=>x[1]!==null&&isGap(x[0]))],['Программа 6 класса (Петерсон)',w.filter(x=>x[1]!==null&&!isGap(x[0])&&GR[x[0]]!='экз'&&x[0]!='logic')],['Лицейские задачи',w.filter(x=>x[1]!==null&&x[0]=='logic')]].map(([h,l])=>`<h2 style="margin-top:16px">${h}</h2>${l.map(([k,a])=>`<div style="margin:6px 0">${TOPICS[k]} <span class="tag ${a>=50?'ok':'bad'}">${a}%</span></div>`).join('')}`).join('')}<div class="row"><button class="pri" onclick="go('plan')">Смотреть план занятий</button><button onclick="S.test=null;save();go('test')">Пройти заново</button></div></div>`}
 // План
 function makePlan(){const gaps=weak().filter(x=>isGap(x[0])&&x[1]<80).map(x=>x[0]).slice(0,4);const days=[];
  for(let d=0;d<48;d++){const wk=Math.floor(d/6),i=d%6;
   if(i==5){days.push({d:d+1,wk,mini:true,main:PET[wk],gap:gaps});continue}
-  const gap=wk>=4&&i%2?'logic':(gaps.length?gaps[(d+i)%gaps.length]:'logic');
+  const gap=wk>=2&&i%2?(wk>=5&&i==3?'logic':EXAMT[(wk*2+i)%EXAMT.length]):(gaps.length?gaps[(d+i)%gaps.length]:'logic');
   days.push({d:d+1,wk,main:PET[wk],gap})}
  S.plan={days,from:today()}}
 function todayPlan(){if(!S.plan)return null;const n=Math.floor((Date.now()-new Date(S.plan.from))/864e5);return S.plan.days[Math.min(n,47)]}
 function plan(){if(!S.plan)return $('#app').innerHTML=`<div class="card"><h2>План ещё не готов</h2><p>Пройди входной тест — по нему я составлю план на 8 недель.</p><button class="pri" onclick="go('test')">Пройти тест</button></div>`;
  const wk=[...Array(8).keys()];
  $('#app').innerHTML=`<div class="card"><h1>План на 8 недель</h1><p class="mut">6 дней занятий в неделю по ~20 минут, 7-й день отдых. Каждый день: <b>тема Петерсона</b> (идём в ногу со школой) + <b>закрытие пробела</b>. 6-й день — мини-контрольная. С 5-й недели добавляются лицейские задачи. Порядок тем в школе может отличаться — сверяйтесь с классным планом.</p></div>`+
- wk.map(w=>`<div class="card"><h2>Неделя ${w+1}: ${TOPICS[PET[w]]}</h2>${S.plan.days.filter(x=>x.wk==w).map(x=>`<div class="day"><b>День ${x.d}</b><span>${x.mini?'Мини-контрольная: по задаче из каждой темы недели и пробелов':`Школа: ${TOPICS[x.main]} · Пробел: ${TOPICS[x.gap]}`}</span></div>`).join('')}</div>`).join('')+`<button class="pri" onclick="go('practice')">Начать сегодняшнее занятие</button>`}
+ wk.map(w=>`<div class="card"><h2>Неделя ${w+1}: ${TOPICS[PET[w]]}</h2>${S.plan.days.filter(x=>x.wk==w).map(x=>`<div class="day"><b>День ${x.d}</b><span>${x.mini?([3,5,7].includes(x.wk)?'⏱ Пробный вступительный на 40 минут (раздел «Экзамен»)':'Мини-контрольная: по задаче из каждой темы недели и пробелов'):`Школа: ${TOPICS[x.main]} · Пробел: ${TOPICS[x.gap]}`}</span></div>`).join('')}</div>`).join('')+`<button class="pri" onclick="go('practice')">Начать сегодняшнее занятие</button>`}
 // Практика с подсказками
 function practice(next=true){
  if(next||!cur){const w=weak().filter(x=>x[1]!==100),tp=todayPlan(),r=Math.random();const k=tp&&r<.4?tp.main:tp&&r<.75&&!tp.mini?tp.gap:w[0]?.[0]||pick(Object.keys(TOPICS));cur={...GEN[k](T(k).level),t:k,tries:0};hintN=0}
@@ -151,13 +211,50 @@ function practice(next=true){
 function showHints(){$('#hs').innerHTML=cur.hints.slice(0,hintN).map((h,i)=>`<div class="hint">💡 ${i+1}. ${h}</div>`).join('')+(hintN>=3?`<div class="row"><button onclick="reveal()">Показать решение</button></div>`:'')}
 window.hint=()=>{if(hintN<3){hintN++;T(cur.t).hints++;save()}showHints()};
 window.check=()=>{const u=$('#a').value;if(u.trim()==='')return;const t=T(cur.t);
- if(same(u,cur.a)){const clean=hintN==0&&cur.tries==0;t.done++;t.ok++;t.last=today();t.streak=clean?t.streak+1:0;S.xp+=clean?15:8;if(t.streak>=3&&t.level<3){t.level++;t.streak=0}
-  S.log.push({d:today(),t:cur.t,ok:1});save();$('#fb').innerHTML=`<p class="ok win"><b>Верно!</b> ${clean?'С первого раза 🔥':'Ты дошла сама — это важнее скорости.'}</p><button class="pri" onclick="practice()">Следующая</button>`}
+ if(okAns(u,cur)){const clean=hintN==0&&cur.tries==0,L0=level();t.done++;t.ok++;t.last=today();t.streak=clean?t.streak+1:0;S.xp+=clean?15:8;if(t.streak>=3&&t.level<3){t.level++;t.streak=0}
+  S.log.push({d:today(),t:cur.t,ok:1});save();if(level()>L0&&level()-2<elNames().length)toast('🎉 Новый уровень! Открыт элемент на кольце: <b>'+elNames()[level()-2]+'</b>');$('#fb').innerHTML=`<p class="ok win"><b>Верно!</b> ${clean?'С первого раза 🔥':'Ты дошла сама — это важнее скорости.'}</p><button class="pri" onclick="practice()">Следующая</button>`}
  else{cur.tries++;t.bad++;t.streak=0;S.log.push({d:today(),t:cur.t,ok:0});if(cur.tries%2==0&&t.level>1)t.level--;save();if(hintN<3)hintN++,t.hints++;save();
   $('#fb').innerHTML=`<p class="bad">Пока не то. Ничего, вот подсказка — попробуй ещё раз.</p>`;showHints()}};
 window.reveal=()=>{const t=T(cur.t);t.done++;t.last=today();save();$('#fb').innerHTML=`<p>Решение: <b>${cur.sol}</b>. Эту тему я ещё предложу — так закрепится.</p><button class="pri" onclick="practice()">Следующая</button>`;$('#hs').innerHTML=''};
+
+// ---- Пробный экзамен (40 минут)
+const V1=()=>[
+{t:'calc',q:`Вычисли: (1,5 : ${fh(1,3)} − ${fh(3,8)} : 0,25) · 3,2 − 3,2 · ${fh(5,8)}`,as:[{a:'7.6'}],sol:'7,6'},
+{t:'eqm',q:`Реши уравнение: ${mixH([25,9])} : (${mixH([15,4])} y − ${mixH([35,3])}) + ${mixH([13,7])} = ${mixH([46,21])}`,as:[{a:'16/3'}],sol:`y = 5${fh(1,3)}`},
+{t:'len',q:'Вырази в метрах и найди значение выражения: 9 дм 2 мм + 3 м 6 дм 8 см 4 мм − 25 дм 7 см + 3 см 8 мм − 42 см',as:[{a:'1.634'}],sol:'1,634 м'},
+{t:'vol',q:`Длина прямоугольного параллелепипеда равна 15 см, ширина составляет 80 % длины. Высота составляет ${fh(3,4)} ширины. Найди объём.`,as:[{a:'1620'}],sol:'15·12·9 = 1620 см³'},
+{t:'meet',q:`Из двух городов, расстояние между которыми 420 км, одновременно навстречу друг другу выехали два автобуса. Скорость первого 60 км/ч, что составляет ${fh(3,4)} скорости второго. 1) Какое расстояние будет между ними через 2 ч после выезда? 2) Через сколько времени они встретятся?`,as:[{a:'140'},{a:'3'}],sol:'140 км; 3 ч'},
+{t:'expr',q:'Упрости выражение: 3,6a + 1,2 + b + 0,7b + 2,9 + 2a',as:[{lin:'5.6a+1.7b+4.1'}],sol:'5,6a + 1,7b + 4,1'},
+{t:'afrac',q:`Выполни действия и сократи (все переменные — натуральные числа):<br>а) ${fh('a','16c')} · ${fh('4bc','a²')} &nbsp;&nbsp; б) ${fh('5x','42yz')} : ${fh('x²','6y')}`,as:[{alts:['b/(4a)','b/4a','0.25b/a','(1/4)b/a']},{alts:['5/(7xz)','5/7xz','(5/7)/(xz)','5/(7*x*z)']}],lab:['а)','б)'],sol:'а) b/(4a); б) 5/(7xz)'},
+{t:'lang',q:'Переведи на математический язык: «Произведение квадрата числа m и суммы кубов чисел n и k». Найди значение при m = 2, n = 1, k = 3.',as:[{a:'112'}],sol:'m²(n³+k³) = 4·28 = 112'},
+{t:'inv',q:`Найди натуральное число k, если ${fh(1,'k')} ≈ 0,17`,as:[{a:'6'}],sol:'k = 6'}];
+const V2=()=>[
+{t:'calc',q:`Вычисли: 20 : 33${fh(1,3)} − (4${fh(7,25)} − 1,28) : (0,75 + 3${fh(1,4)}) · 0,2`,as:[{a:'0.45'}],sol:'0,45'},
+{t:'eqm',q:`Реши уравнение: 4${fh(1,2)} − 5${fh(1,3)} : (20x − 14${fh(2,3)}) = 1${fh(5,6)}`,as:[{a:'5/6'}],sol:`x = ${fh(5,6)}`},
+{t:'len',q:'Вырази в метрах и найди значение выражения: 2 м 35 см − 5 дм 6 см + 74 дм − 95 см 3 мм + 1 м 8 дм 7 см 3 мм',as:[{a:'10.11'}],sol:'10,11 м'},
+{t:'vol',q:`Высота прямоугольного параллелепипеда 25 см, ширина составляет 60 % высоты. Длина составляет ${fh(3,5)} ширины. Найди объём.`,as:[{a:'3375'}],sol:'25·15·9 = 3375 см³'},
+{t:'meet',q:'Пассажирский поезд едет со скоростью 80 км/ч. Впереди едет товарный, скорость которого 70 % скорости пассажирского. Сейчас между ними 120 км. 1) Какое расстояние будет между ними через 2 ч? 2) Сколько времени потребуется пассажирскому поезду, чтобы догнать товарный?',as:[{a:'72'},{a:'5'}],sol:'72 км; 5 ч'},
+{t:'expr',q:'Упрости выражение: 7,4y + 2,6 + y + 0,9x + 3,1 + 3x',as:[{lin:'8.4y+3.9x+5.7'}],sol:'8,4y + 3,9x + 5,7'},
+{t:'afrac',q:`Выполни действия и сократи:<br>а) ${fh('a','3b')} · ${fh('12b','a²')} &nbsp;&nbsp; б) ${fh('4c','d')} : ${fh('8c²','3d')}`,as:[{alts:['4/a','4:a']},{alts:['3/(2c)','3/2c','1.5/c','(3/2)/c','3/(2*c)']}],lab:['а)','б)'],sol:'а) 4/a; б) 3/(2c)'},
+{t:'lang',q:'Переведи на математический язык: «Частное куба числа a и квадрата разности чисел b и c». Найди значение при a = 4, b = 7, c = 5.',as:[{a:'16'}],sol:'a³ : (b−c)² = 64 : 4 = 16'},
+{t:'inv',q:`Найди натуральное число p, если ${fh(1,'p')} ≈ 0,091`,as:[{a:'11'}],sol:'p = 11'}];
+let EXAM=null,exTimer=null;
+const fmt=sec=>{sec=Math.max(0,sec);return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0')};
+function exam(){
+ if(!EXAM){$('#app').innerHTML=`<div class="card"><h1>Пробный вступительный экзамен</h1><p class="mut">Как настоящая работа для перевода в физ-мат 6 класс: 9 заданий за <b>40 минут</b>. Подсказок нет, таймер идёт. Ориентир: ~4 минуты на задание, к 20-й минуте — 4–5 решённых заданий, последние 5 минут — на проверку. Решай на бумаге в клетку, а в окошко пиши только ответ.</p>
+ <div class="row"><button class="pri" onclick="startEx(1)">Вариант 1 (настоящий)</button><button class="pri" onclick="startEx(2)">Вариант 2 (настоящий)</button><button onclick="startEx(0)">Новый вариант (сгенерированный)</button></div></div>
+ ${(S.exams||[]).length?`<div class="card"><h2>Прошлые попытки</h2><table><tr><th>Дата<th>Вариант<th>Баллы<th>Время</tr>${S.exams.slice(-8).reverse().map(e=>`<tr><td>${e.d}<td>${e.v}<td>${e.sc}/9<td>${fmt(e.sec)}</tr>`).join('')}</table></div>`:''}`;return}
+ if(EXAM.done)return examResult();
+ $('#app').innerHTML=`<div class="tm" id="tmb"><span>Осталось</span><b id="tm">${fmt(EXAM.left)}</b><span id="tmn" class="mut"></span><button class="pri" onclick="finishEx()">Сдать работу</button></div>`+
+ EXAM.items.map((it,i)=>`<div class="card ex"><div class="n">ЗАДАНИЕ ${i+1}</div><div class="q">${it.q}</div><div class="row">${it.as.map((p,j)=>`<input id="e${i}_${j}" placeholder="${it.lab?it.lab[j]+' ':''}ответ" value="${(EXAM.user[i]||[])[j]||''}" oninput="(EXAM.user[${i}]??=[])[${j}]=this.value">`).join('')}</div></div>`).join('')+`<button class="pri" onclick="finishEx()">Сдать работу</button>`}
+window.startEx=v=>{const items=v==1?V1():v==2?V2():EXAMT.map(k=>EX[k]());EXAM={v:v||'новый',items,user:[],left:2400,total:2400,done:false};clearInterval(exTimer);exTimer=setInterval(()=>{if(!EXAM||EXAM.done){clearInterval(exTimer);return}EXAM.left--;if(page=='exam'&&$('#tm')){$('#tm').textContent=fmt(EXAM.left);const b=$('#tmb');b.classList.toggle('warn',EXAM.left<300);const a=EXAM.user.filter(u=>u&&u.some(x=>x&&x.trim())).length;$('#tmn').textContent=`отвечено ${a}/9`+(EXAM.left<1200&&a<4?' · пора ускориться':'')}if(EXAM.left<=0)finishEx()},1000);exam()};
+window.finishEx=()=>{if(!EXAM||EXAM.done)return;EXAM.done=true;EXAM.sec=EXAM.total-EXAM.left;EXAM.ok=EXAM.items.map((it,i)=>it.as.every((p,j)=>okAns(((EXAM.user[i]||[])[j])||'',p)));go('exam')};
+function examResult(){const sc=()=>EXAM.ok.filter(Boolean).length;
+ $('#app').innerHTML=`<div class="card"><h1>Результат: <span id="sc">${sc()}</span> из 9</h1><p class="mut">Время: ${fmt(EXAM.sec)} из 40:00. Если ответ верный, но записан в другой форме (например, дробь), нажми «Засчитать».</p><div class="row"><button class="pri" onclick="saveEx()">Сохранить результат</button><button onclick="EXAM=null;go('exam')">Новая попытка</button></div></div>`+
+ EXAM.items.map((it,i)=>`<div class="card res ${EXAM.ok[i]?'yes':'no'}" id="r${i}"><div class="n">ЗАДАНИЕ ${i+1} · ${TOPICS[it.t]}</div><div class="q">${it.q}</div><p>Твой ответ: <b>${(EXAM.user[i]||[]).filter(Boolean).join('; ')||'—'}</b><br>Правильно: <b>${it.sol}</b></p><button onclick="EXAM.ok[${i}]=!EXAM.ok[${i}];examResult()">${EXAM.ok[i]?'Отменить зачёт':'Засчитать'}</button></div>`).join('')}
+window.saveEx=()=>{if(EXAM.saved)return toast('Уже сохранено');EXAM.saved=true;EXAM.items.forEach((it,i)=>{const t=T(it.t);t.done++;EXAM.ok[i]?t.ok++:t.bad++;t.last=today();S.log.push({d:today(),t:it.t,ok:EXAM.ok[i]?1:0})});(S.exams??=[]).push({d:today(),v:EXAM.v,sc:EXAM.ok.filter(Boolean).length,sec:EXAM.sec});S.xp+=EXAM.ok.filter(Boolean).length*10;save();toast('Результат сохранён')};
 // Чат
-const SYS=()=>`Ты добрый репетитор по математике для ученицы, которая только перешла в 6 класс${S.name?' ('+S.name+')':''} и готовится к поступлению в физ-мат лицей. В школе учебник Петерсона; в 3–4 классах были пробелы, поэтому при непонимании возвращайся к базе (столбик, порядок действий, доли, величины). Она занимается воздушной гимнастикой — объясняй через кольцо, вращения, время и длину окружности. Иногда давай нестандартные задачи лицейского уровня. Пиши коротко, простыми словами. НИКОГДА не давай готовый ответ сразу: задай наводящий вопрос или дай одну подсказку, дай ответ только если ученица просит после 3 подсказок. Слабые темы: ${weak().slice(0,3).map(x=>TOPICS[x[0]]).join(', ')}.`;
+const SYS=()=>`Ты добрый репетитор по математике для ученицы, которая только перешла в 6 класс${S.name?' ('+S.name+')':''} и готовится к поступлению в физ-мат лицей. В школе учебник Петерсона; в 3–4 классах были пробелы, поэтому при непонимании возвращайся к базе (столбик, порядок действий, доли, величины). Она занимается воздушной гимнастикой — объясняй через кольцо, вращения, время и длину окружности. Иногда давай нестандартные задачи лицейского уровня. Вступительная работа в физ-мат 6 класс: 9 заданий за 40 минут (вычисления с дробями и десятичными, уравнение со смешанными числами, единицы длины, объём с процентами и долями, движение навстречу/вдогонку, упрощение выражений, дроби с буквами, перевод на математический язык, число k из 1/k≈). Пиши коротко, простыми словами. НИКОГДА не давай готовый ответ сразу: задай наводящий вопрос или дай одну подсказку, дай ответ только если ученица просит после 3 подсказок. Слабые темы: ${weak().slice(0,3).map(x=>TOPICS[x[0]]).join(', ')}.`;
 function chat(){$('#app').innerHTML=`<div class="card"><h2>Чат с репетитором</h2><div class="chat" id="ch"></div><div class="row"><input id="ci" placeholder="Напиши вопрос или свой ответ…" onkeydown="event.key=='Enter'&&send()"><button class="pri" onclick="send()">Отправить</button></div>${S.cfg.url?'':'<p class="mut">ИИ не подключён: чат отвечает по шаблону. Подключить — в разделе «Родителю» → Настройки.</p>'}</div>`;
  if(!S.msgs.length)S.msgs.push({r:'assistant',c:`Привет! Спрашивай про любую тему или присылай своё решение — я подскажу, но решать будешь сама 💪`});drawChat()}
 function drawChat(){$('#ch').innerHTML=S.msgs.map(m=>`<div class="m ${m.r=='user'?'u':'a'}">${m.c.replace(/</g,'&lt;')}</div>`).join('');$('#ch').scrollTop=1e9;save()}
@@ -169,13 +266,14 @@ window.send=async()=>{const v=$('#ci').value.trim();if(!v)return;$('#ci').value=
 function spark(){const days={};S.log.forEach(l=>{(days[l.d]??=[0,0])[0]+=l.ok;days[l.d][1]++});const ds=Object.keys(days).sort().slice(-14);if(ds.length<2)return'<p class="mut">Динамика появится после занятий в разные дни.</p>';
  const pts=ds.map((d,i)=>[i/(ds.length-1)*280+10,70-days[d][0]/days[d][1]*60]);return`<svg viewBox="0 0 300 90" style="width:100%;max-width:420px"><polyline fill="none" stroke="var(--acc)" stroke-width="3" points="${pts.map(p=>p.join(',')).join(' ')}"/>${pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="var(--acc2)"/>`).join('')}<text x="10" y="86">${ds[0].slice(5)}</text><text x="250" y="86">${ds.at(-1).slice(5)}</text></svg><p class="mut">Доля верных ответов по дням</p>`}
 function reportText(){const w=weak().filter(x=>x[1]!==null);const st=w.filter(x=>x[1]>=70).map(x=>TOPICS[x[0]]),wk=w.filter(x=>x[1]<60).map(x=>TOPICS[x[0]]);const h=Object.values(S.topics).reduce((s,t)=>s+t.hints,0);
- const gp=w.filter(x=>isGap(x[0])&&x[1]<70).map(x=>TOPICS[x[0]]);const tp=todayPlan();return`Отчёт для родителя (${today()})\nЦель: физ-мат лицей, учебник Петерсона (6 класс).\nСейчас по плану: ${tp?TOPICS[tp.main]+' (неделя '+(tp.wk+1)+' из 8)':'тест не пройден'}.\nПробелы 3–5 класса: ${gp.join(', ')||'не выявлено'}.\nЗанималась: ${Math.round(S.minutes)} мин, задач решено: ${Object.values(S.topics).reduce((s,t)=>s+t.done,0)}, подсказок использовано: ${h}.\nПолучается хорошо: ${st.join(', ')||'пока мало данных'}.\nСложности: ${wk.join(', ')||'явных нет'}.\nРекомендации: ${wk.length?'на этой неделе уделить время темам «'+wk.slice(0,2).join('», «')+'» — по 15–20 минут 3 раза в неделю, просить проговаривать решение вслух.':'переходить к более сложным задачам и текстовым заданиям.'}`}
+ const gp=w.filter(x=>isGap(x[0])&&x[1]<70).map(x=>TOPICS[x[0]]);const tp=todayPlan();return`Отчёт для родителя (${today()})\nЦель: физ-мат лицей, учебник Петерсона (6 класс).\nСейчас по плану: ${tp?TOPICS[tp.main]+' (неделя '+(tp.wk+1)+' из 8)':'тест не пройден'}.\nПробелы 3–5 класса: ${gp.join(', ')||'не выявлено'}.\nПробные экзамены: ${(S.exams||[]).slice(-3).map(e=>e.d+' — '+e.sc+'/9 за '+fmt(e.sec)).join('; ')||'ещё не проходили'}.\nЗанималась: ${Math.round(S.minutes)} мин, задач решено: ${Object.values(S.topics).reduce((s,t)=>s+t.done,0)}, подсказок использовано: ${h}.\nПолучается хорошо: ${st.join(', ')||'пока мало данных'}.\nСложности: ${wk.join(', ')||'явных нет'}.\nРекомендации: ${wk.length?'на этой неделе уделить время темам «'+wk.slice(0,2).join('», «')+'» — по 15–20 минут 3 раза в неделю, просить проговаривать решение вслух.':'переходить к более сложным задачам и текстовым заданиям.'}`}
 function parent(){const rows=Object.entries(TOPICS).map(([k,v])=>{const t=S.topics[k];return`<tr><td>${v}</td><td>${t?.done||0}</td><td>${acc(k)??'—'}${acc(k)==null?'':'%'}</td><td>${t?.hints||0}</td><td>${t?.level||1}</td><td>${t?.last||'—'}</td></tr>`}).join('');
  $('#app').innerHTML=`<div class="card"><h1>Кабинет родителя</h1><div class="grid"><div class="stat">Минут занятий<b>${Math.round(S.minutes)}</b></div><div class="stat">Уровень<b>${level()}</b></div></div></div>
  <div class="card"><h2>По темам</h2><div style="overflow:auto"><table><tr><th>Тема<th>Задач<th>Верно<th>Подсказок<th>Уровень<th>Последний раз</tr>${rows}</table></div></div>
  <div class="card"><h2>Динамика</h2>${spark()}</div>
  <div class="card"><h2>Отчёт и рекомендации</h2><textarea id="rp" rows="8" readonly>${reportText()}</textarea><div class="row"><button class="pri" onclick="$('#rp').select();document.execCommand('copy')">Скопировать</button></div></div>
  <div class="card"><h2>Фото на сайте</h2><p class="mut">Фото хранятся только в браузере этого устройства и никуда не отправляются. До 6 штук.</p><div class="photos">${photos.map((u,i)=>`<div><img src="${u}"><button onclick="photos.splice(${i},1);savePh();parent()">×</button></div>`).join('')}</div><input type="file" accept="image/*" multiple onchange="addPhotos(this)"></div>
+ <div class="card"><h2>Названия элементов на кольце</h2><p class="mut">По одному в строке — впишите настоящие элементы, которые она делает. Открываются по уровням.</p><textarea id="els" rows="6">${elNames().join('\n')}</textarea><div class="row"><button onclick="S.elements=$('#els').value.split('\n').map(x=>x.trim()).filter(Boolean);save();parent()">Сохранить</button></div></div>
  <div class="card"><h2>Настройки</h2><p class="mut">Адрес ИИ (Cloudflare Worker из README):</p><div class="row"><input id="u" value="${S.cfg.url||''}" placeholder="https://….workers.dev"><button onclick="S.cfg.url=$('#u').value.trim();save();parent()">Сохранить</button></div><div class="row"><button onclick="if(confirm('Стереть весь прогресс?')){localStorage.clear();location.reload()}">Сбросить прогресс</button></div></div>`}
 window.addPhotos=async inp=>{for(const f of inp.files){if(photos.length>=6)break;try{const bm=await createImageBitmap(f),k=Math.min(1,1000/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=bm.width*k;c.height=bm.height*k;c.getContext('2d').drawImage(bm,0,0,c.width,c.height);photos.push(c.toDataURL('image/jpeg',.78))}catch{}}savePh();nav();parent()};
 nav();render();
