@@ -62,7 +62,7 @@ svg text{fill:var(--mut);font-size:11px}
 </header>
 <main id="app"></main>
 <script>
-const $=s=>document.querySelector(s), ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const $=s=>document.querySelector(s), ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{if(!window.svFail){window.svFail=1;setTimeout(()=>toast('⚠ Не удалось сохранить прогресс. Не используйте режим инкогнито и освободите место в браузере.'),0)}}}};
 const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)), pick=a=>a[R(0,a.length-1)];
 const gcd=(a,b)=>b?gcd(b,a%b):a;
 const TOPICS={order:'Порядок действий',mul:'Умножение и деление в столбик',units:'Величины и время',motion:'Задачи на движение',geom:'Периметр и площадь',eq:'Уравнения',dec:'Десятичные дроби',fbas:'Смешанные числа и дроби',div:'Признаки делимости',gcd:'НОД и НОК',frac:'Сложение дробей',prop:'Отношения и пропорции',pct:'Проценты',circ:'Окружность и круг',neg:'Отрицательные числа',logic:'Задачи для лицея',calc:'Вычисления: дроби и десятичные',eqm:'Уравнения со смешанными числами',len:'Единицы длины (м, дм, см, мм)',vol:'Объём, проценты и доли',meet:'Движение навстречу и вдогонку',expr:'Упрощение выражений',afrac:'Дроби с буквами',lang:'Математический язык',inv:'Дробь 1/k и число k'};
@@ -146,7 +146,7 @@ const okAns=(u,it)=>{if(String(u).trim()==='')return false;if(it.lin){const a=li
 // состояние
 let S=ls.get('st',{name:'',topics:{},log:[],minutes:0,test:null,plan:null,xp:0,cfg:{url:'https://calm-leaf-7bbb.golubev-artur2021.workers.dev'},msgs:[]});
 const T=k=>S.topics[k]??(S.topics[k]={done:0,ok:0,bad:0,hints:0,level:1,streak:0,last:null});
-const save=()=>ls.set('st',S);
+const save=()=>{S.cur=(typeof cur!=='undefined'&&cur)?{cur,hintN}:null;ls.set('st',S)};
 const today=()=>new Date().toISOString().slice(0,10);
 setInterval(()=>{if(!document.hidden){S.minutes+=1/6;save()}},10000);
 const acc=k=>{const t=S.topics[k];return t&&t.done?Math.round(100*t.ok/t.done):null};
@@ -154,11 +154,11 @@ const acc=k=>{const t=S.topics[k];return t&&t.done?Math.round(100*t.ok/t.done):n
 const PAGES={home:'Главная',test:'Тест',plan:'План',practice:'Практика',exam:'Экзамен',chat:'Чат',parent:'Родителю'};
 let page='home',cur=null,hintN=0;
 function nav(){const lg=$('#logo');lg.innerHTML=(photos[0]?`<img class="ava" src="${photos[0]}">`:'<svg viewBox="0 0 32 32" fill="none" stroke="url(#g)" stroke-width="3"><defs><linearGradient id="g"><stop stop-color="#ff5a4d"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><circle cx="16" cy="18" r="10"/><path d="M16 2v6"/></svg>')+'<span>Мой ИИ-репетитор</span>';$('#nav').innerHTML=Object.entries(PAGES).map(([k,v])=>`<button class="${k==page?'on':''}" onclick="go('${k}')">${v}</button>`).join('')+`<button onclick="theme()">◐</button>`}
-window.go=p=>{page=p;nav();render()};
+window.go=p=>{page=p;S.page=p;save();nav();render()};
 window.theme=()=>{const r=document.documentElement;r.dataset.t=r.dataset.t=='light'?'dark':'light'};
 const level=()=>Math.floor(S.xp/100)+1;
 const weak=()=>Object.keys(TOPICS).map(k=>[k,acc(k)]).sort((a,b)=>(a[1]??-1)-(b[1]??-1));
-function render(){({home,test,plan,practice,exam,chat,parent})[page]()}
+function render(){({home,test,plan,practice:()=>practice(!(cur&&!cur.solved)),exam,chat,parent})[page]()}
 
 const ELS=['Ласточка','Ангел','Русалка','Бабочка','Полумесяц','Мельница','Колыбель','Звезда'];
 const elNames=()=>(S.elements&&S.elements.length?S.elements:ELS);
@@ -205,17 +205,17 @@ function plan(){if(!S.plan)return $('#app').innerHTML=`<div class="card"><h2>П�
  wk.map(w=>`<div class="card"><h2>Неделя ${w+1}: ${TOPICS[PET[w]]}</h2>${S.plan.days.filter(x=>x.wk==w).map(x=>`<div class="day"><b>День ${x.d}</b><span>${x.mini?([3,5,7].includes(x.wk)?'⏱ Пробный вступительный на 40 минут (раздел «Экзамен»)':'Мини-контрольная: по задаче из каждой темы недели и пробелов'):`Школа: ${TOPICS[x.main]} · Пробел: ${TOPICS[x.gap]}`}</span></div>`).join('')}</div>`).join('')+`<button class="pri" onclick="go('practice')">Начать сегодняшнее занятие</button>`}
 // Практика с подсказками
 function practice(next=true){
- if(next||!cur){const w=weak().filter(x=>x[1]!==100),tp=todayPlan(),r=Math.random();const k=tp&&r<.4?tp.main:tp&&r<.75&&!tp.mini?tp.gap:w[0]?.[0]||pick(Object.keys(TOPICS));cur={...GEN[k](T(k).level),t:k,tries:0};hintN=0}
+ if(next||!cur||cur.solved){const w=weak().filter(x=>x[1]!==100),tp=todayPlan(),r=Math.random();const k=tp&&r<.4?tp.main:tp&&r<.75&&!tp.mini?tp.gap:w[0]?.[0]||pick(Object.keys(TOPICS));cur={...GEN[k](T(k).level),t:k,tries:0};hintN=0}
  const t=T(cur.t);$('#app').innerHTML=`<div class="card"><span class="tag">${TOPICS[cur.t]} · сложность ${t.level}/3</span><div class="q" style="margin-top:12px">${cur.q}</div><div id="fb"></div>
  <div class="row"><input id="a" autofocus placeholder="Ответ" onkeydown="event.key=='Enter'&&check()"><button class="pri" onclick="check()">Проверить</button><button onclick="hint()">Подсказка</button></div><div id="hs"></div></div>`;showHints()}
 function showHints(){$('#hs').innerHTML=cur.hints.slice(0,hintN).map((h,i)=>`<div class="hint">💡 ${i+1}. ${h}</div>`).join('')+(hintN>=3?`<div class="row"><button onclick="reveal()">Показать решение</button></div>`:'')}
 window.hint=()=>{if(hintN<3){hintN++;T(cur.t).hints++;save()}showHints()};
 window.check=()=>{const u=$('#a').value;if(u.trim()==='')return;const t=T(cur.t);
- if(okAns(u,cur)){const clean=hintN==0&&cur.tries==0,L0=level();t.done++;t.ok++;t.last=today();t.streak=clean?t.streak+1:0;S.xp+=clean?15:8;if(t.streak>=3&&t.level<3){t.level++;t.streak=0}
+ if(okAns(u,cur)){cur.solved=true;const clean=hintN==0&&cur.tries==0,L0=level();t.done++;t.ok++;t.last=today();t.streak=clean?t.streak+1:0;S.xp+=clean?15:8;if(t.streak>=3&&t.level<3){t.level++;t.streak=0}
   S.log.push({d:today(),t:cur.t,ok:1});save();if(level()>L0&&level()-2<elNames().length)toast('🎉 Новый уровень! Открыт элемент на кольце: <b>'+elNames()[level()-2]+'</b>');$('#fb').innerHTML=`<p class="ok win"><b>Верно!</b> ${clean?'С первого раза 🔥':'Ты дошла сама — это важнее скорости.'}</p><button class="pri" onclick="practice()">Следующая</button>`}
  else{cur.tries++;t.bad++;t.streak=0;S.log.push({d:today(),t:cur.t,ok:0});if(cur.tries%2==0&&t.level>1)t.level--;save();if(hintN<3)hintN++,t.hints++;save();
   $('#fb').innerHTML=`<p class="bad">Пока не то. Ничего, вот подсказка — попробуй ещё раз.</p>`;showHints()}};
-window.reveal=()=>{const t=T(cur.t);t.done++;t.last=today();save();$('#fb').innerHTML=`<p>Решение: <b>${cur.sol}</b>. Эту тему я ещё предложу — так закрепится.</p><button class="pri" onclick="practice()">Следующая</button>`;$('#hs').innerHTML=''};
+window.reveal=()=>{cur.solved=true;const t=T(cur.t);t.done++;t.last=today();save();$('#fb').innerHTML=`<p>Решение: <b>${cur.sol}</b>. Эту тему я ещё предложу — так закрепится.</p><button class="pri" onclick="practice()">Следующая</button>`;$('#hs').innerHTML=''};
 
 // ---- Пробный экзамен (40 минут)
 const V1=()=>[
@@ -238,7 +238,7 @@ const V2=()=>[
 {t:'afrac',q:`Выполни действия и сократи:<br>а) ${fh('a','3b')} · ${fh('12b','a²')} &nbsp;&nbsp; б) ${fh('4c','d')} : ${fh('8c²','3d')}`,as:[{alts:['4/a','4:a']},{alts:['3/(2c)','3/2c','1.5/c','(3/2)/c','3/(2*c)']}],lab:['а)','б)'],sol:'а) 4/a; б) 3/(2c)'},
 {t:'lang',q:'Переведи на математический язык: «Частное куба числа a и квадрата разности чисел b и c». Найди значение при a = 4, b = 7, c = 5.',as:[{a:'16'}],sol:'a³ : (b−c)² = 64 : 4 = 16'},
 {t:'inv',q:`Найди натуральное число p, если ${fh(1,'p')} ≈ 0,091`,as:[{a:'11'}],sol:'p = 11'}];
-let EXAM=null,exTimer=null;
+let EXAM=ls.get('exam',null),exTimer=null;const svEx=()=>ls.set('exam',EXAM);
 const fmt=sec=>{sec=Math.max(0,sec);return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0')};
 function exam(){
  if(!EXAM){$('#app').innerHTML=`<div class="card"><h1>Пробный вступительный экзамен</h1><p class="mut">Как настоящая работа для перевода в физ-мат 6 класс: 9 заданий за <b>40 минут</b>. Подсказок нет, таймер идёт. Ориентир: ~4 минуты на задание, к 20-й минуте — 4–5 решённых заданий, последние 5 минут — на проверку. Решай на бумаге в клетку, а в окошко пиши только ответ.</p>
@@ -246,13 +246,15 @@ function exam(){
  ${(S.exams||[]).length?`<div class="card"><h2>Прошлые попытки</h2><table><tr><th>Дата<th>Вариант<th>Баллы<th>Время</tr>${S.exams.slice(-8).reverse().map(e=>`<tr><td>${e.d}<td>${e.v}<td>${e.sc}/9<td>${fmt(e.sec)}</tr>`).join('')}</table></div>`:''}`;return}
  if(EXAM.done)return examResult();
  $('#app').innerHTML=`<div class="tm" id="tmb"><span>Осталось</span><b id="tm">${fmt(EXAM.left)}</b><span id="tmn" class="mut"></span><button class="pri" onclick="finishEx()">Сдать работу</button></div>`+
- EXAM.items.map((it,i)=>`<div class="card ex"><div class="n">ЗАДАНИЕ ${i+1}</div><div class="q">${it.q}</div><div class="row">${it.as.map((p,j)=>`<input id="e${i}_${j}" placeholder="${it.lab?it.lab[j]+' ':''}ответ" value="${(EXAM.user[i]||[])[j]||''}" oninput="(EXAM.user[${i}]??=[])[${j}]=this.value">`).join('')}</div></div>`).join('')+`<button class="pri" onclick="finishEx()">Сдать работу</button>`}
-window.startEx=v=>{const items=v==1?V1():v==2?V2():EXAMT.map(k=>EX[k]());EXAM={v:v||'новый',items,user:[],left:2400,total:2400,done:false};clearInterval(exTimer);exTimer=setInterval(()=>{if(!EXAM||EXAM.done){clearInterval(exTimer);return}EXAM.left--;if(page=='exam'&&$('#tm')){$('#tm').textContent=fmt(EXAM.left);const b=$('#tmb');b.classList.toggle('warn',EXAM.left<300);const a=EXAM.user.filter(u=>u&&u.some(x=>x&&x.trim())).length;$('#tmn').textContent=`отвечено ${a}/9`+(EXAM.left<1200&&a<4?' · пора ускориться':'')}if(EXAM.left<=0)finishEx()},1000);exam()};
-window.finishEx=()=>{if(!EXAM||EXAM.done)return;EXAM.done=true;EXAM.sec=EXAM.total-EXAM.left;EXAM.ok=EXAM.items.map((it,i)=>it.as.every((p,j)=>okAns(((EXAM.user[i]||[])[j])||'',p)));go('exam')};
+ EXAM.items.map((it,i)=>`<div class="card ex"><div class="n">ЗАДАНИЕ ${i+1}</div><div class="q">${it.q}</div><div class="row">${it.as.map((p,j)=>`<input id="e${i}_${j}" placeholder="${it.lab?it.lab[j]+' ':''}ответ" value="${(EXAM.user[i]||[])[j]||''}" oninput="(EXAM.user[${i}]??=[])[${j}]=this.value;svEx()">`).join('')}</div></div>`).join('')+`<button class="pri" onclick="finishEx()">Сдать работу</button>`}
+const runEx=()=>{clearInterval(exTimer);exTimer=setInterval(()=>{if(!EXAM||EXAM.done){clearInterval(exTimer);return}EXAM.left--;svEx();if(page=='exam'&&$('#tm')){$('#tm').textContent=fmt(EXAM.left);const b=$('#tmb');b.classList.toggle('warn',EXAM.left<300);const a=EXAM.user.filter(u=>u&&u.some(x=>x&&x.trim())).length;$('#tmn').textContent=`отвечено ${a}/9`+(EXAM.left<1200&&a<4?' · пора ускориться':'')}if(EXAM.left<=0)finishEx()},1000)};
+window.startEx=v=>{const items=v==1?V1():v==2?V2():EXAMT.map(k=>EX[k]());EXAM={v:v||'новый',items,user:[],left:2400,total:2400,done:false};svEx();runEx();exam()};
+window.exReset=()=>{EXAM=null;ls.set('exam',null);go('exam')};
+window.finishEx=()=>{if(!EXAM||EXAM.done)return;EXAM.done=true;EXAM.sec=EXAM.total-EXAM.left;EXAM.ok=EXAM.items.map((it,i)=>it.as.every((p,j)=>okAns(((EXAM.user[i]||[])[j])||'',p)));svEx();go('exam')};
 function examResult(){const sc=()=>EXAM.ok.filter(Boolean).length;
- $('#app').innerHTML=`<div class="card"><h1>Результат: <span id="sc">${sc()}</span> из 9</h1><p class="mut">Время: ${fmt(EXAM.sec)} из 40:00. Если ответ верный, но записан в другой форме (например, дробь), нажми «Засчитать».</p><div class="row"><button class="pri" onclick="saveEx()">Сохранить результат</button><button onclick="EXAM=null;go('exam')">Новая попытка</button></div></div>`+
- EXAM.items.map((it,i)=>`<div class="card res ${EXAM.ok[i]?'yes':'no'}" id="r${i}"><div class="n">ЗАДАНИЕ ${i+1} · ${TOPICS[it.t]}</div><div class="q">${it.q}</div><p>Твой ответ: <b>${(EXAM.user[i]||[]).filter(Boolean).join('; ')||'—'}</b><br>Правильно: <b>${it.sol}</b></p><button onclick="EXAM.ok[${i}]=!EXAM.ok[${i}];examResult()">${EXAM.ok[i]?'Отменить зачёт':'Засчитать'}</button></div>`).join('')}
-window.saveEx=()=>{if(EXAM.saved)return toast('Уже сохранено');EXAM.saved=true;EXAM.items.forEach((it,i)=>{const t=T(it.t);t.done++;EXAM.ok[i]?t.ok++:t.bad++;t.last=today();S.log.push({d:today(),t:it.t,ok:EXAM.ok[i]?1:0})});(S.exams??=[]).push({d:today(),v:EXAM.v,sc:EXAM.ok.filter(Boolean).length,sec:EXAM.sec});S.xp+=EXAM.ok.filter(Boolean).length*10;save();toast('Результат сохранён')};
+ $('#app').innerHTML=`<div class="card"><h1>Результат: <span id="sc">${sc()}</span> из 9</h1><p class="mut">Время: ${fmt(EXAM.sec)} из 40:00. Если ответ верный, но записан в другой форме (например, дробь), нажми «Засчитать».</p><div class="row"><button class="pri" onclick="saveEx()">Сохранить результат</button><button onclick="exReset()">Новая попытка</button></div></div>`+
+ EXAM.items.map((it,i)=>`<div class="card res ${EXAM.ok[i]?'yes':'no'}" id="r${i}"><div class="n">ЗАДАНИЕ ${i+1} · ${TOPICS[it.t]}</div><div class="q">${it.q}</div><p>Твой ответ: <b>${(EXAM.user[i]||[]).filter(Boolean).join('; ')||'—'}</b><br>Правильно: <b>${it.sol}</b></p><button onclick="EXAM.ok[${i}]=!EXAM.ok[${i}];svEx();examResult()">${EXAM.ok[i]?'Отменить зачёт':'Засчитать'}</button></div>`).join('')}
+window.saveEx=()=>{if(EXAM.saved)return toast('Уже сохранено');EXAM.saved=true;svEx();EXAM.items.forEach((it,i)=>{const t=T(it.t);t.done++;EXAM.ok[i]?t.ok++:t.bad++;t.last=today();S.log.push({d:today(),t:it.t,ok:EXAM.ok[i]?1:0})});(S.exams??=[]).push({d:today(),v:EXAM.v,sc:EXAM.ok.filter(Boolean).length,sec:EXAM.sec});S.xp+=EXAM.ok.filter(Boolean).length*10;save();toast('Результат сохранён')};
 // Чат
 const SYS=()=>`Ты добрый репетитор по математике для ученицы, которая только перешла в 6 класс${S.name?' ('+S.name+')':''} и готовится к поступлению в физ-мат лицей. В школе учебник Петерсона; в 3–4 классах были пробелы, поэтому при непонимании возвращайся к базе (столбик, порядок действий, доли, величины). Она занимается воздушной гимнастикой — объясняй через кольцо, вращения, время и длину окружности. Иногда давай нестандартные задачи лицейского уровня. Вступительная работа в физ-мат 6 класс: 9 заданий за 40 минут (вычисления с дробями и десятичными, уравнение со смешанными числами, единицы длины, объём с процентами и долями, движение навстречу/вдогонку, упрощение выражений, дроби с буквами, перевод на математический язык, число k из 1/k≈). Пиши коротко, простыми словами. НИКОГДА не давай готовый ответ сразу: задай наводящий вопрос или дай одну подсказку, дай ответ только если ученица просит после 3 подсказок. Слабые темы: ${weak().slice(0,3).map(x=>TOPICS[x[0]]).join(', ')}.`;
 function chat(){$('#app').innerHTML=`<div class="card"><h2>Чат с репетитором</h2><div class="chat" id="ch"></div><div class="row"><input id="ci" placeholder="Напиши вопрос или свой ответ…" onkeydown="event.key=='Enter'&&send()"><button class="pri" onclick="send()">Отправить</button></div>${S.cfg.url?'':'<p class="mut">ИИ не подключён: чат отвечает по шаблону. Подключить — в разделе «Родителю» → Настройки.</p>'}</div>`;
@@ -276,6 +278,13 @@ function parent(){const rows=Object.entries(TOPICS).map(([k,v])=>{const t=S.topi
  <div class="card"><h2>Названия элементов на кольце</h2><p class="mut">По одному в строке — впишите настоящие элементы, которые она делает. Открываются по уровням.</p><textarea id="els" rows="6">${elNames().join('\n')}</textarea><div class="row"><button onclick="S.elements=$('#els').value.split('\n').map(x=>x.trim()).filter(Boolean);save();parent()">Сохранить</button></div></div>
  <div class="card"><h2>Настройки</h2><p class="mut">Адрес ИИ (Cloudflare Worker из README):</p><div class="row"><input id="u" value="${S.cfg.url||''}" placeholder="https://….workers.dev"><button onclick="S.cfg.url=$('#u').value.trim();save();parent()">Сохранить</button></div><div class="row"><button onclick="if(confirm('Стереть весь прогресс?')){localStorage.clear();location.reload()}">Сбросить прогресс</button></div></div>`}
 window.addPhotos=async inp=>{for(const f of inp.files){if(photos.length>=6)break;try{const bm=await createImageBitmap(f),k=Math.min(1,1000/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=bm.width*k;c.height=bm.height*k;c.getContext('2d').drawImage(bm,0,0,c.width,c.height);photos.push(c.toDataURL('image/jpeg',.78))}catch{}}savePh();nav();parent()};
+page=(S.page&&PAGES[S.page])?S.page:'home';
+if(page=='practice'&&S.cur&&S.cur.cur&&!S.cur.cur.solved){cur=S.cur.cur;hintN=S.cur.hintN||0}
+if(page=='exam'&&!EXAM)page='home';
+if(EXAM&&!EXAM.done)runEx();
+addEventListener('visibilitychange',()=>{if(document.hidden)save()});addEventListener('pagehide',save);
+try{navigator.storage?.persist?.()}catch{}
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 nav();render();
 </script>
 </body>
