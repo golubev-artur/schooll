@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Мой ИИ-репетитор</title>
+<style>
+:root{--bg:#0f1020;--card:#1a1b34;--card2:#23244a;--tx:#f3f2ff;--mut:#a3a3c8;--acc:#ff7a59;--acc2:#ffc857;--vio:#8b7bff;--ok:#3ddc97;--bad:#ff5c7a;--r:20px}
+@media(prefers-color-scheme:light){:root:not([data-t=dark]){--bg:#f5f3ff;--card:#fff;--card2:#ede9ff;--tx:#1b1740;--mut:#6b6896}}
+:root[data-t=light]{--bg:#f5f3ff;--card:#fff;--card2:#ede9ff;--tx:#1b1740;--mut:#6b6896}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:radial-gradient(900px 500px at 85% -10%,#ff7a5933,transparent),radial-gradient(700px 500px at -10% 10%,#8b7bff33,transparent),var(--bg);color:var(--tx);min-height:100vh}
+header{display:flex;align-items:center;gap:12px;padding:14px 16px;position:sticky;top:0;backdrop-filter:blur(14px);background:color-mix(in srgb,var(--bg) 70%,transparent);z-index:5}
+.logo{font-weight:800;font-size:18px;display:flex;gap:8px;align-items:center}.logo svg{width:28px;height:28px}
+nav{display:flex;gap:6px;margin-left:auto;overflow-x:auto}nav button{white-space:nowrap}
+button{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:9px 16px;background:var(--card2);color:var(--tx);transition:.15s}
+button:hover{transform:translateY(-1px)}button.on,button.pri{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#22120a;font-weight:700}
+main{max-width:920px;margin:0 auto;padding:8px 16px 60px}.card{background:var(--card);border-radius:var(--r);padding:20px;margin:14px 0;box-shadow:0 8px 30px #0003}
+h1{font-size:clamp(26px,5vw,40px);margin:.3em 0}h2{margin:.2em 0 .6em}.mut{color:var(--mut)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.stat{background:var(--card2);border-radius:16px;padding:14px}.stat b{font-size:26px;display:block}
+.bar{height:10px;border-radius:9px;background:var(--card2);overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--vio),var(--acc));border-radius:9px}
+input,textarea{font:inherit;width:100%;padding:12px 14px;border-radius:14px;border:2px solid var(--card2);background:var(--bg);color:var(--tx)}input:focus,textarea:focus{outline:0;border-color:var(--vio)}
+.q{font-size:20px;margin:8px 0 14px}.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.row input{flex:1;min-width:140px}
+.hint{background:#ffc85722;border-left:4px solid var(--acc2);padding:10px 14px;border-radius:12px;margin:8px 0}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+.chat{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow:auto;padding:4px}
+.m{padding:10px 14px;border-radius:16px;max-width:85%;white-space:pre-wrap}.m.u{align-self:flex-end;background:var(--vio);color:#fff}.m.a{background:var(--card2)}
+table{width:100%;border-collapse:collapse}td,th{padding:8px;text-align:left;border-bottom:1px solid var(--card2)}
+.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-size:13px;background:var(--card2)}
+.day{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--card2)}.day b{min-width:64px;color:var(--acc)}
+.hidden{display:none}svg text{fill:var(--mut);font-size:11px}
+</style>
+</head>
+<body>
+<header>
+ <div class="logo"><svg viewBox="0 0 32 32" fill="none" stroke="url(#g)" stroke-width="3"><defs><linearGradient id="g"><stop stop-color="#ff7a59"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><circle cx="16" cy="18" r="10"/><path d="M16 2v6"/></svg>Мой ИИ-репетитор</div>
+ <nav id="nav"></nav>
+</header>
+<main id="app"></main>
+<script>
+const $=s=>document.querySelector(s), ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)), pick=a=>a[R(0,a.length-1)];
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+const TOPICS={order:'Порядок действий',mul:'Умножение и деление в столбик',units:'Величины и время',motion:'Задачи на движение',geom:'Периметр и площадь',eq:'Уравнения',dec:'Десятичные дроби',fbas:'Смешанные числа и дроби',div:'Признаки делимости',gcd:'НОД и НОК',frac:'Сложение дробей',prop:'Отношения и пропорции',pct:'Проценты',circ:'Окружность и круг',neg:'Отрицательные числа',logic:'Задачи для лицея'};
+const GR={order:'3–4',mul:'3–4',units:'3–4',motion:'4',geom:'4–5',eq:'5',dec:'5',fbas:'5',div:'6',gcd:'6',frac:'6',prop:'6',pct:'5–6',circ:'6',neg:'6',logic:'лицей'};
+const isGap=k=>['3–4','4','4–5','5'].includes(GR[k]);
+// порядок тем в учебнике Петерсон-6 (ч.1) — примерная неделя за неделей
+const PET=['div','div','gcd','frac','frac','frac','prop','pct'];
+// Генераторы: level 1..3 -> {q, a:"строка ответа", hints:[3], sol}
+const GEN={
+frac(l){const d1=pick([2,3,4,5]),d2=pick([6,8,10,12].filter(x=>x%d1==0||l>1)),n1=R(1,d1-1),n2=R(1,d2-1);const den=d1*d2/gcd(d1,d2),num=n1*den/d1+n2*den/d2,g=gcd(num,den);
+ return{q:`Акробатка отработала ${n1}/${d1} часа растяжку и ${n2}/${d2} часа элементы на кольце. Сколько часов всего? (ответ дробью)`,a:`${num/g}/${den/g}`,hints:[`Знаменатели разные (${d1} и ${d2}). Сначала приведи дроби к общему знаменателю.`,`Общий знаменатель — ${den}. Домножь числители: ${n1}·${den/d1} и ${n2}·${den/d2}.`,`Сложи числители: ${n1*den/d1}+${n2*den/d2}=${num}, получится ${num}/${den}. Сократи, если можно.`],sol:`${num}/${den} = ${num/g}/${den/g}`}},
+dec(l){const a=R(12,49)/10*(l>1?1:1),b=pick([2,3,4,5]);const r=+(a*b).toFixed(2);
+ return{q:`Лента для кольца стоит ${a} ₽ за 1 дм. Сколько стоят ${b} дм? (десятичной дробью)`,a:String(r),hints:[`Нужно умножить ${a} на ${b}.`,`Умножь как целые: ${Math.round(a*10)}·${b}=${Math.round(a*10)*b}.`,`В ${a} один знак после запятой — отдели один знак справа.`],sol:`${a}·${b}=${r}`}},
+neg(l){const a=R(3,9+l*4),b=R(a+1,a+8+l*3);return{q:`Гимнастка из точки ${a} м опустилась на ${b} м вниз по числовой прямой (ноль — пол). Где она теперь? (число)`,a:String(a-b),hints:[`Спуск вниз — это вычитание: ${a} − ${b}.`,`Ты уходишь ниже нуля. Сначала потрать ${a} на путь до нуля.`,`Остаток ${b-a} — уже ниже нуля, поэтому знак «−».`],sol:`${a}−${b}=${a-b}`}},
+pct(l){const n=pick([20,40,50,60,80,120,200]),p=pick(l>1?[15,25,35,45]:[10,20,25,50]);const r=n*p/100;if(!Number.isInteger(r*10))return GEN.pct(l);
+ return{q:`В студии ${n} девочек, ${p}% из них занимаются на кольце. Сколько девочек на кольце?`,a:String(r),hints:[`1% — это n/100 от числа. Найди 1% от ${n}.`,`1% = ${n/100}. Умножь на ${p}.`,`Или: ${n}·${p}/100 = ${r}.`],sol:`${n}·${p}/100=${r}`}},
+prop(l){const a=R(2,5),b=a*R(2,4),k=R(2,5),c=a*k;return{q:`Гимнастка выполняет ${a} связки за ${b} мин. Сколько минут нужно на ${c} связок в том же темпе?`,a:String(b*k),hints:[`Составь пропорцию: ${a} связок — ${b} мин; ${c} связок — x мин.`,`Во сколько раз ${c} больше ${a}?`,`В ${k} раз. Значит, и время в ${k} раз больше: ${b}·${k}.`],sol:`x=${b}·${k}=${b*k}`}},
+gcd(l){const g=R(2,6),x=g*R(2,4),y=g*R(5,8);const nod=gcd(x,y),nok=x*y/nod,askK=Math.random()<.5;
+ return{q:askK?`Один элемент повторяется каждые ${x} сек, другой — каждые ${y} сек. Через сколько секунд они впервые совпадут? (НОК)`:`Разделить ${x} и ${y} гимнасток на одинаковые группы без остатка, группы как можно больше. Сколько человек в группе? (НОД)`,a:String(askK?nok:nod),hints:[askK?`Ищем наименьшее общее кратное: перечисляй кратные числа ${x} и ${y}.`:`Ищем наибольший общий делитель: выпиши делители ${x} и ${y}.`,askK?`Кратные ${x}: ${x}, ${2*x}, ${3*x}… Смотри, какое из них делится на ${y}.`:`Общие делители у ${x} и ${y} — найди самый большой.`,askK?`НОК = ${x}·${y}/НОД = ${nok}.`:`НОД(${x};${y}) = ${nod}.`],sol:askK?`НОК=${nok}`:`НОД=${nod}`}},
+eq(l){const x=R(2,9),a=R(2,5),b=R(1,12);return{q:`Реши уравнение: ${a}x + ${b} = ${a*x+b}. Чему равен x?`,a:String(x),hints:[`Сначала избавься от +${b}: вычти ${b} из обеих частей.`,`Получится ${a}x = ${a*x}.`,`Теперь раздели обе части на ${a}.`],sol:`x=${x}`}},
+circ(l){const d=pick([60,80,90,100]),r=+(3.14*d).toFixed(1);return{q:`Диаметр гимнастического кольца ${d} см. Найди длину обода (π≈3,14). Ответ в см.`,a:String(r),hints:[`Длина окружности C = π·d, если известен диаметр.`,`Подставь: C = 3,14·${d}.`,`Умножь: ${d}·3,14 = ${r}.`],sol:`C=${r} см`}},
+order(l){const a=R(3,9),b=R(2,9),c=R(2,6),d=R(1,a*1);const v=a+b*c-d;return{q:`Вычисли: ${a} + ${b}·${c} − ${d}`,a:String(v),hints:[`Сначала действия высшей ступени: умножение и деление.`,`Считай ${b}·${c} = ${b*c}.`,`Дальше слева направо: ${a}+${b*c}−${d}.`],sol:`${v}`}},
+mul(l){const a=R(12,49),b=R(11,29);return{q:`Вычисли в столбик: ${a}·${b}`,a:String(a*b),hints:[`Разбей ${b} на десятки и единицы.`,`${a}·${b%10} и ${a}·${b-b%10}.`,`Сложи: ${a*(b%10)} + ${a*(b-b%10)}.`],sol:`${a*b}`}},
+units(l){const h=R(1,3),m=R(10,55),k=pick([2,3]);return{q:`Тренировка на кольце длится ${h} ч ${m} мин. Сколько это минут?`,a:String(h*60+m),hints:[`В одном часе 60 минут.`,`${h} ч = ${h*60} мин.`,`Прибавь ${m} мин.`],sol:`${h*60+m}`}},
+motion(l){const v=pick([4,5,6,8,12]),t=R(2,9);return{q:`Гимнастка едет на занятие со скоростью ${v} км/ч и проезжает ${v*t} км. Сколько часов она в пути?`,a:String(t),hints:[`Путь = скорость · время.`,`Значит, время = путь : скорость.`,`${v*t} : ${v} = ${t}.`],sol:`${t} ч`}},
+geom(l){const a=R(3,9),b=R(2,8)+0.5,k=+(a*b).toFixed(2);return{q:`Мат для растяжки — прямоугольник ${a} м на ${b} м. Найди его площадь (м²).`,a:String(k),hints:[`Площадь прямоугольника = длина · ширина.`,`Умножь ${a}·${b}.`,`${a}·${b} = ${k}.`],sol:`${k} м²`}},
+fbas(l){const w=R(2,5),d=R(3,8),n=R(1,d-1);return{q:`Запиши число ${w} ${n}/${d} в виде неправильной дроби. Чему равен числитель?`,a:String(w*d+n),hints:[`Целую часть переведи в доли со знаменателем ${d}.`,`${w}=${w*d}/${d}.`,`Прибавь ${n}: ${w*d}+${n}.`],sol:`${w*d+n}/${d}`}},
+div(l){const a=R(1,9),b=R(1,9);let d=0;while((a+b+d)%9)d++;return{q:`Какую наименьшую цифру нужно поставить вместо * в числе ${a}${b}*, чтобы оно делилось на 9?`,a:String(d),hints:[`Признак делимости на 9: сумма цифр делится на 9.`,`Сумма известных цифр: ${a}+${b}=${a+b}.`,`Сколько добавить, чтобы получить число, кратное 9?`],sol:`${d}`}},
+logic(l){const g=R(6,12),t=g*2+R(2,g-2);return{q:`В студии ${g} групп, в каждой по 2 или по 3 человека, всего ${t} человек. Сколько групп по 3 человека?`,a:String(t-2*g),hints:[`Попробуй: если бы во всех группах было по 2 человека.`,`Тогда всего было бы ${2*g}. А у нас ${t}.`,`Каждая группа из 3 даёт +1. Сколько «лишних»: ${t}−${2*g}.`],sol:`${t-2*g}`}}};
+const parse=s=>{s=String(s).trim().replace(',','.').replace('−','-');const m=s.match(/^(-?\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/);if(m)return +m[1]/+m[2];const v=Number(s);return s===''||isNaN(v)?NaN:v};
+const same=(u,a)=>Math.abs(parse(u)-parse(a))<1e-6;
+// состояние
+let S=ls.get('st',{name:'',topics:{},log:[],minutes:0,test:null,plan:null,xp:0,cfg:{url:'https://calm-leaf-7bbb.golubev-artur2021.workers.dev'},msgs:[]});
+const T=k=>S.topics[k]??(S.topics[k]={done:0,ok:0,bad:0,hints:0,level:1,streak:0,last:null});
+const save=()=>ls.set('st',S);
+const today=()=>new Date().toISOString().slice(0,10);
+setInterval(()=>{if(!document.hidden){S.minutes+=1/6;save()}},10000);
+const acc=k=>{const t=S.topics[k];return t&&t.done?Math.round(100*t.ok/t.done):null};
+// Навигация
+const PAGES={home:'Главная',test:'Тест',plan:'План',practice:'Практика',chat:'Чат',parent:'Родителю'};
+let page='home',cur=null,hintN=0;
+function nav(){$('#nav').innerHTML=Object.entries(PAGES).map(([k,v])=>`<button class="${k==page?'on':''}" onclick="go('${k}')">${v}</button>`).join('')+`<button onclick="theme()">◐</button>`}
+window.go=p=>{page=p;nav();render()};
+window.theme=()=>{const r=document.documentElement;r.dataset.t=r.dataset.t=='light'?'dark':'light'};
+const level=()=>Math.floor(S.xp/100)+1;
+const weak=()=>Object.keys(TOPICS).map(k=>[k,acc(k)]).sort((a,b)=>(a[1]??-1)-(b[1]??-1));
+function render(){({home,test,plan,practice,chat,parent})[page]()}
+function home(){
+ const done=Object.values(S.topics).reduce((s,t)=>s+t.done,0),mastered=Object.keys(TOPICS).filter(k=>acc(k)>=80&&S.topics[k].done>=4).length;
+ $('#app').innerHTML=`<div class="card"><h1>Привет${S.name?', '+S.name:''}! 🤸</h1><p class="mut">Цель — поступить в физ-мат лицей. Сначала тест: найдём пробелы за 3–5 классы и проверим 6 класс. Потом план на 8 недель: нынешняя тема Петерсона + закрытие пробелов.</p>
+ ${S.name?'':`<div class="row"><input id="nm" placeholder="Как тебя зовут?"><button class="pri" onclick="S.name=$('#nm').value.trim();save();home()">Готово</button></div>`}
+ <div class="grid" style="margin-top:14px"><div class="stat">Уровень<b>${level()}</b><div class="bar"><i style="width:${S.xp%100}%"></i></div></div><div class="stat">Решено задач<b>${done}</b></div><div class="stat">Освоено тем<b>${mastered}/16</b></div><div class="stat">Минут занятий<b>${Math.round(S.minutes)}</b></div></div>
+ <div class="row" style="margin-top:16px"><button class="pri" onclick="go(S.test?.done?'practice':'test')">Начать занятие</button><button onclick="go('practice')" >Повторить слабые темы</button></div></div>
+ <div class="card"><h2>Темы</h2>${Object.entries(TOPICS).map(([k,v])=>`<div style="margin:10px 0"><div style="display:flex;justify-content:space-between"><span>${v}</span><span class="mut">${acc(k)==null?'—':acc(k)+'%'}</span></div><div class="bar"><i style="width:${acc(k)||0}%"></i></div></div>`).join('')}</div>`}
+// Тест
+function test(){
+ if(!S.test||S.test.done&&!S.test.redo){if(S.test?.done)return testResult();S.test={i:0,qs:Object.keys(TOPICS).flatMap(k=>(['div','gcd','frac','prop','pct'].includes(k)?[GEN[k](1),GEN[k](2)]:[GEN[k](1)]).map(q=>({...q,t:k}))),res:[],done:false};save()}
+ const t=S.test;if(t.i>=t.qs.length){t.done=true;t.qs.forEach((q,i)=>{const x=T(q.t);x.done++;t.res[i]?x.ok++:x.bad++;x.last=today()});
+  Object.keys(TOPICS).forEach(k=>{const x=T(k),a=acc(k);x.level=a>=80?2:1});makePlan();save();return testResult()}
+ const q=t.qs[t.i];$('#app').innerHTML=`<div class="card"><span class="tag">Входной тест · ${t.i+1}/${t.qs.length}</span><div class="bar" style="margin:10px 0"><i style="width:${t.i/t.qs.length*100}%"></i></div><div class="q">${q.q}</div><div class="row"><input id="a" autofocus placeholder="Твой ответ" onkeydown="event.key=='Enter'&&ans()"><button class="pri" onclick="ans()">Дальше</button><button onclick="ans(true)">Не знаю</button></div><p class="mut">В тесте подсказок нет — это нормально не знать, я просто пойму, с чего начать.</p></div>`;
+ window.ans=skip=>{t.res[t.i]=!skip&&same($('#a').value,q.a);t.i++;save();test()}}
+function testResult(){const w=weak();const ok=S.test.res.filter(Boolean).length;
+ $('#app').innerHTML=`<div class="card"><h1>Результат: ${ok} из ${S.test.qs.length}</h1>${[['Пробелы 3–5 класса',w.filter(x=>isGap(x[0]))],['Программа 6 класса (Петерсон)',w.filter(x=>!isGap(x[0])&&x[0]!='logic')],['Лицейские задачи',w.filter(x=>x[0]=='logic')]].map(([h,l])=>`<h2 style="margin-top:16px">${h}</h2>${l.map(([k,a])=>`<div style="margin:6px 0">${TOPICS[k]} <span class="tag ${a>=50?'ok':'bad'}">${a}%</span></div>`).join('')}`).join('')}<div class="row"><button class="pri" onclick="go('plan')">Смотреть план занятий</button><button onclick="S.test=null;save();go('test')">Пройти заново</button></div></div>`}
+// План
+function makePlan(){const gaps=weak().filter(x=>isGap(x[0])&&x[1]<80).map(x=>x[0]).slice(0,4);const days=[];
+ for(let d=0;d<48;d++){const wk=Math.floor(d/6),i=d%6;
+  if(i==5){days.push({d:d+1,wk,mini:true,main:PET[wk],gap:gaps});continue}
+  const gap=wk>=4&&i%2?'logic':(gaps.length?gaps[(d+i)%gaps.length]:'logic');
+  days.push({d:d+1,wk,main:PET[wk],gap})}
+ S.plan={days,from:today()}}
+function todayPlan(){if(!S.plan)return null;const n=Math.floor((Date.now()-new Date(S.plan.from))/864e5);return S.plan.days[Math.min(n,47)]}
+function plan(){if(!S.plan)return $('#app').innerHTML=`<div class="card"><h2>План ещё не готов</h2><p>Пройди входной тест — по нему я составлю план на 8 недель.</p><button class="pri" onclick="go('test')">Пройти тест</button></div>`;
+ const wk=[...Array(8).keys()];
+ $('#app').innerHTML=`<div class="card"><h1>План на 8 недель</h1><p class="mut">6 дней занятий в неделю по ~20 минут, 7-й день отдых. Каждый день: <b>тема Петерсона</b> (идём в ногу со школой) + <b>закрытие пробела</b>. 6-й день — мини-контрольная. С 5-й недели добавляются лицейские задачи. Порядок тем в школе может отличаться — сверяйтесь с классным планом.</p></div>`+
+ wk.map(w=>`<div class="card"><h2>Неделя ${w+1}: ${TOPICS[PET[w]]}</h2>${S.plan.days.filter(x=>x.wk==w).map(x=>`<div class="day"><b>День ${x.d}</b><span>${x.mini?'Мини-контрольная: по задаче из каждой темы недели и пробелов':`Школа: ${TOPICS[x.main]} · Пробел: ${TOPICS[x.gap]}`}</span></div>`).join('')}</div>`).join('')+`<button class="pri" onclick="go('practice')">Начать сегодняшнее занятие</button>`}
+// Практика с подсказками
+function practice(next=true){
+ if(next||!cur){const w=weak().filter(x=>x[1]!==100),tp=todayPlan(),r=Math.random();const k=tp&&r<.4?tp.main:tp&&r<.75&&!tp.mini?tp.gap:w[0]?.[0]||pick(Object.keys(TOPICS));cur={...GEN[k](T(k).level),t:k,tries:0};hintN=0}
+ const t=T(cur.t);$('#app').innerHTML=`<div class="card"><span class="tag">${TOPICS[cur.t]} · сложность ${t.level}/3</span><div class="q" style="margin-top:12px">${cur.q}</div><div id="fb"></div>
+ <div class="row"><input id="a" autofocus placeholder="Ответ" onkeydown="event.key=='Enter'&&check()"><button class="pri" onclick="check()">Проверить</button><button onclick="hint()">Подсказка</button></div><div id="hs"></div></div>`;showHints()}
+function showHints(){$('#hs').innerHTML=cur.hints.slice(0,hintN).map((h,i)=>`<div class="hint">💡 ${i+1}. ${h}</div>`).join('')+(hintN>=3?`<div class="row"><button onclick="reveal()">Показать решение</button></div>`:'')}
+window.hint=()=>{if(hintN<3){hintN++;T(cur.t).hints++;save()}showHints()};
+window.check=()=>{const u=$('#a').value;if(u.trim()==='')return;const t=T(cur.t);
+ if(same(u,cur.a)){const clean=hintN==0&&cur.tries==0;t.done++;t.ok++;t.last=today();t.streak=clean?t.streak+1:0;S.xp+=clean?15:8;if(t.streak>=3&&t.level<3){t.level++;t.streak=0}
+  S.log.push({d:today(),t:cur.t,ok:1});save();$('#fb').innerHTML=`<p class="ok"><b>Верно!</b> ${clean?'С первого раза 🔥':'Ты дошла сама — это важнее скорости.'}</p><button class="pri" onclick="practice()">Следующая</button>`}
+ else{cur.tries++;t.bad++;t.streak=0;S.log.push({d:today(),t:cur.t,ok:0});if(cur.tries%2==0&&t.level>1)t.level--;save();if(hintN<3)hintN++,t.hints++;save();
+  $('#fb').innerHTML=`<p class="bad">Пока не то. Ничего, вот подсказка — попробуй ещё раз.</p>`;showHints()}};
+window.reveal=()=>{const t=T(cur.t);t.done++;t.last=today();save();$('#fb').innerHTML=`<p>Решение: <b>${cur.sol}</b>. Эту тему я ещё предложу — так закрепится.</p><button class="pri" onclick="practice()">Следующая</button>`;$('#hs').innerHTML=''};
+// Чат
+const SYS=()=>`Ты добрый репетитор по математике для ученицы, которая только перешла в 6 класс${S.name?' ('+S.name+')':''} и готовится к поступлению в физ-мат лицей. В школе учебник Петерсона; в 3–4 классах были пробелы, поэтому при непонимании возвращайся к базе (столбик, порядок действий, доли, величины). Она занимается воздушной гимнастикой — объясняй через кольцо, вращения, время и длину окружности. Иногда давай нестандартные задачи лицейского уровня. Пиши коротко, простыми словами. НИКОГДА не давай готовый ответ сразу: задай наводящий вопрос или дай одну подсказку, дай ответ только если ученица просит после 3 подсказок. Слабые темы: ${weak().slice(0,3).map(x=>TOPICS[x[0]]).join(', ')}.`;
+function chat(){$('#app').innerHTML=`<div class="card"><h2>Чат с репетитором</h2><div class="chat" id="ch"></div><div class="row"><input id="ci" placeholder="Напиши вопрос или свой ответ…" onkeydown="event.key=='Enter'&&send()"><button class="pri" onclick="send()">Отправить</button></div>${S.cfg.url?'':'<p class="mut">ИИ не подключён: чат отвечает по шаблону. Подключить — в разделе «Родителю» → Настройки.</p>'}</div>`;
+ if(!S.msgs.length)S.msgs.push({r:'assistant',c:`Привет! Спрашивай про любую тему или присылай своё решение — я подскажу, но решать будешь сама 💪`});drawChat()}
+function drawChat(){$('#ch').innerHTML=S.msgs.map(m=>`<div class="m ${m.r=='user'?'u':'a'}">${m.c.replace(/</g,'&lt;')}</div>`).join('');$('#ch').scrollTop=1e9;save()}
+window.send=async()=>{const v=$('#ci').value.trim();if(!v)return;$('#ci').value='';S.msgs.push({r:'user',c:v});drawChat();let reply;
+ if(S.cfg.url){try{const r=await fetch(S.cfg.url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({system:SYS(),messages:S.msgs.map(m=>({role:m.r,content:m.c}))})});reply=(await r.json()).reply}catch{reply='Не получилось связаться с ИИ. Проверь адрес в настройках.'}}
+ else reply=pick(['Давай по шагам: что нам известно в задаче и что нужно найти?','Хороший вопрос! Попробуй сначала нарисовать: кольцо, отрезок, число на прямой. Что получилось?','Как думаешь, с какого действия начать? Напиши свою идею — поправлю, если что.']);
+ S.msgs.push({r:'assistant',c:reply});drawChat()};
+// Родителю
+function spark(){const days={};S.log.forEach(l=>{(days[l.d]??=[0,0])[0]+=l.ok;days[l.d][1]++});const ds=Object.keys(days).sort().slice(-14);if(ds.length<2)return'<p class="mut">Динамика появится после занятий в разные дни.</p>';
+ const pts=ds.map((d,i)=>[i/(ds.length-1)*280+10,70-days[d][0]/days[d][1]*60]);return`<svg viewBox="0 0 300 90" style="width:100%;max-width:420px"><polyline fill="none" stroke="var(--acc)" stroke-width="3" points="${pts.map(p=>p.join(',')).join(' ')}"/>${pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="var(--acc2)"/>`).join('')}<text x="10" y="86">${ds[0].slice(5)}</text><text x="250" y="86">${ds.at(-1).slice(5)}</text></svg><p class="mut">Доля верных ответов по дням</p>`}
+function reportText(){const w=weak().filter(x=>x[1]!==null);const st=w.filter(x=>x[1]>=70).map(x=>TOPICS[x[0]]),wk=w.filter(x=>x[1]<60).map(x=>TOPICS[x[0]]);const h=Object.values(S.topics).reduce((s,t)=>s+t.hints,0);
+ const gp=w.filter(x=>isGap(x[0])&&x[1]<70).map(x=>TOPICS[x[0]]);const tp=todayPlan();return`Отчёт для родителя (${today()})\nЦель: физ-мат лицей, учебник Петерсона (6 класс).\nСейчас по плану: ${tp?TOPICS[tp.main]+' (неделя '+(tp.wk+1)+' из 8)':'тест не пройден'}.\nПробелы 3–5 класса: ${gp.join(', ')||'не выявлено'}.\nЗанималась: ${Math.round(S.minutes)} мин, задач решено: ${Object.values(S.topics).reduce((s,t)=>s+t.done,0)}, подсказок использовано: ${h}.\nПолучается хорошо: ${st.join(', ')||'пока мало данных'}.\nСложности: ${wk.join(', ')||'явных нет'}.\nРекомендации: ${wk.length?'на этой неделе уделить время темам «'+wk.slice(0,2).join('», «')+'» — по 15–20 минут 3 раза в неделю, просить проговаривать решение вслух.':'переходить к более сложным задачам и текстовым заданиям.'}`}
+function parent(){const rows=Object.entries(TOPICS).map(([k,v])=>{const t=S.topics[k];return`<tr><td>${v}</td><td>${t?.done||0}</td><td>${acc(k)??'—'}${acc(k)==null?'':'%'}</td><td>${t?.hints||0}</td><td>${t?.level||1}</td><td>${t?.last||'—'}</td></tr>`}).join('');
+ $('#app').innerHTML=`<div class="card"><h1>Кабинет родителя</h1><div class="grid"><div class="stat">Минут занятий<b>${Math.round(S.minutes)}</b></div><div class="stat">Уровень<b>${level()}</b></div></div></div>
+ <div class="card"><h2>По темам</h2><div style="overflow:auto"><table><tr><th>Тема<th>Задач<th>Верно<th>Подсказок<th>Уровень<th>Последний раз</tr>${rows}</table></div></div>
+ <div class="card"><h2>Динамика</h2>${spark()}</div>
+ <div class="card"><h2>Отчёт и рекомендации</h2><textarea id="rp" rows="8" readonly>${reportText()}</textarea><div class="row"><button class="pri" onclick="$('#rp').select();document.execCommand('copy')">Скопировать</button></div></div>
+ <div class="card"><h2>Настройки</h2><p class="mut">Адрес ИИ (Cloudflare Worker из README):</p><div class="row"><input id="u" value="${S.cfg.url||''}" placeholder="https://….workers.dev"><button onclick="S.cfg.url=$('#u').value.trim();save();parent()">Сохранить</button></div><div class="row"><button onclick="if(confirm('Стереть весь прогресс?')){localStorage.clear();location.reload()}">Сбросить прогресс</button></div></div>`}
+nav();render();
+</script>
+</body>
+</html>
