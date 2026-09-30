@@ -9,6 +9,6 @@
 1. supabase.com → New project (бесплатно).
 2. SQL Editor → вставить `supabase.sql` → Run.
 3. Authentication → URL Configuration: Site URL = адрес сайта (`https://<логин>.github.io/<репо>/`).
-4. Authentication → Email Templates → Magic Link: добавить в письмо `{{ .Token }}` (6-значный код).
+4. (Необязательно) Email Templates нельзя менять без своего SMTP. Без этого вход идёт по ссылке из письма.
 5. Project Settings → API: скопировать Project URL и ключ `anon` (публичный) в `SUPA` в начале скрипта `index.html`.
 `service_role` ключ нигде не использовать.
