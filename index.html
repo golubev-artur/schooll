@@ -6,8 +6,8 @@
 <title>Мой ИИ-репетитор</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#130a12;--card:rgba(255,255,255,.06);--card2:rgba(255,255,255,.1);--line:rgba(255,255,255,.12);--tx:#fff4ee;--mut:#c4a9ad;--acc:#ff5a4d;--acc2:#ffc857;--vio:#b06cff;--ok:#3ddc97;--bad:#ff6b81;--r:24px;--fd:'Unbounded','Manrope',system-ui,sans-serif}
-:root[data-t=light]{--bg:#fff6f0;--card:rgba(255,255,255,.85);--card2:rgba(120,40,30,.08);--line:rgba(120,40,30,.14);--tx:#2a0f14;--mut:#8a5f63}
+:root{--bg:#130a12;--card:rgba(255,255,255,.06);--card2:rgba(255,255,255,.1);--line:rgba(255,255,255,.12);--tx:#fff4ee;--mut:#c4a9ad;--acc:#ff5a4d;--acc2:#ffc857;--vio:#b06cff;--ok:#3ddc97;--bad:#ff6b81;--r:24px;--c1:#ffc857;--c2:#ff6b5c;--fd:'Unbounded','Manrope',system-ui,sans-serif}
+:root[data-t=light]{--c1:#b26a00;--c2:#d6362a;--bg:#fff6f0;--card:rgba(255,255,255,.85);--card2:rgba(120,40,30,.08);--line:rgba(120,40,30,.14);--tx:#2a0f14;--mut:#8a5f63}
 *{box-sizing:border-box}
 body{margin:0;font:16px/1.55 'Manrope',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
 body:before,body:after{content:"";position:fixed;z-index:-1;width:60vmax;height:60vmax;border-radius:50%;filter:blur(90px);opacity:.35;animation:drift 18s ease-in-out infinite alternate}
@@ -55,6 +55,11 @@ svg text{fill:var(--mut);font-size:11px}
 @keyframes spinIn{from{transform:rotate(-300deg) scale(.2);opacity:0}to{transform:none;opacity:1}}@keyframes spinB{to{transform:rotate(-360deg)}}@keyframes bead{from{opacity:0}to{opacity:1}}
 .lvl .ei{animation:rise .6s 1.2s both}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}.chart .ln{fill:none;stroke:var(--c1);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}.chart .gr{stroke:var(--line);stroke-width:1}.chart .tg{stroke:var(--mut);stroke-width:1;stroke-dasharray:4 4;opacity:.7}
+.chart .empty{padding:26px 10px;text-align:center;color:var(--mut);border:1px dashed var(--line);border-radius:16px}
+.hb{display:grid;grid-template-columns:minmax(120px,210px) 1fr 44px;gap:10px;align-items:center;padding:5px 0;font-size:14px}.hb .tr{position:relative;height:12px;background:var(--card2);border-radius:8px}.hb .fl{height:100%;background:var(--c2);border-radius:0 6px 6px 0;min-width:3px;transition:width .7s}.hb .tgt{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--mut)}.hb b{text-align:right;font-variant-numeric:tabular-nums}.hb:hover{background:var(--card2);border-radius:10px}
+#ctip{position:fixed;z-index:40;background:var(--bg);color:var(--tx);border:1px solid var(--line);padding:8px 12px;border-radius:12px;font-size:13px;pointer-events:none;display:none;box-shadow:0 8px 24px #0006}
+details.tbl{margin-top:8px;font-size:13px}details.tbl summary{cursor:pointer;color:var(--mut)}.lv{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.lv span{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:6px 12px;font-size:13px}
 .els{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:10px}.el{background:var(--card2);border:1px solid var(--acc2);border-radius:18px;padding:10px;text-align:center;display:flex;flex-direction:column;align-items:center}.el b{font-size:14px}.el small{color:var(--mut)}.el.lock{opacity:.4;border-color:var(--line);filter:grayscale(1)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:linear-gradient(135deg,var(--acc),var(--acc2));color:#2b0d08;padding:14px 22px;border-radius:18px;font-weight:700;z-index:20;box-shadow:0 12px 40px #0008;animation:rise .4s;max-width:90vw;text-align:center}
 .tm{position:sticky;top:60px;z-index:4;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;border-radius:18px;background:var(--bg);border:1px solid var(--acc2);margin:10px 0}.tm b{font:700 24px var(--fd)}.tm.warn b{color:var(--bad)}
@@ -155,9 +160,9 @@ const SUPA={url:'',key:''}; // публичные значения из Supabase
 const DEF=()=>({name:'',topics:{},log:[],minutes:0,test:null,plan:null,xp:0,cfg:{url:'https://calm-leaf-7bbb.golubev-artur2021.workers.dev'},msgs:[]});
 let S=ls.get('st',null)||DEF();
 const T=k=>S.topics[k]??(S.topics[k]={done:0,ok:0,bad:0,hints:0,level:1,streak:0,last:null});
-const save=()=>{S.cur=(typeof cur!=='undefined'&&cur)?{cur,hintN}:null;S.ts=Date.now();ls.set('st',S);if(typeof user!=='undefined'&&user)push()};
+const save=()=>{S.cur=(typeof cur!=='undefined'&&cur)?{cur,hintN}:null;S.ts=Date.now();(S.xpd??={})[today()]=S.xp;ls.set('st',S);if(typeof user!=='undefined'&&user)push()};
 const today=()=>new Date().toISOString().slice(0,10);
-setInterval(()=>{if(!document.hidden){S.minutes+=1/6;ls.set('st',S)}},10000);
+setInterval(()=>{if(!document.hidden){S.minutes+=1/6;(S.mind??={})[today()]=(S.mind[today()]||0)+1/6;ls.set('st',S)}},10000);
 const acc=k=>{const t=S.topics[k];return t&&t.done?Math.round(100*t.ok/t.done):null};
 // Навигация
 const PAGES={home:'Главная',test:'Тест',plan:'План',practice:'Практика',exam:'Экзамен',chat:'Чат',parent:'Родителю'};
@@ -181,7 +186,7 @@ function levelFx(L){const n=elNames()[L-2],o=document.createElement('div');o.cla
 function fxOk(L0,bonus){burst($('#fb'));const i=$('#xpi');if(i){if(level()>L0){i.style.width='100%';setTimeout(()=>{i.style.transition='none';i.style.width='0%';void i.offsetWidth;i.style.transition='';i.style.width=(S.xp%100)+'%'},850)}else i.style.width=(S.xp%100)+'%'}
  const k=$('#stk');if(k){k.textContent='🔥 '+S.streak;k.classList.remove('pop');void k.offsetWidth;k.classList.add('pop')}
  if(bonus)setTimeout(()=>toast(`🔥 Серия ${S.streak} подряд! Бонус +${bonus} очков`),450);
- if(level()>L0)setTimeout(()=>levelFx(level()),950)}
+ if(level()>L0){(S.lvlAt??={})[level()]=today();save();setTimeout(()=>levelFx(level()),950)}}
 function toast(t){const d=document.createElement('div');d.className='toast';d.innerHTML=t;document.body.appendChild(d);setTimeout(()=>d.remove(),4500)}
 let photos=ls.get('photos',[]),heroI=0;const savePh=()=>ls.set('photos',photos);
 const overall=()=>Math.round(100*Object.keys(TOPICS).reduce((z,k)=>{const t=S.topics[k];return z+(t&&t.done?Math.min(1,t.done/4)*t.ok/t.done:0)},0)/Object.keys(TOPICS).length);
@@ -287,10 +292,65 @@ function spark(){const days={};S.log.forEach(l=>{(days[l.d]??=[0,0])[0]+=l.ok;da
  const pts=ds.map((d,i)=>[i/(ds.length-1)*280+10,70-days[d][0]/days[d][1]*60]);return`<svg viewBox="0 0 300 90" style="width:100%;max-width:420px"><polyline fill="none" stroke="var(--acc)" stroke-width="3" points="${pts.map(p=>p.join(',')).join(' ')}"/>${pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="var(--acc2)"/>`).join('')}<text x="10" y="86">${ds[0].slice(5)}</text><text x="250" y="86">${ds.at(-1).slice(5)}</text></svg><p class="mut">Доля верных ответов по дням</p>`}
 function reportText(){const w=weak().filter(x=>x[1]!==null);const st=w.filter(x=>x[1]>=70).map(x=>TOPICS[x[0]]),wk=w.filter(x=>x[1]<60).map(x=>TOPICS[x[0]]);const h=Object.values(S.topics).reduce((s,t)=>s+t.hints,0);
  const gp=w.filter(x=>isGap(x[0])&&x[1]<70).map(x=>TOPICS[x[0]]);const tp=todayPlan();return`Отчёт для родителя (${today()})\nЦель: физ-мат лицей, учебник Петерсона (6 класс).\nСейчас по плану: ${tp?TOPICS[tp.main]+' (неделя '+(tp.wk+1)+' из 8)':'тест не пройден'}.\nПробелы 3–5 класса: ${gp.join(', ')||'не выявлено'}.\nПробные экзамены: ${(S.exams||[]).slice(-3).map(e=>e.d+' — '+e.sc+'/9 за '+fmt(e.sec)).join('; ')||'ещё не проходили'}.\nЗанималась: ${Math.round(S.minutes)} мин, задач решено: ${Object.values(S.topics).reduce((s,t)=>s+t.done,0)}, подсказок использовано: ${h}.\nПолучается хорошо: ${st.join(', ')||'пока мало данных'}.\nСложности: ${wk.join(', ')||'явных нет'}.\nРекомендации: ${wk.length?'на этой неделе уделить время темам «'+wk.slice(0,2).join('», «')+'» — по 15–20 минут 3 раза в неделю, просить проговаривать решение вслух.':'переходить к более сложным задачам и текстовым заданиям.'}`}
-function parent(){const rows=Object.entries(TOPICS).map(([k,v])=>{const t=S.topics[k];return`<tr><td>${v}</td><td>${t?.done||0}</td><td>${acc(k)??'—'}${acc(k)==null?'':'%'}</td><td>${t?.hints||0}</td><td>${t?.level||1}</td><td>${t?.last||'—'}</td></tr>`}).join('');
+
+// ---- Графики для родителя
+const CH={w:600,h:230,l:44,r:16,t:14,b:30};
+const dm=d=>d.slice(8)+'.'+d.slice(5,7);
+function tip(e,h){let t=$('#ctip');if(!t){t=document.createElement('div');t.id='ctip';document.body.appendChild(t)}t.innerHTML=h;t.style.display='block';t.style.left=Math.min(e.clientX+14,innerWidth-t.offsetWidth-8)+'px';t.style.top=Math.max(8,e.clientY-t.offsetHeight-12)+'px'}
+const tipOff=()=>{const t=$('#ctip');if(t)t.style.display='none'};
+const tblH=(head,rows)=>`<details class="tbl"><summary>Таблица данных</summary><table><tr>${head.map(h=>`<th>${h}`).join('')}</tr>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}`).join('')}</tr>`).join('')}</table></details>`;
+function drawLine(el,pts,o){const {w,h,l,r,t,b}=CH,iw=w-l-r,ih=h-t-b,X=i=>l+i*iw/(pts.length-1),Y=v=>t+ih-v/o.ymax*ih;
+ let g='';o.ticks.forEach(k=>{g+=`<line class="gr" x1="${l}" x2="${w-r}" y1="${Y(k[0])}" y2="${Y(k[0])}"/><text x="${l-8}" y="${Y(k[0])+4}" text-anchor="end">${k[1]}</text>`});
+ if(o.target)g+=`<line class="tg" x1="${l}" x2="${w-r}" y1="${Y(o.target[0])}" y2="${Y(o.target[0])}"/><text x="${w-r}" y="${Y(o.target[0])-5}" text-anchor="end">${o.target[1]}</text>`;
+ const step=Math.max(1,Math.ceil(pts.length/6));pts.forEach((p,i)=>{if(i%step==0||i==pts.length-1)g+=`<text x="${X(i)}" y="${h-8}" text-anchor="middle">${p.x}</text>`});
+ const d=pts.map((p,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(p.y).toFixed(1)).join(' ');
+ el.innerHTML=`<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${o.aria}"><defs><linearGradient id="ag${o.id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--c1)" stop-opacity=".28"/><stop offset="1" stop-color="var(--c1)" stop-opacity="0"/></linearGradient></defs>${g}<path d="${d} L${X(pts.length-1)} ${Y(0)} L${X(0)} ${Y(0)} Z" fill="url(#ag${o.id})"/><path class="ln" d="${d}"/><line id="cx${o.id}" class="tg" y1="${t}" y2="${t+ih}" style="display:none"/><circle id="cd${o.id}" r="5" fill="var(--c1)" stroke="var(--bg)" stroke-width="2" style="display:none"/><circle cx="${X(pts.length-1)}" cy="${Y(pts[pts.length-1].y)}" r="5" fill="var(--c1)" stroke="var(--bg)" stroke-width="2"/><rect x="${l}" y="${t}" width="${iw}" height="${ih}" fill="transparent"/></svg>`;
+ const svg=el.firstChild,rc=svg.lastChild;rc.onpointermove=e=>{const bb=svg.getBoundingClientRect(),px=(e.clientX-bb.left)/bb.width*w;let i=Math.round((px-l)/iw*(pts.length-1));i=Math.max(0,Math.min(pts.length-1,i));const cx=svg.querySelector('#cx'+o.id),cd=svg.querySelector('#cd'+o.id);cx.setAttribute('x1',X(i));cx.setAttribute('x2',X(i));cx.style.display='';cd.setAttribute('cx',X(i));cd.setAttribute('cy',Y(pts[i].y));cd.style.display='';tip(e,pts[i].tip)};
+ rc.onpointerleave=()=>{svg.querySelector('#cx'+o.id).style.display='none';svg.querySelector('#cd'+o.id).style.display='none';tipOff()}}
+function drawCols(el,rows,o){const {w,h,l,r,t,b}=CH,iw=w-l-r,ih=h-t-b,n=rows.length,bw=Math.min(46,iw/n*0.6),Y=v=>t+ih-v/o.ymax*ih;let g='';
+ o.ticks.forEach(k=>g+=`<line class="gr" x1="${l}" x2="${w-r}" y1="${Y(k)}" y2="${Y(k)}"/><text x="${l-8}" y="${Y(k)+4}" text-anchor="end">${k}</text>`);
+ rows.forEach((p,i)=>{const cx=l+(i+.5)*iw/n,x=cx-bw/2,y=Y(p.y),rr=Math.min(4,bw/2),bh=Math.max(0,t+ih-y);
+  g+=`<path d="M${x} ${t+ih} V${y+rr} a${rr} ${rr} 0 0 1 ${rr} ${-rr} h${bw-2*rr} a${rr} ${rr} 0 0 1 ${rr} ${rr} V${t+ih} Z" fill="var(--c2)" opacity="${bh?1:0}"/><text x="${cx}" y="${h-8}" text-anchor="middle">${p.x}</text><rect data-i="${i}" x="${cx-iw/n/2}" y="${t}" width="${iw/n}" height="${ih}" fill="transparent"/>`});
+ el.innerHTML=`<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${o.aria}">${g}</svg>`;el.querySelectorAll('rect[data-i]').forEach(rc=>{rc.onpointermove=e=>tip(e,rows[+rc.dataset.i].tip);rc.onpointerleave=tipOff})}
+function drawCharts(){const host=$('#charts');if(!host)return;
+ host.innerHTML=`<div class="card chart"><h2>Точность по дням</h2><p class="mut" id="k1"></p><div id="c1"></div></div>
+ <div class="card chart"><h2>Путь по уровням</h2><p class="mut" id="k2"></p><div id="c2"></div><div class="lv" id="lv"></div></div>
+ <div class="card chart"><h2>Темы: где получается, где нужна практика</h2><p class="mut" id="k3"></p><div id="c3"></div></div>
+ <div class="card chart"><h2>Время занятий по дням, мин</h2><div id="c4"></div></div>
+ <div class="card chart" id="k5c" style="display:none"><h2>Пробные экзамены, баллы из 9</h2><p class="mut" id="k5"></p><div id="c5"></div></div>`;
+ const empty=(id,t)=>{$(id).innerHTML=`<div class="empty">${t}</div>`};
+ // 1. точность по дням
+ const days={};S.log.forEach(l=>{(days[l.d]??=[0,0])[0]+=l.ok;days[l.d][1]++});const ds=Object.keys(days).sort().slice(-14);
+ if(ds.length<2)empty('#c1','График появится, когда Милана позанимается в 2 разных дня.');else{const pts=ds.map(d=>({x:dm(d),y:Math.round(100*days[d][0]/days[d][1]),tip:`<b>${dm(d)}</b><br>${Math.round(100*days[d][0]/days[d][1])}% верных<br>${days[d][0]} из ${days[d][1]} задач`}));
+  drawLine($('#c1'),pts,{id:1,ymax:100,ticks:[[0,'0%'],[50,'50%'],[100,'100%']],target:[80,'цель 80%'],aria:'Доля верных ответов по дням'});
+  const a=pts[0].y,z=pts[pts.length-1].y;$('#k1').textContent=`Сейчас ${z}%, в начале периода ${a}% (${z>a?'растёт':z<a?'снижается':'без изменений'}).`;
+  $('#c1').insertAdjacentHTML('beforeend',tblH(['День','Верно, %','Задач'],ds.map(d=>[dm(d),Math.round(100*days[d][0]/days[d][1]),days[d][1]])))}
+ // 2. уровни
+ const xd=S.xpd||{},xs=Object.keys(xd).sort().slice(-30);
+ if(xs.length<2)empty('#c2','Появится после занятий в 2 разных дня: здесь будет линия очков и ступени уровней.');else{const mx=Math.max(...xs.map(d=>xd[d])),top=(Math.floor(mx/100)+1)*100,st=Math.ceil(top/100/5)*100,ticks=[];for(let v=0;v<=top;v+=st)ticks.push([v,'Ур.'+(v/100+1)]);
+  drawLine($('#c2'),xs.map(d=>({x:dm(d),y:xd[d],tip:`<b>${dm(d)}</b><br>${xd[d]} очков<br>уровень ${Math.floor(xd[d]/100)+1}`})),{id:2,ymax:top,ticks,aria:'Очки и уровни по дням'});
+  $('#k2').textContent=`Сейчас уровень ${level()}, до следующего ${100-S.xp%100} очков.`;
+  $('#c2').insertAdjacentHTML('beforeend',tblH(['День','Очки','Уровень'],xs.map(d=>[dm(d),xd[d],Math.floor(xd[d]/100)+1])))}
+ $('#lv').innerHTML=Object.entries(S.lvlAt||{}).sort((a,b)=>a[0]-b[0]).map(([L,d])=>`<span>🏅 Ур.${L} · ${elNames()[L-2]||'—'} · ${dm(d)}</span>`).join('');
+ // 3. темы
+ const rows=Object.keys(TOPICS).filter(k=>acc(k)!=null).map(k=>({k,a:acc(k),n:S.topics[k].done})).sort((x,y)=>y.a-x.a);
+ if(!rows.length)empty('#c3','Появится после первых решённых задач.');else{const ok=rows.filter(r=>r.a>=80).length;$('#k3').textContent=`Освоено (≥80%): ${ok} из ${rows.length} начатых тем. Серая черта — цель 80%.`;
+  $('#c3').innerHTML=rows.map(r=>`<div class="hb" data-tip="${TOPICS[r.k]}<br><b>${r.a}%</b> верных, задач: ${r.n}"><span>${TOPICS[r.k]}</span><div class="tr"><div class="fl" style="width:${r.a}%"></div><div class="tgt" style="left:80%"></div></div><b>${r.a}%</b></div>`).join('')+tblH(['Тема','Верно, %','Задач'],rows.map(r=>[TOPICS[r.k],r.a,r.n]));
+  $('#c3').querySelectorAll('.hb').forEach(e=>{e.onpointermove=ev=>tip(ev,e.dataset.tip);e.onpointerleave=tipOff})}
+ // 4. время
+ const md=S.mind||{},ms=Object.keys(md).sort().slice(-14);
+ if(!ms.length)empty('#c4','Появится после первого занятия.');else{const vals=ms.map(d=>Math.round(md[d])),mx=Math.max(10,...vals),top=Math.ceil(mx/10)*10;
+  drawCols($('#c4'),ms.map((d,i)=>({x:dm(d),y:vals[i],tip:`<b>${dm(d)}</b><br>${vals[i]} мин`})),{ymax:top,ticks:[0,top/2,top],aria:'Минуты занятий по дням'});
+  $('#c4').insertAdjacentHTML('beforeend',tblH(['День','Минут'],ms.map((d,i)=>[dm(d),vals[i]])))}
+ // 5. экзамены
+ const ex=(S.exams||[]).slice(-10);if(ex.length){$('#k5c').style.display='';const best=Math.max(...ex.map(e=>e.sc));$('#k5').textContent=`Последний результат ${ex[ex.length-1].sc} из 9 за ${fmt(ex[ex.length-1].sec)}, лучший — ${best}. Ориентир для перевода: чем ближе к 9, тем лучше.`;
+  drawCols($('#c5'),ex.map((e,i)=>({x:dm(e.d),y:e.sc,tip:`<b>${dm(e.d)}</b> · вариант ${e.v}<br>${e.sc} из 9<br>время ${fmt(e.sec)}`})),{ymax:9,ticks:[0,3,6,9],aria:'Баллы пробных экзаменов'});
+  $('#c5').insertAdjacentHTML('beforeend',tblH(['Дата','Вариант','Баллы','Время'],ex.map(e=>[dm(e.d),e.v,e.sc,fmt(e.sec)])))}}
+function parent(){parent0();drawCharts()}
+function parent0(){const rows=Object.entries(TOPICS).map(([k,v])=>{const t=S.topics[k];return`<tr><td>${v}</td><td>${t?.done||0}</td><td>${acc(k)??'—'}${acc(k)==null?'':'%'}</td><td>${t?.hints||0}</td><td>${t?.level||1}</td><td>${t?.last||'—'}</td></tr>`}).join('');
  $('#app').innerHTML=`<div class="card"><h1>Кабинет родителя</h1><div class="grid"><div class="stat">Минут занятий<b>${Math.round(S.minutes)}</b></div><div class="stat">Уровень<b>${level()}</b></div></div></div>
  <div class="card"><h2>По темам</h2><div style="overflow:auto"><table><tr><th>Тема<th>Задач<th>Верно<th>Подсказок<th>Уровень<th>Последний раз</tr>${rows}</table></div></div>
- <div class="card"><h2>Динамика</h2>${spark()}</div>
+ <div id="charts"></div>
  <div class="card"><h2>Отчёт и рекомендации</h2><textarea id="rp" rows="8" readonly>${reportText()}</textarea><div class="row"><button class="pri" onclick="$('#rp').select();document.execCommand('copy')">Скопировать</button></div></div>
  <div class="card"><h2>Фото на сайте</h2><p class="mut">Фото хранятся только в браузере этого устройства и никуда не отправляются. До 6 штук.</p><div class="photos">${photos.map((u,i)=>`<div><img src="${u}"><button onclick="photos.splice(${i},1);savePh();parent()">×</button></div>`).join('')}</div><input type="file" accept="image/*" multiple onchange="addPhotos(this)"></div>
  <div class="card"><h2>Названия элементов на кольце</h2><p class="mut">По одному в строке — впишите настоящие элементы, которые она делает. Открываются по уровням.</p><textarea id="els" rows="6">${elNames().join('\n')}</textarea><div class="row"><button onclick="S.elements=$('#els').value.split('\n').map(x=>x.trim()).filter(Boolean);save();parent()">Сохранить</button></div></div>
