@@ -13,7 +13,7 @@ body{margin:0;font:16px/1.55 'Manrope',system-ui,-apple-system,sans-serif;backgr
 body:before,body:after{content:"";position:fixed;z-index:-1;width:60vmax;height:60vmax;border-radius:50%;filter:blur(90px);opacity:.35;animation:drift 18s ease-in-out infinite alternate}
 body:before{background:#ff5a4d;top:-25vmax;right:-20vmax}body:after{background:#b06cff;bottom:-30vmax;left:-25vmax;animation-delay:-9s;opacity:.28}
 @keyframes drift{to{transform:translate(6vmax,4vmax) scale(1.1)}}
-@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@keyframes fade{from{opacity:0}}
 @keyframes spin{to{transform:rotate(360deg)}}@keyframes pop{50%{transform:scale(1.04)}}
 header{display:flex;align-items:center;gap:12px;padding:12px 16px;position:sticky;top:0;backdrop-filter:blur(18px);background:color-mix(in srgb,var(--bg) 60%,transparent);border-bottom:1px solid var(--line);z-index:5}
 .logo{font:700 15px var(--fd);display:flex;gap:10px;align-items:center;white-space:nowrap}.logo svg{width:28px;height:28px}
@@ -22,7 +22,7 @@ nav{display:flex;gap:6px;margin-left:auto;overflow-x:auto;scrollbar-width:none}n
 button{font:600 15px 'Manrope',sans-serif;cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:9px 16px;background:var(--card);color:var(--tx);transition:.18s}
 button:hover{transform:translateY(-2px);background:var(--card2)}
 button.on,button.pri{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#2b0d08;font-weight:800;border-color:transparent;box-shadow:0 8px 24px #ff5a4d44}
-main{max-width:980px;margin:0 auto;padding:8px 16px 70px}main>*{animation:rise .5s both}main>*:nth-child(2){animation-delay:.08s}main>*:nth-child(3){animation-delay:.16s}
+main{max-width:980px;margin:0 auto;padding:8px 16px 70px}main>*{animation:rise .32s both}main>*:nth-child(2){animation-delay:.05s}main>*:nth-child(3){animation-delay:.1s}
 .card{background:var(--card);border:1px solid var(--line);backdrop-filter:blur(14px);border-radius:var(--r);padding:22px;margin:14px 0;box-shadow:0 20px 50px #0004}
 h1{font:700 clamp(24px,5vw,40px)/1.15 var(--fd);margin:.2em 0 .4em}h2{font:700 18px var(--fd);margin:.2em 0 .7em}.mut{color:var(--mut)}
 .hero{position:relative;border-radius:32px;overflow:hidden;margin:14px 0;min-height:400px;display:flex;align-items:flex-end;border:1px solid var(--line);background:linear-gradient(135deg,#3a0d18,#7a1d24 50%,#c2411f);box-shadow:0 30px 70px #0006}
@@ -48,6 +48,13 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:9px 8px;t
 .chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}.chip{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:12px 14px}.chip small{color:var(--mut)}
 .photos{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}.photos div{position:relative}.photos img{width:90px;height:90px;object-fit:cover;border-radius:16px}.photos button{position:absolute;top:-6px;right:-6px;padding:0;width:26px;height:26px}
 svg text{fill:var(--mut);font-size:11px}
+.xpb{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:13px;color:var(--mut)}.xpb .bar{flex:1;height:8px}.xpb .bar i{transition:width .7s cubic-bezier(.2,.8,.2,1)}#stk{font-weight:800;color:var(--acc2);min-width:46px;text-align:right}#stk.pop{animation:pop .5s}
+.burst{position:absolute;left:50%;top:0;pointer-events:none}.burst i{position:absolute;width:8px;height:8px;border-radius:50%;animation:sp .8s ease-out forwards}@keyframes sp{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+.lvl{position:fixed;inset:0;z-index:30;background:#000b;backdrop-filter:blur(8px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;color:#fff;cursor:pointer;animation:fade .3s;padding:20px}.lvl svg.big{width:min(62vw,260px)}.lvl h2{font-size:26px;margin:.2em 0}
+.lvl .ringA{transform-origin:60px 60px;animation:spinIn 1.3s cubic-bezier(.2,.8,.2,1) both}.lvl .ringB{transform-origin:60px 60px;animation:spinB 6s linear infinite}.lvl .lb{opacity:0;transform-origin:center;animation:bead .35s forwards}
+@keyframes spinIn{from{transform:rotate(-300deg) scale(.2);opacity:0}to{transform:none;opacity:1}}@keyframes spinB{to{transform:rotate(-360deg)}}@keyframes bead{from{opacity:0}to{opacity:1}}
+.lvl .ei{animation:rise .6s 1.2s both}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 .els{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:10px}.el{background:var(--card2);border:1px solid var(--acc2);border-radius:18px;padding:10px;text-align:center;display:flex;flex-direction:column;align-items:center}.el b{font-size:14px}.el small{color:var(--mut)}.el.lock{opacity:.4;border-color:var(--line);filter:grayscale(1)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:linear-gradient(135deg,var(--acc),var(--acc2));color:#2b0d08;padding:14px 22px;border-radius:18px;font-weight:700;z-index:20;box-shadow:0 12px 40px #0008;animation:rise .4s;max-width:90vw;text-align:center}
 .tm{position:sticky;top:60px;z-index:4;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;border-radius:18px;background:var(--bg);border:1px solid var(--acc2);margin:10px 0}.tm b{font:700 24px var(--fd)}.tm.warn b{color:var(--bad)}
@@ -153,7 +160,7 @@ const acc=k=>{const t=S.topics[k];return t&&t.done?Math.round(100*t.ok/t.done):n
 // Навигация
 const PAGES={home:'Главная',test:'Тест',plan:'План',practice:'Практика',exam:'Экзамен',chat:'Чат',parent:'Родителю'};
 let page='home',cur=null,hintN=0;
-function nav(){const lg=$('#logo');lg.innerHTML=(photos[0]?`<img class="ava" src="${photos[0]}">`:'<svg viewBox="0 0 32 32" fill="none" stroke="url(#g)" stroke-width="3"><defs><linearGradient id="g"><stop stop-color="#ff5a4d"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><circle cx="16" cy="18" r="10"/><path d="M16 2v6"/></svg>')+'<span>Мой ИИ-репетитор</span>';$('#nav').innerHTML=Object.entries(PAGES).map(([k,v])=>`<button class="${k==page?'on':''}" onclick="go('${k}')">${v}</button>`).join('')+`<button onclick="theme()">◐</button>`}
+function nav(){const lg=$('#logo');lg.innerHTML=('<svg viewBox="0 0 32 32" fill="none" stroke="url(#g)" stroke-width="3"><defs><linearGradient id="g"><stop stop-color="#ff5a4d"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><circle cx="16" cy="18" r="10"/><path d="M16 2v6"/></svg>')+'<span>Мой ИИ-репетитор</span>';$('#nav').innerHTML=Object.entries(PAGES).map(([k,v])=>`<button class="${k==page?'on':''}" onclick="go('${k}')">${v}</button>`).join('')+`<button onclick="theme()">◐</button>`}
 window.go=p=>{page=p;S.page=p;save();nav();render()};
 window.theme=()=>{const r=document.documentElement;r.dataset.t=r.dataset.t=='light'?'dark':'light'};
 const level=()=>Math.floor(S.xp/100)+1;
@@ -164,6 +171,15 @@ const ELS=['Ласточка','Ангел','Русалка','Бабочка','П
 const elNames=()=>(S.elements&&S.elements.length?S.elements:ELS);
 function eIcon(i){const an=(i*37+20)*Math.PI/180,cx=32,cy=32,x1=cx+22*Math.cos(an),y1=cy+22*Math.sin(an),x2=cx-22*Math.cos(an+.5),y2=cy-22*Math.sin(an+.5);
  return`<svg viewBox="0 0 64 64" width="56" height="56"><circle cx="32" cy="32" r="24" fill="none" stroke="url(#gg)" stroke-width="3"/><defs><linearGradient id="gg"><stop stop-color="#ff5a4d"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><path d="M${x1.toFixed(1)} ${y1.toFixed(1)} Q32 ${(20+i*4)%44+10} ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><circle cx="${x1.toFixed(1)}" cy="${y1.toFixed(1)}" r="4" fill="#ffc857"/></svg>`}
+
+function burst(el){if(!el)return;const r=document.createElement('div');r.className='burst';for(let i=0;i<12;i++){const d=document.createElement('i'),a=i/12*6.283,k=40+Math.random()*40;d.style.setProperty('--dx',Math.cos(a)*k+'px');d.style.setProperty('--dy',Math.sin(a)*k+'px');d.style.background=i%2?'#ffc857':'#ff5a4d';r.appendChild(d)}el.style.position='relative';el.appendChild(r);setTimeout(()=>r.remove(),900)}
+function levelFx(L){const n=elNames()[L-2],o=document.createElement('div');o.className='lvl';let b='';for(let i=0;i<24;i++){const an=i/24*6.283-1.5708;b+=`<circle class="lb" style="animation-delay:${(0.6+i*0.05).toFixed(2)}s" cx="${(60+50*Math.cos(an)).toFixed(1)}" cy="${(60+50*Math.sin(an)).toFixed(1)}" r="4.5" fill="${i%2?'#ffc857':'#ff5a4d'}"/>`}
+ o.innerHTML=`<svg class="big" viewBox="0 0 120 120"><g class="ringA"><circle cx="60" cy="60" r="50" fill="none" stroke="#ffffff66" stroke-width="2"/>${b}</g><g class="ringB"><circle cx="60" cy="60" r="38" fill="none" stroke="#ffffff55" stroke-width="1.5" stroke-dasharray="4 6"/></g></svg><h2>Уровень ${L}!</h2>${n?`<p>Открыт элемент на кольце: <b>${n}</b></p><div class="ei">${eIcon(L-2)}</div>`:''}<small style="opacity:.7">нажми, чтобы продолжить</small>`;
+ o.onclick=()=>o.remove();document.body.appendChild(o);setTimeout(()=>o.remove(),5000)}
+function fxOk(L0,bonus){burst($('#fb'));const i=$('#xpi');if(i){if(level()>L0){i.style.width='100%';setTimeout(()=>{i.style.transition='none';i.style.width='0%';void i.offsetWidth;i.style.transition='';i.style.width=(S.xp%100)+'%'},850)}else i.style.width=(S.xp%100)+'%'}
+ const k=$('#stk');if(k){k.textContent='🔥 '+S.streak;k.classList.remove('pop');void k.offsetWidth;k.classList.add('pop')}
+ if(bonus)setTimeout(()=>toast(`🔥 Серия ${S.streak} подряд! Бонус +${bonus} очков`),450);
+ if(level()>L0)setTimeout(()=>levelFx(level()),950)}
 function toast(t){const d=document.createElement('div');d.className='toast';d.innerHTML=t;document.body.appendChild(d);setTimeout(()=>d.remove(),4500)}
 let photos=ls.get('photos',[]),heroI=0;const savePh=()=>ls.set('photos',photos);
 const overall=()=>Math.round(100*Object.keys(TOPICS).reduce((z,k)=>{const t=S.topics[k];return z+(t&&t.done?Math.min(1,t.done/4)*t.ok/t.done:0)},0)/Object.keys(TOPICS).length);
@@ -206,16 +222,16 @@ function plan(){if(!S.plan)return $('#app').innerHTML=`<div class="card"><h2>П�
 // Практика с подсказками
 function practice(next=true){
  if(next||!cur||cur.solved){const w=weak().filter(x=>x[1]!==100),tp=todayPlan(),r=Math.random();const k=tp&&r<.4?tp.main:tp&&r<.75&&!tp.mini?tp.gap:w[0]?.[0]||pick(Object.keys(TOPICS));cur={...GEN[k](T(k).level),t:k,tries:0};hintN=0}
- const t=T(cur.t);$('#app').innerHTML=`<div class="card"><span class="tag">${TOPICS[cur.t]} · сложность ${t.level}/3</span><div class="q" style="margin-top:12px">${cur.q}</div><div id="fb"></div>
+ const t=T(cur.t);$('#app').innerHTML=`<div class="card"><div class="xpb"><span>Ур. ${level()}</span><div class="bar"><i id="xpi" style="width:${S.xp%100}%"></i></div><span id="stk">🔥 ${S.streak||0}</span></div><span class="tag">${TOPICS[cur.t]} · сложность ${t.level}/3</span><div class="q" style="margin-top:12px">${cur.q}</div><div id="fb"></div>
  <div class="row"><input id="a" autofocus placeholder="Ответ" onkeydown="event.key=='Enter'&&check()"><button class="pri" onclick="check()">Проверить</button><button onclick="hint()">Подсказка</button></div><div id="hs"></div></div>`;showHints()}
 function showHints(){$('#hs').innerHTML=cur.hints.slice(0,hintN).map((h,i)=>`<div class="hint">💡 ${i+1}. ${h}</div>`).join('')+(hintN>=3?`<div class="row"><button onclick="reveal()">Показать решение</button></div>`:'')}
 window.hint=()=>{if(hintN<3){hintN++;T(cur.t).hints++;save()}showHints()};
 window.check=()=>{const u=$('#a').value;if(u.trim()==='')return;const t=T(cur.t);
  if(okAns(u,cur)){cur.solved=true;const clean=hintN==0&&cur.tries==0,L0=level();t.done++;t.ok++;t.last=today();t.streak=clean?t.streak+1:0;S.xp+=clean?15:8;if(t.streak>=3&&t.level<3){t.level++;t.streak=0}
-  S.log.push({d:today(),t:cur.t,ok:1});save();if(level()>L0&&level()-2<elNames().length)toast('🎉 Новый уровень! Открыт элемент на кольце: <b>'+elNames()[level()-2]+'</b>');$('#fb').innerHTML=`<p class="ok win"><b>Верно!</b> ${clean?'С первого раза 🔥':'Ты дошла сама — это важнее скорости.'}</p><button class="pri" onclick="practice()">Следующая</button>`}
- else{cur.tries++;t.bad++;t.streak=0;S.log.push({d:today(),t:cur.t,ok:0});if(cur.tries%2==0&&t.level>1)t.level--;save();if(hintN<3)hintN++,t.hints++;save();
+  S.streak=(S.streak||0)+1;const bonus=[3,5,10,15,20].includes(S.streak)?S.streak*2:0;S.xp+=bonus;S.log.push({d:today(),t:cur.t,ok:1});save();const fbHTML=`<p class="ok win"><b>Верно!</b> ${clean?'С первого раза 🔥':'Ты дошла сама — это важнее скорости.'}</p><button class="pri" onclick="practice()">Следующая</button>`;$('#fb').innerHTML=fbHTML;fxOk(L0,bonus)}
+ else{cur.tries++;t.bad++;t.streak=0;S.streak=0;$('#stk')&&($('#stk').textContent='🔥 0');S.log.push({d:today(),t:cur.t,ok:0});if(cur.tries%2==0&&t.level>1)t.level--;save();if(hintN<3)hintN++,t.hints++;save();
   $('#fb').innerHTML=`<p class="bad">Пока не то. Ничего, вот подсказка — попробуй ещё раз.</p>`;showHints()}};
-window.reveal=()=>{cur.solved=true;const t=T(cur.t);t.done++;t.last=today();save();$('#fb').innerHTML=`<p>Решение: <b>${cur.sol}</b>. Эту тему я ещё предложу — так закрепится.</p><button class="pri" onclick="practice()">Следующая</button>`;$('#hs').innerHTML=''};
+window.reveal=()=>{cur.solved=true;S.streak=0;const t=T(cur.t);t.done++;t.last=today();save();$('#fb').innerHTML=`<p>Решение: <b>${cur.sol}</b>. Эту тему я ещё предложу — так закрепится.</p><button class="pri" onclick="practice()">Следующая</button>`;$('#hs').innerHTML=''};
 
 // ---- Пробный экзамен (40 минут)
 const V1=()=>[
