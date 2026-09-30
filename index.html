@@ -18,7 +18,7 @@ body:before{background:#ff5a4d;top:-25vmax;right:-20vmax}body:after{background:#
 header{display:flex;align-items:center;gap:12px;padding:12px 16px;position:sticky;top:0;backdrop-filter:blur(18px);background:color-mix(in srgb,var(--bg) 60%,transparent);border-bottom:1px solid var(--line);z-index:5}
 .logo{font:700 15px var(--fd);display:flex;gap:10px;align-items:center;white-space:nowrap}.logo svg{width:28px;height:28px}
 .ava{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--acc2)}
-nav{display:flex;gap:6px;margin-left:auto;overflow-x:auto;scrollbar-width:none}nav button{white-space:nowrap}
+nav{display:flex;align-items:center;gap:6px;margin-left:auto;overflow-x:auto;scrollbar-width:none}nav button{white-space:nowrap}
 button{font:600 15px 'Manrope',sans-serif;cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:9px 16px;background:var(--card);color:var(--tx);transition:.18s}
 button:hover{transform:translateY(-2px);background:var(--card2)}
 button.on,button.pri{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#2b0d08;font-weight:800;border-color:transparent;box-shadow:0 8px 24px #ff5a4d44}
@@ -60,6 +60,13 @@ svg text{fill:var(--mut);font-size:11px}
 .hb{display:grid;grid-template-columns:minmax(120px,210px) 1fr 44px;gap:10px;align-items:center;padding:5px 0;font-size:14px}.hb .tr{position:relative;height:12px;background:var(--card2);border-radius:8px}.hb .fl{height:100%;background:var(--c2);border-radius:0 6px 6px 0;min-width:3px;transition:width .7s}.hb .tgt{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--mut)}.hb b{text-align:right;font-variant-numeric:tabular-nums}.hb:hover{background:var(--card2);border-radius:10px}
 #ctip{position:fixed;z-index:40;background:var(--bg);color:var(--tx);border:1px solid var(--line);padding:8px 12px;border-radius:12px;font-size:13px;pointer-events:none;display:none;box-shadow:0 8px 24px #0006}
 details.tbl{margin-top:8px;font-size:13px}details.tbl summary{cursor:pointer;color:var(--mut)}.lv{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.lv span{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:6px 12px;font-size:13px}
+.ph{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:14px 0 4px}.ph h1{margin:.2em 0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:10px 0}.kpi{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 16px;backdrop-filter:blur(14px)}.kpi small{color:var(--mut);display:block;font-size:13px}.kpi b{font:700 26px var(--fd);white-space:nowrap;display:block;margin:4px 0}.kpi .dl{font-size:13px;font-weight:700}.dl.up{color:var(--ok)}.dl.dn{color:var(--bad)}.dl.eq{color:var(--mut)}
+.verdict ul{margin:6px 0;padding-left:20px}.verdict li{margin:6px 0}.verdict .g{color:var(--ok);font-weight:700}.verdict .w{color:var(--acc2);font-weight:700}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:420px}.cal span{font-size:11px;color:var(--mut);text-align:center}.cl{aspect-ratio:1;border-radius:8px;background:var(--card2);border:1px solid var(--line)}.cl.l1{background:color-mix(in srgb,var(--c1) 28%,transparent)}.cl.l2{background:color-mix(in srgb,var(--c1) 50%,transparent)}.cl.l3{background:color-mix(in srgb,var(--c1) 75%,transparent)}.cl.l4{background:var(--c1)}.cl.nx{opacity:.25}.cl.td{outline:2px solid var(--tx);outline-offset:1px}
+.calleg{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mut);margin-top:10px}.calleg i{width:14px;height:14px;border-radius:4px;display:inline-block}
+.pin{max-width:380px;margin:40px auto;text-align:center}.pin input{text-align:center;font-size:26px;letter-spacing:10px;max-width:220px;margin:8px auto;display:block}
+details.set>summary{cursor:pointer;font:700 18px var(--fd);padding:4px 0}details.set[open]>summary{margin-bottom:10px}
 .els{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:10px}.el{background:var(--card2);border:1px solid var(--acc2);border-radius:18px;padding:10px;text-align:center;display:flex;flex-direction:column;align-items:center}.el b{font-size:14px}.el small{color:var(--mut)}.el.lock{opacity:.4;border-color:var(--line);filter:grayscale(1)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:linear-gradient(135deg,var(--acc),var(--acc2));color:#2b0d08;padding:14px 22px;border-radius:18px;font-weight:700;z-index:20;box-shadow:0 12px 40px #0008;animation:rise .4s;max-width:90vw;text-align:center}
 .tm{position:sticky;top:60px;z-index:4;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;border-radius:18px;background:var(--bg);border:1px solid var(--acc2);margin:10px 0}.tm b{font:700 24px var(--fd)}.tm.warn b{color:var(--bad)}
@@ -167,8 +174,8 @@ const acc=k=>{const t=S.topics[k];return t&&t.done?Math.round(100*t.ok/t.done):n
 // Навигация
 const PAGES={home:'Главная',test:'Тест',plan:'План',practice:'Практика',exam:'Экзамен',chat:'Чат',parent:'Родителю'};
 let page='home',cur=null,hintN=0;
-function nav(){const lg=$('#logo');lg.innerHTML=('<svg viewBox="0 0 32 32" fill="none" stroke="url(#g)" stroke-width="3"><defs><linearGradient id="g"><stop stop-color="#ff5a4d"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><circle cx="16" cy="18" r="10"/><path d="M16 2v6"/></svg>')+'<span>Мой ИИ-репетитор</span>';$('#nav').innerHTML=Object.entries(PAGES).map(([k,v])=>`<button class="${k==page?'on':''}" onclick="go('${k}')">${v}</button>`).join('')+`<button onclick="theme()">◐</button><span id="sync">${SYN[syncState]||''}</span>`}
-window.go=p=>{page=p;S.page=p;save();nav();render()};
+function nav(){const lg=$('#logo');lg.innerHTML=('<svg viewBox="0 0 32 32" fill="none" stroke="url(#g)" stroke-width="3"><defs><linearGradient id="g"><stop stop-color="#ff5a4d"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><circle cx="16" cy="18" r="10"/><path d="M16 2v6"/></svg>')+'<span>Мой ИИ-репетитор</span>';$('#nav').innerHTML=Object.entries(PAGES).map(([k,v])=>`<button class="${k==page?'on':''}" onclick="go('${k}')">${v}${k=='parent'?' 🔒':''}</button>`).join('')+`<button onclick="theme()">◐</button><span id="sync">${SYN[syncState]||''}</span>`}
+window.go=p=>{if(page=='parent'&&p!='parent')pinClear();page=p;S.page=p;save();nav();render()};
 window.theme=()=>{const r=document.documentElement;r.dataset.t=r.dataset.t=='light'?'dark':'light'};
 const level=()=>Math.floor(S.xp/100)+1;
 const weak=()=>Object.keys(TOPICS).map(k=>[k,acc(k)]).sort((a,b)=>(a[1]??-1)-(b[1]??-1));
@@ -315,6 +322,7 @@ function drawCols(el,rows,o){const {w,h,l,r,t,b}=CH,iw=w-l-r,ih=h-t-b,n=rows.len
 function drawCharts(){const host=$('#charts');if(!host)return;
  host.innerHTML=`<div class="card chart"><h2>Точность по дням</h2><p class="mut" id="k1"></p><div id="c1"></div></div>
  <div class="card chart"><h2>Путь по уровням</h2><p class="mut" id="k2"></p><div id="c2"></div><div class="lv" id="lv"></div></div>
+ <div class="card chart"><h2>Календарь занятий</h2><p class="mut" id="k6"></p><div id="c6"></div></div>
  <div class="card chart"><h2>Темы: где получается, где нужна практика</h2><p class="mut" id="k3"></p><div id="c3"></div></div>
  <div class="card chart"><h2>Время занятий по дням, мин</h2><div id="c4"></div></div>
  <div class="card chart" id="k5c" style="display:none"><h2>Пробные экзамены, баллы из 9</h2><p class="mut" id="k5"></p><div id="c5"></div></div>`;
@@ -332,6 +340,12 @@ function drawCharts(){const host=$('#charts');if(!host)return;
   $('#k2').textContent=`Сейчас уровень ${level()}, до следующего ${100-S.xp%100} очков.`;
   $('#c2').insertAdjacentHTML('beforeend',tblH(['День','Очки','Уровень'],xs.map(d=>[dm(d),xd[d],Math.floor(xd[d]/100)+1])))}
  $('#lv').innerHTML=Object.entries(S.lvlAt||{}).sort((a,b)=>a[0]-b[0]).map(([L,d])=>`<span>🏅 Ур.${L} · ${elNames()[L-2]||'—'} · ${dm(d)}</span>`).join('');
+ // 6. календарь
+ {const st=stats(),T0=today(),dw=(new Date(T0+'T00:00:00Z').getUTCDay()+6)%7,start=isoAdd(T0,-dw-28),lv=c=>!c?0:c<=5?1:c<=10?2:c<=15?3:4;let h='<div class="cal">'+['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<span>${x}</span>`).join(''),act=0;
+  for(let i=0;i<35;i++){const d=isoAdd(start,i),fut=d>T0,c=st.cnt[d]||0;if(c)act++;h+=`<div class="cl ${fut?'nx':'l'+lv(c)} ${d==T0?'td':''}" ${fut?'':`data-tip="<b>${dm(d)}</b><br>${c} задач${st.mn[d]?'<br>'+Math.round(st.mn[d])+' мин':''}"`}></div>`}
+  h+='</div><div class="calleg">меньше <i style="background:var(--card2)"></i><i class="cl l1"></i><i class="cl l2"></i><i class="cl l3"></i><i class="cl l4"></i> больше задач в день</div>';$('#c6').innerHTML=h;
+  $('#k6').textContent=`Занималась ${act} дн. из последних 35. Текущая серия ${st.streak} дн., рекорд ${st.best}.`;
+  $('#c6').querySelectorAll('.cl[data-tip]').forEach(e=>{e.onpointermove=ev=>tip(ev,e.dataset.tip);e.onpointerleave=tipOff})}
  // 3. темы
  const rows=Object.keys(TOPICS).filter(k=>acc(k)!=null).map(k=>({k,a:acc(k),n:S.topics[k].done})).sort((x,y)=>y.a-x.a);
  if(!rows.length)empty('#c3','Появится после первых решённых задач.');else{const ok=rows.filter(r=>r.a>=80).length;$('#k3').textContent=`Освоено (≥80%): ${ok} из ${rows.length} начатых тем. Серая черта — цель 80%.`;
@@ -346,16 +360,62 @@ function drawCharts(){const host=$('#charts');if(!host)return;
  const ex=(S.exams||[]).slice(-10);if(ex.length){$('#k5c').style.display='';const best=Math.max(...ex.map(e=>e.sc));$('#k5').textContent=`Последний результат ${ex[ex.length-1].sc} из 9 за ${fmt(ex[ex.length-1].sec)}, лучший — ${best}. Ориентир для перевода: чем ближе к 9, тем лучше.`;
   drawCols($('#c5'),ex.map((e,i)=>({x:dm(e.d),y:e.sc,tip:`<b>${dm(e.d)}</b> · вариант ${e.v}<br>${e.sc} из 9<br>время ${fmt(e.sec)}`})),{ymax:9,ticks:[0,3,6,9],aria:'Баллы пробных экзаменов'});
   $('#c5').insertAdjacentHTML('beforeend',tblH(['Дата','Вариант','Баллы','Время'],ex.map(e=>[dm(e.d),e.v,e.sc,fmt(e.sec)])))}}
-function parent(){parent0();drawCharts()}
-function parent0(){const rows=Object.entries(TOPICS).map(([k,v])=>{const t=S.topics[k];return`<tr><td>${v}</td><td>${t?.done||0}</td><td>${acc(k)??'—'}${acc(k)==null?'':'%'}</td><td>${t?.hints||0}</td><td>${t?.level||1}</td><td>${t?.last||'—'}</td></tr>`}).join('');
- $('#app').innerHTML=`<div class="card"><h1>Кабинет родителя</h1><div class="grid"><div class="stat">Минут занятий<b>${Math.round(S.minutes)}</b></div><div class="stat">Уровень<b>${level()}</b></div></div></div>
- <div class="card"><h2>По темам</h2><div style="overflow:auto"><table><tr><th>Тема<th>Задач<th>Верно<th>Подсказок<th>Уровень<th>Последний раз</tr>${rows}</table></div></div>
+
+// ---- PIN-код кабинета родителя
+let pinFail=0;
+const pinOk=()=>{try{return Date.now()-(+sessionStorage.getItem('pinT')||0)<10*60*1000}catch{return false}};
+const pinStamp=()=>{try{sessionStorage.setItem('pinT',Date.now())}catch{}};
+const pinClear=()=>{try{sessionStorage.removeItem('pinT')}catch{}};
+async function hashPin(p,salt){const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+':'+p));return[...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function parentGate(msg=''){const setup=!S.pin,lock=ls.get('pinlock',0),wait=Math.ceil((lock-Date.now())/1000);
+ $('#app').innerHTML=`<div class="card pin"><h1>🔒 Кабинет родителя</h1>${setup?`<p class="mut">Придумайте PIN-код (4–6 цифр), чтобы ребёнок не мог открыть этот раздел. Запомните его.</p><input id="p1" type="password" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="off"><input id="p2" type="password" inputmode="numeric" maxlength="6" placeholder="повтор" autocomplete="off" onkeydown="event.key=='Enter'&&pinSave()"><div class="row" style="justify-content:center"><button class="pri" onclick="pinSave()">Сохранить PIN</button></div>`:`<p class="mut">Введите PIN-код.</p><input id="p1" type="password" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="off" onkeydown="event.key=='Enter'&&pinCheck()" ${wait>0?'disabled':''}><div class="row" style="justify-content:center"><button class="pri" onclick="pinCheck()" ${wait>0?'disabled':''}>Войти</button></div>`}
+ <p class="bad" id="pm">${wait>0?'Слишком много попыток. Подождите '+wait+' с.':msg}</p></div>`;setTimeout(()=>$('#p1')?.focus(),50)}
+window.pinSave=async()=>{const a=$('#p1').value,b=$('#p2').value;if(!/^\d{4,6}$/.test(a))return parentGate('PIN — от 4 до 6 цифр.');if(a!==b)return parentGate('PIN-коды не совпали.');const salt=Math.random().toString(36).slice(2);S.pin={salt,h:await hashPin(a,salt)};save();pinStamp();toast('PIN сохранён');parent()};
+window.pinCheck=async()=>{const p=$('#p1').value;if(Date.now()<ls.get('pinlock',0))return parentGate();if(S.pin&&await hashPin(p,S.pin.salt)===S.pin.h){pinFail=0;pinStamp();parent()}else{pinFail++;if(pinFail>=5){ls.set('pinlock',Date.now()+60000);pinFail=0}parentGate('Неверный PIN.')}};
+window.lockParent=()=>{pinClear();go('home')};
+window.changePin=()=>{S.pin=null;save();pinClear();parentGate()};
+addEventListener('pointerdown',()=>{if(page=='parent'&&pinOk())pinStamp()});
+setInterval(()=>{if(page=='parent'&&!pinOk())parentGate()},15000);
+function parent(){if(!pinOk())return parentGate();pinStamp();parent0();drawCharts()}
+const isoAdd=(iso,n)=>new Date(Date.parse(iso+'T00:00:00Z')+n*864e5).toISOString().slice(0,10);
+function stats(){const T0=today(),cnt={},ok={};S.log.forEach(l=>{cnt[l.d]=(cnt[l.d]||0)+1;ok[l.d]=(ok[l.d]||0)+l.ok});const mn=S.mind||{};
+ const sum=(m,from,to)=>{let v=0;for(let i=from;i<=to;i++)v+=m[isoAdd(T0,-i)]||0;return v};
+ const a7=sum(cnt,0,6),b7=sum(cnt,7,13),k7=sum(ok,0,6),kb=sum(ok,7,13);
+ let streak=0,i=cnt[T0]?0:1;while(cnt[isoAdd(T0,-i)]){streak++;i++}
+ let best=0,run=0;for(let j=0;j<120;j++){if(cnt[isoAdd(T0,-j)]){run++;best=Math.max(best,run)}else run=0}
+ return{cnt,ok,mn,min7:Math.round(sum(mn,0,6)),minP:Math.round(sum(mn,7,13)),tasks7:a7,tasksP:b7,acc7:a7?Math.round(100*k7/a7):null,accP:b7?Math.round(100*kb/b7):null,streak,best}}
+const dl=(v,p,u='',inv=false)=>{if(v==null||p==null||p===0&&v===0)return'<span class="dl eq">— нет сравнения</span>';const d=v-p;return d==0?'<span class="dl eq">= как на прошлой неделе</span>':`<span class="dl ${(d>0)!=inv?'up':'dn'}">${d>0?'▲ +':'▼ −'}${Math.abs(d)}${u} к прошлой неделе</span>`};
+function verdict(st){const out=[],good=Object.keys(TOPICS).filter(k=>acc(k)>=80&&S.topics[k].done>=3).sort((x,y)=>acc(y)-acc(x)).slice(0,3),
+ weak=Object.keys(TOPICS).filter(k=>acc(k)!=null&&acc(k)<60&&S.topics[k].done>=2).sort((x,y)=>acc(x)-acc(y)).slice(0,3),tp=todayPlan(),h=Object.values(S.topics).reduce((z,t)=>z+t.hints,0),d=Object.values(S.topics).reduce((z,t)=>z+t.done,0);
+ if(good.length)out.push(`<li><span class="g">Получается:</span> ${good.map(k=>TOPICS[k]).join(', ')}.</li>`);
+ if(weak.length)out.push(`<li><span class="w">Нужна практика:</span> ${weak.map(k=>TOPICS[k]+' ('+acc(k)+'%)').join(', ')}. Они чаще всего попадаются в заданиях на практике.</li>`);
+ if(!d)out.push('<li>Данных пока нет: после первых занятий здесь появятся выводы и рекомендации.</li>');
+ else{
+  out.push(st.min7<100?`<li><span class="w">Регулярность:</span> за 7 дней ${st.min7} мин. Для подготовки к лицею разумно 20 минут в день, 5–6 дней в неделю (≈100–120 мин).</li>`:`<li><span class="g">Регулярность:</span> за 7 дней ${st.min7} мин — хороший ритм.</li>`);
+  if(st.streak>=2)out.push(`<li><span class="g">Серия:</span> ${st.streak} дн. подряд (рекорд ${st.best}).</li>`);
+  if(d>=10&&h/d>1)out.push('<li><span class="w">Подсказки:</span> нужны часто. Попросите объяснить решение вслух: так быстрее закрепляется.</li>');
+  const ex=(S.exams||[]);if(ex.length){const e=ex[ex.length-1];out.push(e.sc>=7?`<li><span class="g">Пробный экзамен:</span> ${e.sc} из 9 за ${fmt(e.sec)} — близко к цели.</li>`:`<li><span class="w">Пробный экзамен:</span> ${e.sc} из 9${e.sec>2280?', время почти на пределе (40 мин)':''}. Проходите вариант раз в неделю, цель — 7+ из 9.</li>`)}else out.push('<li>Пробный экзамен ещё не проходили: запланируйте первую попытку на неделе 4 плана.</li>')}
+ if(tp)out.push(`<li><b>По плану сегодня:</b> ${TOPICS[tp.main]}${tp.mini?'':' + '+(TOPICS[tp.gap]||'повторение')}.</li>`);
+ return`<ul>${out.join('')}</ul>`}
+function parent0(){const st=stats(),rows=Object.entries(TOPICS).map(([k,v])=>{const t=S.topics[k];return`<tr><td>${v}<td>${t?.done||0}<td>${acc(k)??'—'}${acc(k)==null?'':'%'}<td>${t?.hints||0}<td>${t?.level||1}<td>${t?.last||'—'}</tr>`}).join('');
+ const ex=(S.exams||[]),bestE=ex.length?Math.max(...ex.map(e=>e.sc)):null,rd=overall();
+ $('#app').innerHTML=`<div class="ph"><div><span class="tag">Кабинет родителя</span><h1>Прогресс${S.name?': '+S.name:''}</h1><p class="mut" style="margin:0">Сводка за последние 7 дней. Обновляется после каждого задания.</p></div><button onclick="lockParent()">🔒 Закрыть кабинет</button></div>
+ <div class="kpis"><div class="kpi"><small>Время за 7 дней</small><b>${st.min7}<span style="font:600 13px Manrope"> мин</span></b>${dl(st.min7,st.minP,' мин')}</div>
+ <div class="kpi"><small>Решено задач</small><b>${st.tasks7}</b>${dl(st.tasks7,st.tasksP)}</div>
+ <div class="kpi"><small>Точность</small><b>${st.acc7==null?'—':st.acc7+'%'}</b>${dl(st.acc7,st.accP,'%')}</div>
+ <div class="kpi"><small>Занимается подряд</small><b>${st.streak}<span style="font:600 13px Manrope"> дн.</span></b><span class="dl eq">рекорд ${st.best} дн.</span></div>
+ <div class="kpi"><small>Готовность (по темам)</small><b>${rd}%</b><div class="bar"><i style="width:${rd}%"></i></div></div>
+ <div class="kpi"><small>Лучший пробный экзамен</small><b>${bestE==null?'—':bestE+' / 9'}</b><span class="dl eq">уровень ${level()}</span></div></div>
+ <div class="card verdict"><h2>Вывод и рекомендации</h2>${verdict(st)}</div>
  <div id="charts"></div>
- <div class="card"><h2>Отчёт и рекомендации</h2><textarea id="rp" rows="8" readonly>${reportText()}</textarea><div class="row"><button class="pri" onclick="$('#rp').select();document.execCommand('copy')">Скопировать</button></div></div>
- <div class="card"><h2>Фото на сайте</h2><p class="mut">Фото хранятся только в браузере этого устройства и никуда не отправляются. До 6 штук.</p><div class="photos">${photos.map((u,i)=>`<div><img src="${u}"><button onclick="photos.splice(${i},1);savePh();parent()">×</button></div>`).join('')}</div><input type="file" accept="image/*" multiple onchange="addPhotos(this)"></div>
- <div class="card"><h2>Названия элементов на кольце</h2><p class="mut">По одному в строке — впишите настоящие элементы, которые она делает. Открываются по уровням.</p><textarea id="els" rows="6">${elNames().join('\n')}</textarea><div class="row"><button onclick="S.elements=$('#els').value.split('\n').map(x=>x.trim()).filter(Boolean);save();parent()">Сохранить</button></div></div>
- <div class="card"><h2>Аккаунт</h2>${!SUPA.url?'<p class="mut">Облачное сохранение не подключено: прогресс хранится только в этом браузере.</p>':user?`<p>Вы вошли как <b>${user.email}</b>. Прогресс сохраняется в облаке после каждого задания.</p><div class="row"><button onclick="syncNow()">Синхронизировать сейчас</button><button onclick="logout()">Выйти</button></div>`:'<p class="mut">Вход не выполнен: прогресс не синхронизируется между устройствами.</p><div class="row"><button class="pri" onclick="showLogin()">Войти</button></div>'}</div>
- <div class="card"><h2>Настройки</h2><p class="mut">Адрес ИИ (Cloudflare Worker из README):</p><div class="row"><input id="u" value="${S.cfg.url||''}" placeholder="https://….workers.dev"><button onclick="S.cfg.url=$('#u').value.trim();save();parent()">Сохранить</button></div><div class="row"><button onclick="if(confirm('Стереть весь прогресс?')){localStorage.clear();location.reload()}">Сбросить прогресс</button></div></div>`}
+ <div class="card"><h2>Все темы</h2><div style="overflow:auto"><table><tr><th>Тема<th>Задач<th>Верно<th>Подсказок<th>Уровень<th>Последний раз</tr>${rows}</table></div></div>
+ <div class="card"><h2>Отчёт для пересылки</h2><textarea id="rp" rows="8" readonly>${reportText()}</textarea><div class="row"><button class="pri" onclick="$('#rp').select();document.execCommand('copy');toast('Скопировано')">Скопировать</button></div></div>
+ <details class="card set"><summary>Настройки: PIN, фото, элементы, аккаунт</summary>
+ <h2>PIN-код</h2><p class="mut">Защищает этот раздел от ребёнка. Код одинаков на всех устройствах после входа.</p><div class="row"><button onclick="changePin()">Сменить PIN</button></div>
+ <h2 style="margin-top:18px">Фото на сайте</h2><p class="mut">Фото хранятся только в браузере этого устройства и никуда не отправляются. До 6 штук.</p><div class="photos">${photos.map((u,i)=>`<div><img src="${u}"><button onclick="photos.splice(${i},1);savePh();parent()">×</button></div>`).join('')}</div><input type="file" accept="image/*" multiple onchange="addPhotos(this)">
+ <h2 style="margin-top:18px">Названия элементов на кольце</h2><p class="mut">По одному в строке — впишите настоящие элементы. Открываются по уровням.</p><textarea id="els" rows="6">${elNames().join('\n')}</textarea><div class="row"><button onclick="S.elements=$('#els').value.split('\n').map(x=>x.trim()).filter(Boolean);save();parent()">Сохранить</button></div>
+ <h2 style="margin-top:18px">Аккаунт</h2>${!SUPA.url?'<p class="mut">Облачное сохранение не подключено.</p>':user?`<p>Вы вошли как <b>${user.email}</b>. Прогресс сохраняется в облаке после каждого задания.</p><div class="row"><button onclick="syncNow()">Синхронизировать сейчас</button><button onclick="logout()">Выйти</button></div>`:'<p class="mut">Вход не выполнен: прогресс не синхронизируется между устройствами.</p><div class="row"><button class="pri" onclick="showLogin()">Войти</button></div>'}
+ <h2 style="margin-top:18px">Адрес ИИ и сброс</h2><div class="row"><input id="u" value="${S.cfg.url||''}" placeholder="https://….workers.dev"><button onclick="S.cfg.url=$('#u').value.trim();save();parent()">Сохранить</button></div><div class="row"><button onclick="if(confirm('Стереть весь прогресс на этом устройстве?')){localStorage.clear();location.reload()}">Сбросить прогресс</button></div></details>`}
 window.addPhotos=async inp=>{for(const f of inp.files){if(photos.length>=6)break;try{const bm=await createImageBitmap(f),k=Math.min(1,1000/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=bm.width*k;c.height=bm.height*k;c.getContext('2d').drawImage(bm,0,0,c.width,c.height);photos.push(c.toDataURL('image/jpeg',.78))}catch{}}savePh();nav();parent()};
 
 // ---- Облачная синхронизация (Supabase, вход по e-mail-коду)
@@ -382,6 +442,7 @@ addEventListener('visibilitychange',()=>{if(document.hidden&&dirty&&user)push(tr
  const hp=new URLSearchParams(location.hash.slice(1)),he=hp.get('error_code')||hp.get('error');
  try{const {data}=await sb.auth.getSession();if(data.session)await afterLogin(data.session);else{setSync('out');nav();showLogin();if(he){msgG(he=='otp_expired'?'Ссылка устарела или уже использована (почтовые программы иногда открывают её сами). Запросите новую и нажмите ссылку один раз.':'Не удалось войти по ссылке ('+(hp.get('error_description')||he).replace(/\+/g,' ')+'). Запросите новую.');history.replaceState(null,'',location.pathname)}}}catch{setSync('err');nav()}
  sb.auth.onAuthStateChange((ev,ses)=>{if(ev=='SIGNED_IN'&&ses&&!user)afterLogin(ses)})})();
+pinClear();
 page=(S.page&&PAGES[S.page])?S.page:'home';
 if(page=='practice'&&S.cur&&S.cur.cur&&!S.cur.cur.solved){cur=S.cur.cur;hintN=S.cur.hintN||0}
 if(page=='exam'&&!EXAM)page='home';
