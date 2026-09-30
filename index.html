@@ -379,7 +379,8 @@ addEventListener('online',()=>{if(dirty&&user)push(true)});setInterval(()=>{if(d
 addEventListener('visibilitychange',()=>{if(document.hidden&&dirty&&user)push(true)});
 (async()=>{if(!SUPA.url||!SUPA.key)return;if(!await loadSb()){setSync('err');nav();return}
  sb=window.supabase.createClient(SUPA.url,SUPA.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
- try{const {data}=await sb.auth.getSession();if(data.session)await afterLogin(data.session);else{setSync('out');nav();showLogin()}}catch{setSync('err');nav()}
+ const hp=new URLSearchParams(location.hash.slice(1)),he=hp.get('error_code')||hp.get('error');
+ try{const {data}=await sb.auth.getSession();if(data.session)await afterLogin(data.session);else{setSync('out');nav();showLogin();if(he){msgG(he=='otp_expired'?'Ссылка устарела или уже использована (почтовые программы иногда открывают её сами). Запросите новую и нажмите ссылку один раз.':'Не удалось войти по ссылке ('+(hp.get('error_description')||he).replace(/\+/g,' ')+'). Запросите новую.');history.replaceState(null,'',location.pathname)}}}catch{setSync('err');nav()}
  sb.auth.onAuthStateChange((ev,ses)=>{if(ev=='SIGNED_IN'&&ses&&!user)afterLogin(ses)})})();
 page=(S.page&&PAGES[S.page])?S.page:'home';
 if(page=='practice'&&S.cur&&S.cur.cur&&!S.cur.cur.solved){cur=S.cur.cur;hintN=S.cur.hintN||0}
