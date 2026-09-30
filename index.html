@@ -156,7 +156,7 @@ const linP=t=>{const m={};(nrm(t).match(/[+-]?\d*\.?\d*[a-z]?/g)||[]).filter(x=>
 const okAns=(u,it)=>{if(String(u).trim()==='')return false;if(it.lin){const a=linP(u),b=linP(it.lin),ks=new Set([...Object.keys(a),...Object.keys(b)]);return[...ks].every(k=>Math.abs((a[k]||0)-(b[k]||0))<1e-6)}
  if(it.alts)return it.alts.some(x=>nrm(x)==nrm(u));return same(u,it.a)};
 // состояние
-const SUPA={url:'',key:''}; // публичные значения из Supabase (Project URL и anon key)
+const SUPA={url:'https://kjuvltksdnumudkrmlfz.supabase.co',key:'sb_publishable_4naWAz83h2HU0ys61upctQ_m5Op7dfW'}; // публичные значения из Supabase (Project URL и anon key)
 const DEF=()=>({name:'',topics:{},log:[],minutes:0,test:null,plan:null,xp:0,cfg:{url:'https://calm-leaf-7bbb.golubev-artur2021.workers.dev'},msgs:[]});
 let S=ls.get('st',null)||DEF();
 const T=k=>S.topics[k]??(S.topics[k]={done:0,ok:0,bad:0,hints:0,level:1,streak:0,last:null});
