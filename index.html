@@ -174,6 +174,7 @@ const SUPA={url:'https://kjuvltksdnumudkrmlfz.supabase.co',key:'sb_publishable_4
 const DEF=()=>({name:'',topics:{},log:[],minutes:0,test:null,plan:null,xp:0,cfg:{url:'https://calm-leaf-7bbb.golubev-artur2021.workers.dev'},msgs:[]});
 let S=ls.get('st',null)||DEF();
 const T=k=>S.topics[k]??(S.topics[k]={done:0,ok:0,bad:0,hints:0,level:1,streak:0,last:null});
+const persist=()=>{S.cur=(typeof cur!=='undefined'&&cur)?{cur,hintN}:null;ls.set('st',S)};
 const save=()=>{S.cur=(typeof cur!=='undefined'&&cur)?{cur,hintN}:null;S.ts=Date.now();(S.xpd??={})[today()]=S.xp;ls.set('st',S);if(typeof user!=='undefined'&&user)push()};
 const today=()=>new Date().toISOString().slice(0,10);
 setInterval(()=>{if(!document.hidden){S.minutes+=1/6;(S.mind??={})[today()]=(S.mind[today()]||0)+1/6;ls.set('st',S)}},10000);
@@ -182,7 +183,7 @@ const acc=k=>{const t=S.topics[k];return t&&t.done?Math.round(100*t.ok/t.done):n
 const PAGES={home:'Главная',test:'Тест',plan:'План',practice:'Практика',exam:'Экзамен',chat:'Чат',parent:'Родителю'};
 let page='home',cur=null,hintN=0;
 function nav(){const lg=$('#logo');lg.innerHTML=('<svg viewBox="0 0 32 32" fill="none" stroke="url(#g)" stroke-width="3"><defs><linearGradient id="g"><stop stop-color="#ff5a4d"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><circle cx="16" cy="18" r="10"/><path d="M16 2v6"/></svg>')+'<span>Мой ИИ-репетитор</span>';$('#nav').innerHTML=Object.entries(PAGES).map(([k,v])=>`<button class="${k==page?'on':''}" onclick="go('${k}')">${v}${k=='parent'?' 🔒':''}</button>`).join('')+`<button onclick="theme()">◐</button><span id="sync">${synHTML()}</span>`}
-window.go=p=>{if(page=='parent'&&p!='parent')pinClear();page=p;S.page=p;save();nav();render()};
+window.go=p=>{if(page=='parent'&&p!='parent')pinClear();page=p;S.page=p;persist();nav();render()};
 window.theme=()=>{const r=document.documentElement;r.dataset.t=r.dataset.t=='light'?'dark':'light'};
 const level=()=>Math.floor(S.xp/100)+1;
 const weak=()=>Object.keys(TOPICS).map(k=>[k,acc(k)]).sort((a,b)=>(a[1]??-1)-(b[1]??-1));
@@ -602,8 +603,23 @@ let sb=null,user=null,syncState='off',pushT=null,dirty=false,loginEmail='';
 const synHTML=()=>{if(!SUPA.url)return'';if(!user)return syncState=='err'?'<span class="tag bad">⚠ нет связи</span>':'<button onclick="showLogin()">☁ Войти</button>';const nm=esc((user.email||'').split('@')[0].slice(0,12)),ic={err:'⚠ ',busy:'☁ … '}[syncState]||'☁ ✓ ';return`<button class="tag ${syncState=='err'?'bad':''}" onclick="showAccount()" title="Аккаунт: ${esc(user.email||'')}">${ic}${nm}</button>`};
 function setSync(st){syncState=st;const e=$('#sync');if(e)e.innerHTML=synHTML()}
 const loadSb=()=>new Promise(r=>{if(window.supabase)return r(true);const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';sc.onload=()=>r(!!window.supabase);sc.onerror=()=>r(false);document.head.appendChild(sc);setTimeout(()=>r(!!window.supabase),5000)});
-async function push(now){if(!sb||!user)return;clearTimeout(pushT);const run=async()=>{setSync('busy');try{const {error}=await sb.from('progress').upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()});if(error)throw error;dirty=false;setSync('ok')}catch{dirty=true;setSync('err')}};if(now)return run();dirty=true;pushT=setTimeout(run,1500)}
-async function pull(anon){setSync('busy');try{const {data,error}=await sb.from('progress').select('data').maybeSingle();if(error)throw error;const rts=data?.data?.ts||0;if(data&&(anon||rts>(S.ts||0))){const lp=S.pin;S={...DEF(),...data.data};if(lp&&(!S.pin||(lp.ts||0)>(S.pin.ts||0)))S.pin=lp;S.owner=user.id;S.email=user.email;ls.set('st',S);const pg=(S.page&&PAGES[S.page])?S.page:'home';page=pg;cur=null;if(pg=='practice'&&S.cur?.cur&&!S.cur.cur.solved){cur=S.cur.cur;hintN=S.cur.hintN||0}setSync('ok')}else if(!data||(S.ts||0)>rts){if(data?.data?.pin&&(data.data.pin.ts||0)>(S.pin?.ts||0))S.pin=data.data.pin;await push(true)}else setSync('ok')}catch{setSync('err')}}
+
+// ---- Слияние прогресса с облаком (чтобы устаревшее устройство не затирало новое)
+function mergeS(a,b){const c={...b,...a},mx=(p,q)=>{const o={...(p||{})};for(const k in (q||{}))o[k]=Math.max(o[k]||0,q[k]);return o};
+ c.xp=Math.max(a.xp||0,b.xp||0);c.minutes=Math.max(a.minutes||0,b.minutes||0);c.ts=Math.max(a.ts||0,b.ts||0);
+ c.topics={...(b.topics||{})};for(const k in (a.topics||{}))if(!c.topics[k]||(a.topics[k].done||0)>=(c.topics[k].done||0))c.topics[k]=a.topics[k];
+ const cnt=m=>{const o={};(m||[]).forEach(x=>{const k=JSON.stringify(x);(o[k]??=[0,x])[0]++});return o},la=cnt(a.log),lb=cnt(b.log),lo=[];
+ new Set([...Object.keys(la),...Object.keys(lb)]).forEach(k=>{const n=Math.max(la[k]?la[k][0]:0,lb[k]?lb[k][0]:0),x=(la[k]||lb[k])[1];for(let i=0;i<n;i++)lo.push(x)});c.log=lo.sort((p,q)=>p.d<q.d?-1:p.d>q.d?1:0);
+ c.xpd=mx(a.xpd,b.xpd);c.mind=mx(a.mind,b.mind);c.lvlAt={...(b.lvlAt||{}),...(a.lvlAt||{})};
+ const wm=new Map();[...(b.works||[]),...(a.works||[])].forEach(w=>{const o=wm.get(w.id);if(!o||w.items.length>=o.items.length)wm.set(w.id,w)});c.works=[...wm.values()].sort((x,y)=>x.id-y.id).slice(-40);
+ const em=new Map();[...(b.exams||[]),...(a.exams||[])].forEach(e=>em.set(e.id||(e.d+'|'+e.v+'|'+e.sec),e));c.exams=[...em.values()];
+ const tm=new Map();[...(b.talks||[]),...(a.talks||[])].forEach(t=>{const o=tm.get(t.key);if(!o||t.msgs.length>=o.msgs.length)tm.set(t.key,t)});c.talks=[...tm.values()].slice(-60);
+ const ta=a.test,tb=b.test;c.test=!ta?tb:!tb?ta:ta.wid==tb.wid?((tb.done&&!ta.done)||(!ta.done&&(tb.i||0)>(ta.i||0))?tb:ta):((tb.wid||0)>(ta.wid||0)?tb:ta);
+ c.plan=a.plan||b.plan;c.msgs=(a.msgs||[]).length>=(b.msgs||[]).length?a.msgs:b.msgs;c.name=a.name||b.name;c.elements=a.elements||b.elements;
+ c.pin=(a.pin&&(!b.pin||(a.pin.ts||0)>=(b.pin.ts||0)))?a.pin:(b.pin||a.pin);if(!c.pin)delete c.pin;return c}
+let lastSync=0;
+async function push(now){if(!sb||!user)return;clearTimeout(pushT);const run=async()=>{setSync('busy');try{const rr=await sb.from('progress').select('data').maybeSingle();if(rr.error)throw rr.error;if(rr.data&&rr.data.data)S=mergeS(S,rr.data.data);S.owner=user.id;S.email=user.email;const {error}=await sb.from('progress').upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()});if(error)throw error;ls.set('st',S);dirty=false;lastSync=Date.now();setSync('ok')}catch{dirty=true;setSync('err')}};if(now)return run();dirty=true;pushT=setTimeout(run,1500)}
+async function pull(anon){setSync('busy');try{const {data,error}=await sb.from('progress').select('data').maybeSingle();if(error)throw error;const rts=data?.data?.ts||0;if(data&&!anon){const fresh=!S.ts;S=mergeS(S,data.data);S.owner=user.id;S.email=user.email;ls.set('st',S);if(fresh){page=(S.page&&PAGES[S.page])?S.page:'home';cur=null;if(page=='practice'&&S.cur?.cur&&!S.cur.cur.solved){cur=S.cur.cur;hintN=S.cur.hintN||0}}await push(true)}else if(data&&(anon||rts>(S.ts||0))){const lp=S.pin;S={...DEF(),...data.data};if(lp&&(!S.pin||(lp.ts||0)>(S.pin.ts||0)))S.pin=lp;S.owner=user.id;S.email=user.email;ls.set('st',S);const pg=(S.page&&PAGES[S.page])?S.page:'home';page=pg;cur=null;if(pg=='practice'&&S.cur?.cur&&!S.cur.cur.solved){cur=S.cur.cur;hintN=S.cur.hintN||0}setSync('ok')}else if(!data||(S.ts||0)>rts){if(data?.data?.pin&&(data.data.pin.ts||0)>(S.pin?.ts||0))S.pin=data.data.pin;await push(true)}else setSync('ok')}catch{setSync('err')}}
 async function afterLogin(session){const u=session.user,st=ls.get('st:'+u.id,null);
  if(S.owner&&S.owner!==u.id){ls.set('st:'+S.owner,S);S=st||DEF()}else if(!S.owner&&st)S=st;
  const anon=!!S.anon&&!S.owner;delete S.anon;user=u;S.owner=u.id;S.email=u.email;ls.set('st',S);addAcct(u.email);document.querySelector('#gate')?.remove();await pull(anon);S.owner=u.id;S.email=u.email;const pr=ls.get('pinReset',null);let rs=false;if(pr&&(pr=='*'||pr==u.email)){S.pin=null;ls.set('pinReset',null);pinClear();rs=true}save();ls.set('st',S);if(rs){page='parent';S.page='parent';toast('PIN сброшен. Задайте новый PIN.')}nav();render();if(rs)await push(true)}
@@ -615,7 +631,7 @@ window.showLogin=(step=1,note='')=>{overlay(`<div class="card" style="max-width:
  ${step==1?`${accts().length?`<p class="mut" style="margin-bottom:4px">Недавние аккаунты:</p><div class="row" style="margin:0 0 8px">${accts().map(e=>`<button data-e="${esc(e)}" onclick="pickAcct(this.dataset.e)">${esc(e)}</button>`).join('')}</div>`:''}<input id="em" type="email" placeholder="e-mail" value="${esc(loginEmail)}" onkeydown="event.key=='Enter'&&sendCode()"><div class="row"><button class="pri" onclick="sendCode()">Получить ссылку для входа</button><button onclick="document.querySelector('#gate').remove()">Пока без входа</button></div>`:`<input id="cd" inputmode="numeric" placeholder="Код из письма (если есть)" onkeydown="event.key=='Enter'&&verifyCode()"><div class="row"><button class="pri" onclick="verifyCode()">Войти по коду</button><button onclick="sendCode(loginEmail)">Отправить письмо ещё раз</button><button onclick="showLogin(1)">Другой e-mail</button></div>`}
  <p id="gm" class="bad"></p></div>`)};
 window.showAccount=()=>{if(!user)return showLogin();if(S.pin&&!pinOk())return go('parent');
- overlay(`<div class="card" style="max-width:440px;width:100%;text-align:left;color:var(--tx)"><h2>Аккаунт</h2><p>Вы вошли как <b>${esc(user.email)}</b></p><p class="mut">${{ok:'☁ Прогресс сохранён в облаке.',busy:'☁ Сохраняю…',err:'⚠ Нет связи: прогресс сохранится при появлении интернета.'}[syncState]||''}</p>
+ overlay(`<div class="card" style="max-width:440px;width:100%;text-align:left;color:var(--tx)"><h2>Аккаунт</h2><p>Вы вошли как <b>${esc(user.email)}</b></p><p class="mut">${lastSync?'Последняя синхронизация: '+hm(lastSync)+'. ':''}${{ok:'☁ Прогресс сохранён в облаке.',busy:'☁ Сохраняю…',err:'⚠ Нет связи: прогресс сохранится при появлении интернета.'}[syncState]||''}</p>
  <div class="row"><button onclick="syncNow();document.querySelector('#gate')?.remove()">Синхронизировать</button><button class="pri" onclick="logout(true)">Сменить аккаунт</button><button onclick="logout()">Выйти</button><button onclick="document.querySelector('#gate').remove()">Закрыть</button></div>
  <p class="mut" style="font-size:13px">При выходе прогресс этого аккаунта остаётся в облаке и на этом устройстве. Зайдя снова, вы продолжите с того же места.</p></div>`)};
 window.sendCode=async(e)=>{loginEmail=(typeof e=='string'&&e)||$('#em').value.trim();if(!/.+@.+\..+/.test(loginEmail))return msgG('Проверьте e-mail');if($('#gm'))msgG('Отправляю…');const {error}=await sb.auth.signInWithOtp({email:loginEmail,options:{shouldCreateUser:true,emailRedirectTo:location.origin+location.pathname}});if(error)return msgG('Не получилось отправить: '+error.message);showLogin(2)};
@@ -635,7 +651,7 @@ page=(S.page&&PAGES[S.page])?S.page:'home';
 if(page=='practice'&&S.cur&&S.cur.cur&&!S.cur.cur.solved){cur=S.cur.cur;hintN=S.cur.hintN||0}
 if(page=='exam'&&!EXAM)page='home';
 if(EXAM&&!EXAM.done)runEx();
-addEventListener('visibilitychange',()=>{if(document.hidden)save()});addEventListener('pagehide',save);
+addEventListener('visibilitychange',()=>{if(document.hidden)persist()});addEventListener('pagehide',persist);
 try{navigator.storage?.persist?.()}catch{}
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 nav();render();
