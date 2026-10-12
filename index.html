@@ -75,11 +75,13 @@ details.wk{background:var(--card2);border:1px solid var(--line);border-radius:18
 .okfield{border-color:var(--ok)!important;background:#3ddc9722!important;box-shadow:0 0 0 4px #3ddc9733;animation:pop .5s}.badfield{border-color:var(--bad)!important;background:#ff5c7a14!important;animation:shake .35s}@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .okpop{background:#3ddc9722;border:1px solid var(--ok);border-radius:16px;padding:12px 16px;font-size:19px;text-align:center;margin:8px 0;animation:rise .3s;position:relative}
 .lvls{display:flex;gap:10px;overflow-x:auto;padding:10px 2px 4px}.lv{min-width:104px;text-align:center;background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:2px}.lv.dn{border-color:var(--ok)}.lv.cu{border-color:var(--acc2);box-shadow:0 0 0 3px #ffc85733}.lv.lk{opacity:.55}.lc{width:30px;height:30px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-weight:800}.lv.dn .lc{background:var(--ok);color:#06231a}.lv.cu .lc{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#2b0d08}
+.hero-in>div:first-child{flex:1 1 380px;min-width:0}.hero h1{font-size:clamp(24px,4.2vw,38px)}.ringw{width:150px;flex:none;text-align:center;color:#fff}.ring2{width:100%;filter:drop-shadow(0 6px 20px #0008);overflow:visible}.gsway{transform-origin:32px 1.5px;animation:sway 4s ease-in-out infinite alternate}@keyframes sway{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}.ringp{font-size:13px;opacity:.95}.ringp b{font:700 20px var(--fd)}
+.dlist{display:flex;flex-direction:column;gap:8px;max-width:600px}.dr{display:grid;grid-template-columns:28px minmax(90px,1fr) 14px 130px minmax(0,1fr);gap:8px;align-items:center}.dr .dn{color:var(--mut);font-size:13px;text-align:right}.dr .dq{font-size:20px;font-weight:700;white-space:nowrap}.dr input{padding:8px 12px;font-size:18px}.dr .st{font-size:14px;font-weight:700}.dr.bad .dq{color:var(--bad)}
 .els{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:10px}.el{background:var(--card2);border:1px solid var(--acc2);border-radius:18px;padding:10px;text-align:center;display:flex;flex-direction:column;align-items:center}.el b{font-size:14px}.el small{color:var(--mut)}.el.lock{opacity:.4;border-color:var(--line);filter:grayscale(1)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:linear-gradient(135deg,var(--acc),var(--acc2));color:#2b0d08;padding:14px 22px;border-radius:18px;font-weight:700;z-index:20;box-shadow:0 12px 40px #0008;animation:rise .4s;max-width:90vw;text-align:center}
 .tm{position:sticky;top:60px;z-index:4;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;border-radius:18px;background:var(--bg);border:1px solid var(--acc2);margin:10px 0}.tm b{font:700 24px var(--fd)}.tm.warn b{color:var(--bad)}
 .ex{margin:10px 0}.ex .n{font:700 13px var(--fd);color:var(--acc2)}.ex sup,.ex sub,.q sup,.q sub{font-size:.65em}.res{padding:10px 0;border-bottom:1px solid var(--line)}.res.no{border-left:4px solid var(--bad);padding-left:10px}.res.yes{border-left:4px solid var(--ok);padding-left:10px}
-@media(max-width:560px){.logo span{display:none}.hero{min-height:460px}.ring{width:110px}}
+@media(max-width:560px){.logo span{display:none}.hero{min-height:460px}.ringw{width:110px}}
 </style>
 </head>
 <body>
@@ -178,7 +180,7 @@ const T=k=>S.topics[k]??(S.topics[k]={done:0,ok:0,bad:0,hints:0,level:1,streak:0
 const persist=()=>{S.cur=(typeof cur!=='undefined'&&cur)?{cur,hintN}:null;ls.set('st',S)};
 const save=()=>{S.cur=(typeof cur!=='undefined'&&cur)?{cur,hintN}:null;S.ts=Date.now();(S.xpd??={})[today()]=S.xp;ls.set('st',S);if(typeof user!=='undefined'&&user)push()};
 const today=()=>new Date().toISOString().slice(0,10);
-const STUDY=['test','practice','exam','chat'],IDLE=300000;
+const STUDY=['test','practice','drill','exam','chat'],IDLE=300000;
 let lastAct=Date.now(),actPend=0,actTk=Date.now();
 const actNow=()=>(S.act||0)+actPend;
 function actCommit(){if(actPend<=0)return;S.act=(S.act||0)+actPend;const m=actPend/60;S.minutes=(S.minutes||0)+m;(S.mind??={})[today()]=((S.mind||{})[today()]||0)+m;actPend=0;ls.set('st',S)}
@@ -188,20 +190,31 @@ function actStep(){const n=Date.now(),dt=Math.min(6,(n-actTk)/1000);actTk=n;if(d
 setInterval(actStep,5000);
 const acc=k=>{const t=S.topics[k];return t&&t.done?Math.round(100*t.ok/t.done):null};
 // Навигация
-const PAGES={home:'Главная',test:'Тест',plan:'План',practice:'Практика',exam:'Экзамен',chat:'Чат',parent:'Родителю'};
+const PAGES={home:'Главная',test:'Тест',plan:'План',practice:'Практика',drill:'Тренажёр',exam:'Экзамен',chat:'Чат',parent:'Родителю'};
 let page='home',cur=null,hintN=0;
 function nav(){const lg=$('#logo');lg.innerHTML=('<svg viewBox="0 0 32 32" fill="none" stroke="url(#g)" stroke-width="3"><defs><linearGradient id="g"><stop stop-color="#ff5a4d"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><circle cx="16" cy="18" r="10"/><path d="M16 2v6"/></svg>')+'<span>Мой ИИ-репетитор</span>';$('#nav').innerHTML=Object.entries(PAGES).map(([k,v])=>`<button class="${k==page?'on':''}" onclick="go('${k}')">${v}${k=='parent'?' 🔒':''}</button>`).join('')+`<button onclick="theme()">◐</button><span id="sync">${synHTML()}</span>`}
 window.go=p=>{if(page=='parent'&&p!='parent')pinClear();page=p;S.page=p;persist();nav();render()};
 window.theme=()=>{const r=document.documentElement;r.dataset.t=r.dataset.t=='light'?'dark':'light'};
 const level=()=>Math.floor(S.xp/100)+1;
 const weak=()=>Object.keys(TOPICS).map(k=>[k,acc(k)]).sort((a,b)=>(a[1]??-1)-(b[1]??-1));
-function render(){({home,test,plan,practice:()=>practice(!(cur&&!cur.solved)),exam,chat,parent})[page]()}
+function render(){({home,test,plan,practice:()=>practice(!(cur&&!cur.solved)),drill,exam,chat,parent})[page]()}
 
 const ELS=['Ласточка','Ангел','Русалка','Бабочка','Полумесяц','Мельница','Колыбель','Звезда'];
 const elNames=()=>(S.elements&&S.elements.length?S.elements:ELS);
-function eIcon(i){const an=(i*37+20)*Math.PI/180,cx=32,cy=32,x1=cx+22*Math.cos(an),y1=cy+22*Math.sin(an),x2=cx-22*Math.cos(an+.5),y2=cy-22*Math.sin(an+.5);
- return`<svg viewBox="0 0 64 64" width="56" height="56"><circle cx="32" cy="32" r="24" fill="none" stroke="url(#gg)" stroke-width="3"/><defs><linearGradient id="gg"><stop stop-color="#ff5a4d"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><path d="M${x1.toFixed(1)} ${y1.toFixed(1)} Q32 ${(20+i*4)%44+10} ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><circle cx="${x1.toFixed(1)}" cy="${y1.toFixed(1)}" r="4" fill="#ffc857"/></svg>`}
+// Три базовые позы (руки всегда на обруче), остальные — повороты фигуры внутри кольца.
+const BASE=[
+ // 0: вис, ноги врозь
+ `<path d="M24.5 14.2Q26 21 28.5 26M39.5 14.2Q38 21 35.5 26M28.5 26H35.5M32 26V39M32 39Q27 44 20 49L14 54M32 39Q37 44 44 49L50 54"/><circle cx="32" cy="20" r="3.5" fill="currentColor" stroke="none"/>`,
+ // 1: шпагат (одна нога в сторону, другая вниз)
+ `<path d="M27 13.6Q27.5 19 28.5 25M37 13.6Q36.5 19 35.5 25M28.5 25H35.5M32 25V36M32 36Q24 36.5 16 36L9.5 34.5M32 36Q37 44 40 52"/><circle cx="32" cy="19.3" r="3.5" fill="currentColor" stroke="none"/>`,
+ // 2: сидя на кольце
+ `<path d="M14.5 21.5Q20 31 28.5 41M49.5 21.5Q44 31 35.5 41M28.5 41H35.5M32 41V52M32 52Q26 57 23 62M32 52Q38 57 41 62"/><circle cx="32" cy="35.3" r="3.5" fill="currentColor" stroke="none"/>`
+];
+const POSES=[[0,0],[1,0],[2,0],[0,35],[1,-40],[2,30],[0,180],[1,90]];
+const gymFig=i=>{const [b,a]=POSES[i%POSES.length];return`<g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" transform="rotate(${a} 32 34)">${BASE[b]}</g>`};
+const hoopSvg=(i,sz=56)=>`<svg viewBox="0 0 64 66" width="${sz}" height="${sz}"><defs><linearGradient id="gg"><stop stop-color="#ff5a4d"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><path d="M32 1.5V12" stroke="#ffc857" stroke-width="2.4" stroke-linecap="round"/><circle cx="32" cy="34" r="22" fill="none" stroke="url(#gg)" stroke-width="3"/>${gymFig(i)}</svg>`;
 
+function eIcon(i){return hoopSvg(i,56)}
 function burst(el){if(!el)return;const r=document.createElement('div');r.className='burst';for(let i=0;i<12;i++){const d=document.createElement('i'),a=i/12*6.283,k=40+Math.random()*40;d.style.setProperty('--dx',Math.cos(a)*k+'px');d.style.setProperty('--dy',Math.sin(a)*k+'px');d.style.background=i%2?'#ffc857':'#ff5a4d';r.appendChild(d)}el.style.position='relative';el.appendChild(r);setTimeout(()=>r.remove(),900)}
 function levelFx(L){const n=elNames()[L-2],o=document.createElement('div');o.className='lvl';let b='';for(let i=0;i<24;i++){const an=i/24*6.283-1.5708;b+=`<circle class="lb" style="animation-delay:${(0.6+i*0.05).toFixed(2)}s" cx="${(60+50*Math.cos(an)).toFixed(1)}" cy="${(60+50*Math.sin(an)).toFixed(1)}" r="4.5" fill="${i%2?'#ffc857':'#ff5a4d'}"/>`}
  o.innerHTML=`<svg class="big" viewBox="0 0 120 120"><g class="ringA"><circle cx="60" cy="60" r="50" fill="none" stroke="#ffffff66" stroke-width="2"/>${b}</g><g class="ringB"><circle cx="60" cy="60" r="38" fill="none" stroke="#ffffff55" stroke-width="1.5" stroke-dasharray="4 6"/></g></svg><h2>Уровень ${L}!</h2>${n?`<p>Открыт элемент на кольце: <b>${n}</b></p><div class="ei">${eIcon(L-2)}</div>`:''}<small style="opacity:.7">нажми, чтобы продолжить</small>`;
@@ -213,8 +226,7 @@ function fxOk(L0,bonus){burst($('#fb'));const i=$('#xpi');if(i){if(level()>L0){i
 function toast(t){const d=document.createElement('div');d.className='toast';d.innerHTML=t;document.body.appendChild(d);setTimeout(()=>d.remove(),4500)}
 let photos=ls.get('photos',[]),heroI=0;const savePh=()=>ls.set('photos',photos);
 const overall=()=>Math.round(100*Object.keys(TOPICS).reduce((z,k)=>{const t=S.topics[k];return z+(t&&t.done?Math.min(1,t.done/4)*t.ok/t.done:0)},0)/Object.keys(TOPICS).length);
-function ringSvg(p){const n=24,on=Math.round(n*p/100);let b='';for(let i=0;i<n;i++){const an=i/n*6.283-1.5708,x=60+50*Math.cos(an),y=60+50*Math.sin(an);b+=`<circle class="bead" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.2" fill="${i%2?'#ffc857':'#ff5a4d'}" opacity="${i<on?1:.22}"/>`}
- return`<svg class="ring" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="#0006" stroke="#fff5" stroke-width="2"/><g class="hoop-spin">${b}</g><text x="60" y="64" text-anchor="middle">${p}%</text><text class="lbl" x="60" y="80" text-anchor="middle">готовность</text></svg>`}
+function ringSvg(p){const C=2*Math.PI*22;return`<div class="ringw"><svg class="ring2" viewBox="0 0 64 66"><defs><linearGradient id="gg"><stop stop-color="#ff5a4d"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><g class="gsway"><path d="M32 1.5V12" stroke="#ffc857" stroke-width="2.4" stroke-linecap="round"/><circle cx="32" cy="34" r="22" fill="none" stroke="#ffffff33" stroke-width="3"/><circle cx="32" cy="34" r="22" fill="none" stroke="url(#gg)" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="${(C*p/100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 32 34)"/>${gymFig(level()-1)}</g></svg><div class="ringp"><b>${p}%</b> готовность</div></div>`}
 function setHero(i){heroI=i;document.querySelectorAll('.hero .bg').forEach((e,j)=>e.classList.toggle('show',j==i));document.querySelectorAll('.thumbs img').forEach((e,j)=>e.classList.toggle('on',j==i))}
 setInterval(()=>{if(page=='home'&&photos.length>1)setHero((heroI+1)%photos.length)},6000);
 function home(){
@@ -427,6 +439,55 @@ function examResult(){const w=examWork(),sc=EXAM.ok.filter(Boolean).length;EXAM.
   ${ok||fx?`<p class="mut">Правильно: <b>${it.sol}</b></p>`:`<div class="hint" style="border-color:var(--bad)"><b class="bad">Где ошибка.</b> ${dgs[0]?dgs[0].tip:''}</div><div class="hint">💡 Подсказка: ${(it.h||[])[hn]||''}</div>
   <div class="row">${it.as.map((p,j)=>`<input id="rx${i}_${j}" placeholder="${it.lab?it.lab[j]+' ':''}исправь ответ" value="${esc(rt[j]||'')}">`).join('')}<button class="pri" onclick="exRetry(${i})">Проверить ещё раз</button></div>${tries>=2?`<details class="tbl"><summary>Показать решение</summary><ol class="steps">${(it.h||[]).map(h=>`<li>${h}</li>`).join('')}</ol><b>Ответ: ${it.sol}</b></details>`:''}`}
   <div class="row"><button onclick="openTalk('e${EXAM.id}-${i}')">💬 Обсудить пример</button><button onclick="openTalk('e${EXAM.id}-${i}','rule')">📘 Правило</button><button onclick="exTog(${i})">${ok?'Отменить зачёт':'Засчитать вручную'}</button></div><div id="th${i}"></div></div>`}).join('')}
+// ---- Тренажёр на скорость
+const frs=(n,d)=>{const g=fg(n,d);return d/g==1?String(n/g):`${n/g}/${d/g}`};
+const rnd=(x,k)=>String(Math.round(x*k)/k);
+const DR={
+ add:{n:'Сложение',e:'➕',g:l=>{const[a,b]=l==1?[R(12,89),R(11,89)]:l==2?[R(101,899),R(12,98)]:[R(101,899),R(101,899)];return{q:`${a} + ${b}`,a:String(a+b)}}},
+ sub:{n:'Вычитание',e:'➖',g:l=>{let a,b;if(l==1){a=R(30,99);b=R(11,a-1)}else if(l==2){a=R(101,999);b=R(12,99)}else{a=R(300,999);b=R(101,a-1)}return{q:`${a} − ${b}`,a:String(a-b)}}},
+ mul:{n:'Умножение',e:'✖️',g:l=>{const[a,b]=l==1?[R(12,49),R(2,9)]:l==2?[R(12,29),R(11,29)]:[R(101,399),R(12,49)];return{q:`${a} · ${b}`,a:String(a*b)}}},
+ div:{n:'Деление',e:'➗',g:l=>{const[d,k]=l==1?[R(2,9),R(5,12)]:l==2?[R(3,12),R(12,60)]:[R(11,29),R(21,90)];return{q:`${d*k} : ${d}`,a:String(k)}}},
+ frac:{n:'Дроби',e:'½',g:l=>{const D=l==1?[2,3,4,5,6]:l==2?[3,4,5,6,8,10,12]:[6,8,9,10,12,15];let A=[R(1,pick(D)-1),0],B;const d1=pick(D),d2=pick(D);A=[R(1,d1-1),d1];B=[R(1,d2-1),d2];let op=l==1||Math.random()<.6?'+':'−';if(op=='−'&&A[0]/A[1]<B[0]/B[1])[A,B]=[B,A];if(op=='−'&&A[0]/A[1]==B[0]/B[1])op='+';const r=op=='+'?fadd(A,B):fsub(A,B);return{q:`${fh(A[0],A[1])} ${op} ${fh(B[0],B[1])}`,a:frs(r[0],r[1])}}},
+ dec:{n:'Десятичные',e:'0,5',g:l=>{let q,a;if(l==1){const x=R(11,99)/10,y=R(11,99)/10;q=`${dec(x)} + ${dec(y)}`;a=rnd(x+y,10)}else if(l==2){const x=R(11,99)/10,k=R(2,9);q=`${dec(x)} · ${k}`;a=rnd(x*k,10)}else{const x=R(11,59)/10,y=R(11,59)/10;q=`${dec(x)} · ${dec(y)}`;a=rnd(x*y,100)}return{q,a}}},
+ pct:{n:'Проценты',e:'％',g:l=>{if(l==3){const p=pick([10,20,25,40,50,60,75]),N=pick([40,60,80,120,160,200,240]);return{q:`${p}% числа равны ${N*p/100}. Найди число`,a:String(N)}}const p=pick(l==1?[10,20,25,50]:[5,15,30,35,40,45,60,75,80]),N=pick(l==1?[20,40,60,80,100,200]:[20,40,60,80,120,160,200,240]);return{q:`${p}% от ${N}`,a:String(N*p/100)}}}
+};
+let drCfg={n:10,l:1},D=ls.get('drill',null);
+const svD=()=>ls.set('drill',D);
+const fmtMs=ms=>{const s=ms/1000,m=Math.floor(s/60);return m?`${m}:${(s%60).toFixed(1).padStart(4,'0')}`:`${s.toFixed(1)} с`};
+function giveXp(n){const L0=level();S.xp+=n;if(level()>L0){(S.lvlAt??={})[level()]=today();save();setTimeout(()=>levelFx(level()),800)}else save()}
+function drill(){if(D&&D.phase)return drillView();drillMenu()}
+function drillMenu(){const keyOf=t=>t+'|'+drCfg.l+'|'+drCfg.n;
+ $('#app').innerHTML=`<div class="card"><h1>⚡ Тренажёр на скорость</h1><p class="mut">Выбери тему. Появится столбик примеров, время пойдёт сразу. Отвечай в любом порядке. Когда запишешь последний ответ, время остановится, а проверка будет после этого.</p>
+ <div class="row" style="align-items:center"><span class="mut">Примеров:</span>${[10,15,20].map(n=>`<button class="${drCfg.n==n?'on':''}" onclick="drCfg.n=${n};drill()">${n}</button>`).join('')}<span class="mut" style="margin-left:10px">Сложность:</span>${[[1,'Лёгкий'],[2,'Средний'],[3,'Сложный']].map(([l,t])=>`<button class="${drCfg.l==l?'on':''}" onclick="drCfg.l=${l};drill()">${t}</button>`).join('')}</div></div>
+ <div class="grid">${Object.entries(DR).map(([k,v])=>{const b=(S.drillBest||{})[keyOf(k)];return`<div class="card" style="margin:6px 0"><div style="font-size:30px">${v.e}</div><h2>${v.n}</h2><p class="mut" style="margin:0 0 8px">${b?'🏆 Рекорд без ошибок: '+fmtMs(b):'Рекорда пока нет'}</p><button class="pri" onclick="drStart('${k}')">Начать</button></div>`}).join('')}</div>`}
+window.drStart=k=>{const seen=new Set(),items=[];let guard=0;while(items.length<drCfg.n&&guard++<500){const x=DR[k].g(+drCfg.l);if(seen.has(x.q))continue;seen.add(x.q);items.push(x)}
+ D={id:Date.now(),type:k,l:+drCfg.l,n:items.length,items,ans:items.map(()=>''),ans2:[],t0:Date.now(),t1:null,phase:'run',res:[],fixed:[],reveal:false};svD();drill()};
+const drFilled=()=>D.ans.filter(v=>String(v).trim()!=='').length;
+function drRows(){const chk=D.phase!='run';return`<div class="dlist">${D.items.map((x,i)=>{const ok=chk&&D.res[i],fx=chk&&D.fixed[i],bad=chk&&!ok&&!fx,edit=D.phase=='run'||(D.phase=='fix'&&bad),val=D.phase=='fix'&&bad?(D.ans2[i]||''):(fx?(D.ans2[i]||''):D.ans[i]);
+  return`<div class="dr ${bad?'bad':''}"><span class="dn">${i+1}</span><span class="dq">${x.q}</span><span>=</span><input id="d${i}" class="${ok||fx?'okfield':bad?'badfield':''}" inputmode="decimal" autocomplete="off" value="${esc(val)}" ${edit?'':'disabled'} oninput="drIn(${i},this.value)" onkeydown="drKey(event,${i})"><span class="st ${ok||fx?'ok':'bad'}">${ok?'✓':fx?'✓ исправлено':bad?(D.reveal?'верно: '+esc(String(x.a).replace('.',',')):'✗'):''}</span></div>`}).join('')}</div>`}
+function drillView(){const n=D.n,msNow=(D.t1||Date.now())-D.t0;
+ if(D.phase=='run'){$('#app').innerHTML=`<div class="tm" id="dtm"><span>${DR[D.type].e} ${DR[D.type].n}</span><b id="dt">${fmtMs(msNow)}</b><span id="dfill" class="mut"></span><button class="pri" id="dchk" onclick="drCheck()" style="display:none">Проверить</button></div><div class="card">${drRows()}</div>`;drUpd();return}
+ const errs=D.res.filter(x=>!x).length,left=D.items.filter((_,i)=>!D.res[i]&&!D.fixed[i]).length;
+ $('#app').innerHTML=`<div class="card"><h1>${errs?`Ошибок: ${errs} из ${n}`:'Без ошибок! 🎉'}</h1><p>⏱ Время: <b>${fmtMs(D.t1-D.t0)}</b> · ${((D.t1-D.t0)/1000/n).toFixed(1)} с на пример${D.fixed.filter(Boolean).length?` · исправлено: <b>${D.fixed.filter(Boolean).length}</b>`:''}</p>
+ <div class="row">${D.phase=='checked'&&left?'<button class="pri" onclick="drFix()">Исправить ошибки</button>':''}${D.phase=='fix'?'<button class="pri" onclick="drRecheck()">Проверить исправления</button>':''}${left&&!D.reveal?'<button onclick="drReveal()">Показать ответы</button>':''}<button onclick="drStart(D.type)">Ещё раз (новые примеры)</button><button onclick="drClose()">К выбору темы</button></div></div><div class="card">${drRows()}</div>`}
+function drUpd(){const f=drFilled(),n=D.n,e=$('#dfill'),b=$('#dchk');if(!e)return;e.textContent=D.t1?`все ответы записаны · время остановлено`:`заполнено ${f}/${n}`;if(b)b.style.display=(f==n)?'':'none'}
+window.drIn=(i,v)=>{if(D.phase=='fix'){D.ans2[i]=v;svD();return}D.ans[i]=v;const f=drFilled();if(f==D.n&&!D.t1){D.t1=Date.now();const t=$('#dt');if(t)t.textContent=fmtMs(D.t1-D.t0)}svD();drUpd()};
+window.drKey=(e,i)=>{if(e.key=='Enter'||e.key=='ArrowDown'){e.preventDefault();const nx=$('#d'+(i+1));if(nx&&!nx.disabled)nx.focus();else e.target.blur()}if(e.key=='ArrowUp'){e.preventDefault();const pv=$('#d'+(i-1));pv&&pv.focus()}};
+setInterval(()=>{if(page=='drill'&&D&&D.phase=='run'&&!D.t1){const t=$('#dt');if(t)t.textContent=fmtMs(Date.now()-D.t0)}},100);
+window.drCheck=()=>{if(drFilled()<D.n)return;if(!D.t1)D.t1=Date.now();D.res=D.items.map((x,i)=>same(D.ans[i],x.a));D.phase='checked';
+ const errs=D.res.filter(x=>!x).length,ms=D.t1-D.t0,key=D.type+'|'+D.l+'|'+D.n;
+ (S.drills??=[]).push({id:D.id,ts:Date.now(),d:today(),type:D.type,l:D.l,n:D.n,ms,errors:errs,fixedN:0,items:D.items.map((x,i)=>({q:x.q,a:x.a,u:D.ans[i],ok:D.res[i]}))});S.drills=S.drills.slice(-60);
+ let msg='';if(!errs){const b=(S.drillBest??={})[key];if(!b||ms<b){S.drillBest[key]=ms;msg=b?'🏆 Новый рекорд!':'🏆 Первый рекорд!'}}
+ giveXp(D.n-errs+(errs?0:10));svD();drill();if(msg){toast(msg);burst($('#app .card'))}};
+const drRec=()=>(S.drills||[]).find(r=>r.id==D.id);
+window.drFix=()=>{D.phase='fix';svD();drill();const f=D.items.findIndex((_,i)=>!D.res[i]&&!D.fixed[i]);const el=$('#d'+f);el&&el.focus()};
+window.drRecheck=()=>{const r=drRec();D.items.forEach((x,i)=>{if(!D.res[i]&&!D.fixed[i]&&same(D.ans2[i],x.a)){D.fixed[i]=true;if(r&&r.items[i])r.items[i].fixed=true}});if(r)r.fixedN=D.fixed.filter(Boolean).length;
+ const left=D.items.filter((_,i)=>!D.res[i]&&!D.fixed[i]).length;D.phase=left?'fix':'checked';save();svD();drill();if(!left){toast('✅ Все ошибки исправлены!');burst($('#app .card'))}};
+window.drReveal=()=>{D.reveal=true;const r=drRec();if(r)r.revealed=true;save();svD();drill()};
+window.drClose=()=>{D=null;ls.set('drill',null);drill()};
+function drillsHTML(){const ds=[...(S.drills||[])].reverse().slice(0,20);
+ return`<div class="card"><h2>Тренажёр</h2><p class="mut">Какие темы тренировала, сколько времени потратила и сколько ошибок. Нажмите на тренировку, чтобы увидеть все примеры.</p>${ds.length?ds.map(r=>`<details class="wk"><summary><b>⚡ ${DR[r.type]?DR[r.type].n:r.type}</b> · ${dm(r.d)} · уровень ${r.l} · ⏱ ${fmtMs(r.ms)} · <span class="tag ${r.errors?'bad':'ok'}">ошибок: ${r.errors} из ${r.n}</span>${r.fixedN?` · исправлено: ${r.fixedN}`:''}${r.revealed?' · ответы показаны':''}</summary><div class="dlist" style="margin-top:8px">${r.items.map((x,i)=>`<div class="dr ${x.ok?'':'bad'}"><span class="dn">${i+1}</span><span class="dq">${x.q}</span><span>=</span><b>${esc(x.u||'—')}</b><span class="st ${x.ok||x.fixed?'ok':'bad'}">${x.ok?'✓':`✗ верно: ${esc(String(x.a).replace('.',','))}${x.fixed?' · исправлено':''}`}</span></div>`).join('')}</div></details>`).join(''):'<div style="padding:18px;text-align:center;color:var(--mut);border:1px dashed var(--line);border-radius:16px">Тренажёр ещё не запускали.</div>'}</div>`}
+
 // Чат
 const SYS=()=>`Ты добрый репетитор по математике для ученицы, которая только перешла в 6 класс${S.name?' ('+S.name+')':''} и готовится к поступлению в физ-мат лицей. В школе учебник Петерсона; в 3–4 классах были пробелы, поэтому при непонимании возвращайся к базе (столбик, порядок действий, доли, величины). Она занимается воздушной гимнастикой — объясняй через кольцо, вращения, время и длину окружности. Иногда давай нестандартные задачи лицейского уровня. Вступительная работа в физ-мат 6 класс: 9 заданий за 40 минут (вычисления с дробями и десятичными, уравнение со смешанными числами, единицы длины, объём с процентами и долями, движение навстречу/вдогонку, упрощение выражений, дроби с буквами, перевод на математический язык, число k из 1/k≈). Пиши коротко, простыми словами. НИКОГДА не давай готовый ответ сразу: задай наводящий вопрос или дай одну подсказку, дай ответ только если ученица просит после 3 подсказок. Слабые темы: ${weak().slice(0,3).map(x=>TOPICS[x[0]]).join(', ')}.`;
 function chat(){$('#app').innerHTML=`<div class="card"><h2>Чат с репетитором</h2><div class="chat" id="ch"></div><div class="row"><input id="ci" placeholder="Напиши вопрос или свой ответ…" onkeydown="event.key=='Enter'&&send()"><button class="pri" onclick="send()">Отправить</button></div>${S.cfg.url?'':'<p class="mut">ИИ не подключён: чат отвечает по шаблону. Подключить — в разделе «Родителю» → Настройки.</p>'}</div>`;
@@ -595,6 +656,7 @@ function parent0(){const st=stats(),rows=Object.entries(TOPICS).map(([k,v])=>{co
  <div class="card verdict"><h2>Вывод и рекомендации</h2>${verdict(st)}</div>
  ${worksHTML()}
  ${talksHTML()}
+ ${drillsHTML()}
  <div id="charts"></div>
  <div class="card"><h2>Все темы</h2><div style="overflow:auto"><table><tr><th>Тема<th>Задач<th>Верно<th>Подсказок<th>Уровень<th>Последний раз</tr>${rows}</table></div></div>
  <div class="card"><h2>Отчёт для пересылки</h2><textarea id="rp" rows="8" readonly>${reportText()}</textarea><div class="row"><button class="pri" onclick="$('#rp').select();document.execCommand('copy');toast('Скопировано')">Скопировать</button></div></div>
@@ -615,7 +677,7 @@ const loadSb=()=>new Promise(r=>{if(window.supabase)return r(true);const sc=docu
 
 // ---- Слияние прогресса с облаком (чтобы устаревшее устройство не затирало новое)
 function mergeS(a,b){const c={...b,...a},mx=(p,q)=>{const o={...(p||{})};for(const k in (q||{}))o[k]=Math.max(o[k]||0,q[k]);return o};
- c.xp=Math.max(a.xp||0,b.xp||0);c.act=Math.max(a.act||0,b.act||0);c.minutes=Math.max(a.minutes||0,b.minutes||0);c.ts=Math.max(a.ts||0,b.ts||0);
+ c.xp=Math.max(a.xp||0,b.xp||0);c.act=Math.max(a.act||0,b.act||0);{const dmap=new Map();[...(b.drills||[]),...(a.drills||[])].forEach(r=>{const o=dmap.get(r.id);if(!o||(r.fixedN||0)>=(o.fixedN||0))dmap.set(r.id,r)});c.drills=[...dmap.values()].slice(-60);const bb={...(b.drillBest||{})};for(const k in (a.drillBest||{}))bb[k]=Math.min(bb[k]||1e12,a.drillBest[k]);c.drillBest=bb}c.minutes=Math.max(a.minutes||0,b.minutes||0);c.ts=Math.max(a.ts||0,b.ts||0);
  c.topics={...(b.topics||{})};for(const k in (a.topics||{}))if(!c.topics[k]||(a.topics[k].done||0)>=(c.topics[k].done||0))c.topics[k]=a.topics[k];
  const cnt=m=>{const o={};(m||[]).forEach(x=>{const k=JSON.stringify(x);(o[k]??=[0,x])[0]++});return o},la=cnt(a.log),lb=cnt(b.log),lo=[];
  new Set([...Object.keys(la),...Object.keys(lb)]).forEach(k=>{const n=Math.max(la[k]?la[k][0]:0,lb[k]?lb[k][0]:0),x=(la[k]||lb[k])[1];for(let i=0;i<n;i++)lo.push(x)});c.log=lo.sort((p,q)=>p.d<q.d?-1:p.d>q.d?1:0);
