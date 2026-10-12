@@ -74,6 +74,7 @@ details.wk{background:var(--card2);border:1px solid var(--line);border-radius:18
 .talk{background:var(--card2);border:1px solid var(--acc2);border-radius:20px;padding:14px;margin:12px 0;animation:rise .3s}.talk .th{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}.talk .chat{max-height:300px}.qchips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.qchips button{font-size:13px;padding:6px 12px}.m .tm2{display:block;font-size:11px;opacity:.6;margin-top:3px}.dots{animation:pop 1s infinite}
 .okfield{border-color:var(--ok)!important;background:#3ddc9722!important;box-shadow:0 0 0 4px #3ddc9733;animation:pop .5s}.badfield{border-color:var(--bad)!important;background:#ff5c7a14!important;animation:shake .35s}@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .okpop{background:#3ddc9722;border:1px solid var(--ok);border-radius:16px;padding:12px 16px;font-size:19px;text-align:center;margin:8px 0;animation:rise .3s;position:relative}
+.lvls{display:flex;gap:10px;overflow-x:auto;padding:10px 2px 4px}.lv{min-width:104px;text-align:center;background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:2px}.lv.dn{border-color:var(--ok)}.lv.cu{border-color:var(--acc2);box-shadow:0 0 0 3px #ffc85733}.lv.lk{opacity:.55}.lc{width:30px;height:30px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-weight:800}.lv.dn .lc{background:var(--ok);color:#06231a}.lv.cu .lc{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#2b0d08}
 .els{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:10px}.el{background:var(--card2);border:1px solid var(--acc2);border-radius:18px;padding:10px;text-align:center;display:flex;flex-direction:column;align-items:center}.el b{font-size:14px}.el small{color:var(--mut)}.el.lock{opacity:.4;border-color:var(--line);filter:grayscale(1)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:linear-gradient(135deg,var(--acc),var(--acc2));color:#2b0d08;padding:14px 22px;border-radius:18px;font-weight:700;z-index:20;box-shadow:0 12px 40px #0008;animation:rise .4s;max-width:90vw;text-align:center}
 .tm{position:sticky;top:60px;z-index:4;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;border-radius:18px;background:var(--bg);border:1px solid var(--acc2);margin:10px 0}.tm b{font:700 24px var(--fd)}.tm.warn b{color:var(--bad)}
@@ -177,7 +178,14 @@ const T=k=>S.topics[k]??(S.topics[k]={done:0,ok:0,bad:0,hints:0,level:1,streak:0
 const persist=()=>{S.cur=(typeof cur!=='undefined'&&cur)?{cur,hintN}:null;ls.set('st',S)};
 const save=()=>{S.cur=(typeof cur!=='undefined'&&cur)?{cur,hintN}:null;S.ts=Date.now();(S.xpd??={})[today()]=S.xp;ls.set('st',S);if(typeof user!=='undefined'&&user)push()};
 const today=()=>new Date().toISOString().slice(0,10);
-setInterval(()=>{if(!document.hidden){S.minutes+=1/6;(S.mind??={})[today()]=(S.mind[today()]||0)+1/6;ls.set('st',S)}},10000);
+const STUDY=['test','practice','exam','chat'],IDLE=300000;
+let lastAct=Date.now(),actPend=0,actTk=Date.now();
+const actNow=()=>(S.act||0)+actPend;
+function actCommit(){if(actPend<=0)return;S.act=(S.act||0)+actPend;const m=actPend/60;S.minutes=(S.minutes||0)+m;(S.mind??={})[today()]=((S.mind||{})[today()]||0)+m;actPend=0;ls.set('st',S)}
+function onAct(){const n=Date.now();if(n-lastAct>IDLE)actPend=0;else actCommit();lastAct=n;actTk=n}
+['pointerdown','keydown','touchstart','scroll','input','click'].forEach(e=>addEventListener(e,onAct,{passive:true,capture:true}));
+function actStep(){const n=Date.now(),dt=Math.min(6,(n-actTk)/1000);actTk=n;if(document.hidden||!STUDY.includes(page))return;if(n-lastAct>IDLE){actPend=0;return}actPend+=dt}
+setInterval(actStep,5000);
 const acc=k=>{const t=S.topics[k];return t&&t.done?Math.round(100*t.ok/t.done):null};
 // Навигация
 const PAGES={home:'Главная',test:'Тест',plan:'План',practice:'Практика',exam:'Экзамен',chat:'Чат',parent:'Родителю'};
@@ -218,7 +226,8 @@ function home(){
  ${S.name?'':`<div class="row"><input id="nm" placeholder="Как тебя зовут?" style="max-width:240px"><button onclick="S.name=$('#nm').value.trim();save();home()">Готово</button></div>`}
  <div class="row"><button class="pri" onclick="go(S.test?.done?'practice':'test')">▶ Начать занятие</button><button onclick="go('practice')">Повторить слабые темы</button><button onclick="go('exam')">⏱ Пробный экзамен 40 мин</button></div></div>${ringSvg(p)}</div></section>
  <div class="grid"><div class="stat">Уровень<b>${level()}</b><div class="bar"><i style="width:${S.xp%100}%"></i></div></div><div class="stat">Решено задач<b>${done}</b></div><div class="stat">Освоено тем<b>${mastered}/${Object.keys(TOPICS).length}</b></div><div class="stat">Минут занятий<b>${Math.round(S.minutes)}</b></div></div>
- <div class="card"><h2>Элементы на кольце</h2><p class="mut">Новый уровень открывает новый элемент. Сейчас открыто: ${Math.min(level()-1,elNames().length)} из ${elNames().length}.</p><div class="els">${elNames().map((n,i)=>`<div class="el ${i<level()-1?'':'lock'}">${eIcon(i)}<b>${i<level()-1?n:'🔒'}</b><small>${i<level()-1?'открыт':'уровень '+(i+2)}</small></div>`).join('')}</div></div>
+ <div class="card"><h2>Мои уровни</h2><p class="mut">Сейчас уровень <b>${level()}</b>. До уровня ${level()+1} осталось <b>${100-S.xp%100}</b> очков. Новый уровень открывает элемент на кольце.</p><div class="bar"><i style="width:${S.xp%100}%"></i></div>
+ <div class="lvls">${Array.from({length:Math.min(Math.max(level()+3,6),elNames().length+1)},(_,i)=>{const n=i+1,L=level(),dn=n<L,cu=n==L,el=n>=2?elNames()[n-2]:null,dt=S.lvlAt&&S.lvlAt[n];return`<div class="lv ${dn?'dn':cu?'cu':'lk'}"><div class="lc">${dn?'✓':n}</div><b>Ур. ${n}</b>${n>=2&&(dn||cu)?`<div style="zoom:.7">${eIcon(n-2)}</div>`:''}<small>${n==1?'старт':dn||cu?(el||''):'🔒 '+(el?'«'+el+'»':'')}</small><small class="mut">${dt?dm(dt):''}</small></div>`}).join('')}</div></div>
  ${[['Закрываем пробелы 3–5 класса',k=>isGap(k)],['Программа 6 класса (Петерсон)',k=>!isGap(k)&&k!='logic'&&GR[k]!='экз'],['Как во вступительной работе',k=>GR[k]=='экз'],['Лицей',k=>k=='logic']].map(([h,f])=>`<div class="card"><h2>${h}</h2><div class="chips">${Object.keys(TOPICS).filter(f).map(k=>`<div class="chip"><div style="display:flex;justify-content:space-between"><span>${TOPICS[k]}</span><small>${acc(k)==null?'—':acc(k)+'%'}</small></div><div class="bar" style="margin-top:8px"><i style="width:${acc(k)||0}%"></i></div></div>`).join('')}</div></div>`).join('')}`}
 
 // ---- Разбор ошибок, время, работы
@@ -306,14 +315,14 @@ window.talkSend=async(key,text)=>{const c=TC[key],t=talkGet(key),inp=$('#ti-'+ke
  const reply=await askTalk(c,t),fb=lastFb;tkAcct(t);t.msgs.push({r:'assistant',c:reply,ts:Date.now(),fb});save();drawTalk(key);const tt=$('#tt-'+key);if(tt)tt.textContent=fmtT(t.secs)};
 
 // Тест
-let tT0=0,tFb=null;
+let tT0=0,tA0=0,tFb=null;
 function test(){
  if(!S.test||S.test.done&&!S.test.redo){if(S.test?.done)return testResult();S.test={i:0,qs:Object.keys(TOPICS).filter(k=>GR[k]!='экз').flatMap(k=>(['div','gcd','frac','prop','pct'].includes(k)?[GEN[k](1),GEN[k](2)]:[GEN[k](1)]).map(q=>({...q,t:k}))),res:[],items:[],done:false,wid:Date.now()};save()}
  const t=S.test;t.items??=[];
  if(t.i>=t.qs.length){t.done=true;t.qs.forEach((q,i)=>{const x=T(q.t);x.done++;t.res[i]?x.ok++:x.bad++;x.last=today()});
   Object.keys(TOPICS).filter(k=>S.topics[k]).forEach(k=>{const x=T(k),a=acc(k);x.level=a>=80?2:1});
   (S.works??=[]).push({id:t.wid,type:'test',d:today(),secs:t.items.reduce((z,x)=>z+(x.secs||0),0),items:t.items.map(slim)});S.works=S.works.slice(-40);makePlan();save();return testResult()}
- const q=t.qs[t.i];tFb=null;tT0=Date.now();
+ const q=t.qs[t.i];tFb=null;tT0=Date.now();tA0=actNow();
  $('#app').innerHTML=`<div class="card"><span class="tag">Входной тест · ${t.i+1}/${t.qs.length}</span><div class="bar" style="margin:10px 0"><i style="width:${t.i/t.qs.length*100}%"></i></div><div class="q">${q.q}</div><div id="tfb"></div><div class="row" id="trow"><input id="a" autofocus placeholder="Твой ответ" onkeydown="event.key=='Enter'&&ans()"><button class="pri" onclick="ans()">Проверить</button><button onclick="ans(true)">Не знаю</button></div><p class="mut">Если ошибёшься, я подскажу, где, и ты сможешь исправить ответ.</p></div>`}
 const PRAISE=['Верно! Поздравляю! 🎉','Отлично! Так держать! ⭐','Правильно! Ты молодец! 💪','Супер! Именно так! 🚀','Верный ответ! Блестяще! ✨'];
 let tTimer=null;
@@ -323,9 +332,9 @@ window.tGo=tGo;
 function okFx(u,fixed){const row=$('#trow');if(!row)return tNext();row.innerHTML=`<input id="a" class="okfield" value="${esc(u)}" disabled><button class="pri" onclick="tGo()">Дальше →</button>`;
  const f=$('#tfb');f.innerHTML=`<div class="okpop"><b>${fixed?'✅ Исправила! Отличная работа! 🎉':pick(PRAISE)}</b></div>`;burst(f);clearTimeout(tTimer);tTimer=setTimeout(tGo,1800)}
 window.ans=skip=>{const t=S.test,q=t.qs[t.i],u=skip?'':$('#a').value;if(!skip&&!u.trim())return;
- if(okAns(u,q)){let fx=false;if(!t.res[t.i]&&t.items[t.i]){t.items[t.i].fixed=true;fx=true}else{t.res[t.i]=true;t.items[t.i]={t:q.t,ts:Date.now(),secs:Math.round(Math.min(600,(Date.now()-tT0)/1000)),ok:true}}save();return okFx(u,fx)}
+ if(okAns(u,q)){let fx=false;if(!t.res[t.i]&&t.items[t.i]){t.items[t.i].fixed=true;fx=true}else{t.res[t.i]=true;t.items[t.i]={t:q.t,ts:Date.now(),secs:Math.max(0,Math.round(Math.min(900,actNow()-tA0))),ok:true}}save();return okFx(u,fx)}
  const hints=q.hints;
- if(!t.items[t.i]){t.res[t.i]=false;t.items[t.i]=mkItem(q.t,q.q,[{u,part:q}],hints,q.sol,Math.min(600,(Date.now()-tT0)/1000));t.items[t.i].tries=0;t.items[t.i].key='t'+t.wid+'-'+t.i}
+ if(!t.items[t.i]){t.res[t.i]=false;t.items[t.i]=mkItem(q.t,q.q,[{u,part:q}],hints,q.sol,Math.max(0,Math.min(900,actNow()-tA0)));t.items[t.i].tries=0;t.items[t.i].key='t'+t.wid+'-'+t.i}
  const it=t.items[t.i];it.tries++;it.ans[0]=u;it.dg=[diag(q,u,hints)];save();
  const d=it.dg[0],hn=Math.min(it.tries-1,hints.length-1);
  {const a=$('#a');a.classList.remove('badfield');void a.offsetWidth;a.classList.add('badfield')}$('#tfb').innerHTML=`<div class="hint" style="border-color:var(--bad)"><b class="bad">Ответ «${esc(u||'—')}» не подошёл.</b> ${d.tip}</div><div class="hint">💡 Подсказка ${hn+1}: ${hints[hn]}</div><div class="row"><button onclick="document.querySelector('#a').value='';document.querySelector('#a').focus()">Исправить ответ</button><button onclick="openTalk('${it.key}')">💬 Обсудить пример</button><button onclick="openTalk('${it.key}','rule')">📘 Правило</button><button onclick="showSol()">Показать решение и дальше</button></div><div id="talkhost"></div>`;regTalk({key:it.key,host:'#talkhost',t:q.t,q:q.q,a:corStr(q),lin:q.lin,alts:q.alts,hints,where:'test',err:()=>true,ans:()=>S.test.items[S.test.i]?.ans||[]});$('#a').value='';$('#a').focus()};
@@ -348,13 +357,13 @@ function plan(){if(!S.plan)return $('#app').innerHTML=`<div class="card"><h2>П�
  wk.map(w=>`<div class="card"><h2>Неделя ${w+1}: ${TOPICS[PET[w]]}</h2>${S.plan.days.filter(x=>x.wk==w).map(x=>`<div class="day"><b>День ${x.d}</b><span>${x.mini?([3,5,7].includes(x.wk)?'⏱ Пробный вступительный на 40 минут (раздел «Экзамен»)':'Мини-контрольная: по задаче из каждой темы недели и пробелов'):`Школа: ${TOPICS[x.main]} · Пробел: ${TOPICS[x.gap]}`}</span></div>`).join('')}</div>`).join('')+`<button class="pri" onclick="go('practice')">Начать сегодняшнее занятие</button>`}
 // Практика с подсказками
 function practice(next=true){
- if(next||!cur||cur.solved){const w=weak().filter(x=>x[1]!==100),tp=todayPlan(),r=Math.random();const k=tp&&r<.4?tp.main:tp&&r<.75&&!tp.mini?tp.gap:w[0]?.[0]||pick(Object.keys(TOPICS));cur={...GEN[k](T(k).level),t:k,tries:0,t0:Date.now(),id:Date.now()};hintN=0}
+ if(next||!cur||cur.solved){const w=weak().filter(x=>x[1]!==100),tp=todayPlan(),r=Math.random();const k=tp&&r<.4?tp.main:tp&&r<.75&&!tp.mini?tp.gap:w[0]?.[0]||pick(Object.keys(TOPICS));cur={...GEN[k](T(k).level),t:k,tries:0,t0:Date.now(),a0:actNow(),id:Date.now()};hintN=0}
  if(!cur.t0)cur.t0=Date.now();if(!cur.id)cur.id=cur.t0;regTalk({key:'p'+cur.id,host:'#talkhost',t:cur.t,q:cur.q,a:corStr(cur),lin:cur.lin,alts:cur.alts,hints:cur.hints,where:'practice',err:()=>cur.tries>0,ans:()=>{const it=curItem();return it?it.ans:[]}});
  const t=T(cur.t);$('#app').innerHTML=`<div class="card"><div class="xpb"><span>Ур. ${level()}</span><div class="bar"><i id="xpi" style="width:${S.xp%100}%"></i></div><span id="stk">🔥 ${S.streak||0}</span></div><span class="tag">${TOPICS[cur.t]} · сложность ${t.level}/3</span><div class="q" style="margin-top:12px">${cur.q}</div><div id="fb"></div>
  <div class="row"><input id="a" autofocus placeholder="Ответ" onkeydown="event.key=='Enter'&&check()"><button class="pri" onclick="check()">Проверить</button><button onclick="hint()">Подсказка</button></div><div id="hs"></div><div class="row"><button onclick="openTalk('p${cur.id}')">💬 Обсудить пример</button><button onclick="openTalk('p${cur.id}','rule')">📘 Найти правило</button></div><div id="talkhost"></div></div>`;showHints()}
 function showHints(){$('#hs').innerHTML=cur.hints.slice(0,hintN).map((h,i)=>`<div class="hint">💡 ${i+1}. ${h}</div>`).join('')+(hintN>=3?`<div class="row"><button onclick="reveal()">Показать решение</button></div>`:'')}
 window.hint=()=>{if(hintN<3){hintN++;T(cur.t).hints++;save()}showHints()};
-const curSecs=()=>Math.round(Math.min(600,(Date.now()-(cur.t0||Date.now()))/1000));
+const curSecs=()=>Math.max(0,Math.round(Math.min(900,actNow()-(cur.a0??actNow()))));
 function curItem(){const w=practiceWork();return w.items.find(x=>x.ts==cur.recTs)}
 window.check=()=>{const u=$('#a').value;if(u.trim()==='')return;const t=T(cur.t),w=practiceWork();
  if(okAns(u,cur)){cur.solved=true;const clean=hintN==0&&cur.tries==0,L0=level();t.done++;t.ok++;t.last=today();t.streak=clean?t.streak+1:0;S.xp+=clean?15:8;if(t.streak>=3&&t.level<3){t.level++;t.streak=0}
@@ -606,7 +615,7 @@ const loadSb=()=>new Promise(r=>{if(window.supabase)return r(true);const sc=docu
 
 // ---- Слияние прогресса с облаком (чтобы устаревшее устройство не затирало новое)
 function mergeS(a,b){const c={...b,...a},mx=(p,q)=>{const o={...(p||{})};for(const k in (q||{}))o[k]=Math.max(o[k]||0,q[k]);return o};
- c.xp=Math.max(a.xp||0,b.xp||0);c.minutes=Math.max(a.minutes||0,b.minutes||0);c.ts=Math.max(a.ts||0,b.ts||0);
+ c.xp=Math.max(a.xp||0,b.xp||0);c.act=Math.max(a.act||0,b.act||0);c.minutes=Math.max(a.minutes||0,b.minutes||0);c.ts=Math.max(a.ts||0,b.ts||0);
  c.topics={...(b.topics||{})};for(const k in (a.topics||{}))if(!c.topics[k]||(a.topics[k].done||0)>=(c.topics[k].done||0))c.topics[k]=a.topics[k];
  const cnt=m=>{const o={};(m||[]).forEach(x=>{const k=JSON.stringify(x);(o[k]??=[0,x])[0]++});return o},la=cnt(a.log),lb=cnt(b.log),lo=[];
  new Set([...Object.keys(la),...Object.keys(lb)]).forEach(k=>{const n=Math.max(la[k]?la[k][0]:0,lb[k]?lb[k][0]:0),x=(la[k]||lb[k])[1];for(let i=0;i<n;i++)lo.push(x)});c.log=lo.sort((p,q)=>p.d<q.d?-1:p.d>q.d?1:0);
