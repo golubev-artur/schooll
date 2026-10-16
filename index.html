@@ -47,7 +47,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:9px 8px;t
 .day{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.day b{min-width:64px;color:var(--acc2)}
 .chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}.chip{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:12px 14px}.chip small{color:var(--mut)}
 .photos{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}.photos div{position:relative}.photos img{width:90px;height:90px;object-fit:cover;border-radius:16px}.photos button{position:absolute;top:-6px;right:-6px;padding:0;width:26px;height:26px}
-svg text{fill:var(--mut);font-size:11px}
+svg:not(.hsv) text{fill:var(--mut);font-size:11px}
 .xpb{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:13px;color:var(--mut)}.xpb .bar{flex:1;height:8px}.xpb .bar i{transition:width .7s cubic-bezier(.2,.8,.2,1)}#stk{font-weight:800;color:var(--acc2);min-width:46px;text-align:right}#stk.pop{animation:pop .5s}
 .burst{position:absolute;left:50%;top:0;pointer-events:none}.burst i{position:absolute;width:8px;height:8px;border-radius:50%;animation:sp .8s ease-out forwards}@keyframes sp{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
 .lvl{position:fixed;inset:0;z-index:30;background:#000b;backdrop-filter:blur(8px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;color:#fff;cursor:pointer;animation:fade .3s;padding:20px}.lvl svg.big{width:min(62vw,260px)}.lvl h2{font-size:26px;margin:.2em 0}
@@ -77,6 +77,16 @@ details.wk{background:var(--card2);border:1px solid var(--line);border-radius:18
 .lvls{display:flex;gap:10px;overflow-x:auto;padding:10px 2px 4px}.lv{min-width:104px;text-align:center;background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:2px}.lv.dn{border-color:var(--ok)}.lv.cu{border-color:var(--acc2);box-shadow:0 0 0 3px #ffc85733}.lv.lk{opacity:.55}.lc{width:30px;height:30px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-weight:800}.lv.dn .lc{background:var(--ok);color:#06231a}.lv.cu .lc{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#2b0d08}
 .hero-in>div:first-child{flex:1 1 380px;min-width:0}.hero h1{font-size:clamp(24px,4.2vw,38px)}.ringw{width:150px;flex:none;text-align:center;color:#fff}.ring2{width:100%;filter:drop-shadow(0 6px 20px #0008);overflow:visible}.gsway{transform-origin:32px 1.5px;animation:sway 4s ease-in-out infinite alternate}@keyframes sway{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}.ringp{font-size:13px;opacity:.95}.ringp b{font:700 20px var(--fd)}
 .dlist{display:flex;flex-direction:column;gap:8px;max-width:600px}.dr{display:grid;grid-template-columns:28px minmax(90px,1fr) 14px 130px minmax(0,1fr);gap:8px;align-items:center}.dr .dn{color:var(--mut);font-size:13px;text-align:right}.dr .dq{font-size:20px;font-weight:700;white-space:nowrap}.dr input{padding:8px 12px;font-size:18px}.dr .st{font-size:14px;font-weight:700}.dr.bad .dq{color:var(--bad)}
+.sub{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.sub .card{margin:0}.sub .em{font-size:40px}
+.hv{max-width:760px;margin:0 auto}.hv .banner{border-radius:22px;overflow:hidden;margin:6px 0 14px;border:1px solid var(--line)}.hv .banner svg{display:block;width:100%;height:auto}
+.hv h1{font-size:clamp(22px,4.4vw,32px)}.htxt{font-size:17px;line-height:1.75}.htxt h2{display:flex;gap:10px;align-items:center}.htxt .ic{font-size:26px}
+.himg{width:100%;border-radius:18px;border:1px solid var(--line);cursor:zoom-in;display:block}.hcap{font-size:13px;color:var(--mut);margin:6px 2px 0}
+.hcauses{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.hcauses .c{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center}.hcauses .c i{font-size:28px;font-style:normal;display:block}.harrow{text-align:center;font-size:26px;color:var(--acc2);margin:6px 0}.hres{background:linear-gradient(135deg,#ff5a4d33,#ffc85733);border:1px solid var(--acc2);border-radius:16px;padding:12px 16px;text-align:center;font-weight:700}
+.htl{position:relative;padding-left:26px;margin:8px 0}.htl:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:3px;background:linear-gradient(var(--acc),var(--acc2));border-radius:3px}.htl .e{position:relative;margin:0 0 14px}.htl .e:before{content:"";position:absolute;left:-24px;top:6px;width:13px;height:13px;border-radius:50%;background:var(--bg);border:3px solid var(--acc2)}.htl .e.big:before{background:var(--acc);border-color:#fff}.htl b{font:700 18px var(--fd);color:var(--acc2);margin-right:8px}
+.htr{display:flex;flex-wrap:wrap;gap:8px}.htr button{font-size:15px}.htrd{background:var(--card2);border:1px solid var(--acc2);border-radius:16px;padding:12px 16px;margin-top:10px;animation:rise .25s}
+.hchain{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.hchain .s{background:var(--card2);border:1px solid var(--acc2);border-radius:14px;padding:10px 14px;font-weight:700}.hchain .a{color:var(--acc2);font-size:22px}
+.hq{border-top:1px solid var(--line);padding:12px 0}.hq textarea{min-height:70px}.hv .fb{margin-top:8px}
+.lbox{position:fixed;inset:0;background:#000d;z-index:40;display:grid;place-items:center;padding:12px;cursor:zoom-out}.lbox img{max-width:100%;max-height:100%;border-radius:12px}
 .els{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:10px}.el{background:var(--card2);border:1px solid var(--acc2);border-radius:18px;padding:10px;text-align:center;display:flex;flex-direction:column;align-items:center}.el b{font-size:14px}.el small{color:var(--mut)}.el.lock{opacity:.4;border-color:var(--line);filter:grayscale(1)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:linear-gradient(135deg,var(--acc),var(--acc2));color:#2b0d08;padding:14px 22px;border-radius:18px;font-weight:700;z-index:20;box-shadow:0 12px 40px #0008;animation:rise .4s;max-width:90vw;text-align:center}
 .tm{position:sticky;top:60px;z-index:4;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;border-radius:18px;background:var(--bg);border:1px solid var(--acc2);margin:10px 0}.tm b{font:700 24px var(--fd)}.tm.warn b{color:var(--bad)}
@@ -90,6 +100,7 @@ details.wk{background:var(--card2);border:1px solid var(--line);border-radius:18
  <nav id="nav"></nav>
 </header>
 <main id="app"></main>
+<script src="history.js"></script>
 <script>
 const $=s=>document.querySelector(s), ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{if(!window.svFail){window.svFail=1;setTimeout(()=>toast('⚠ Не удалось сохранить прогресс. Не используйте режим инкогнито и освободите место в браузере.'),0)}}}};
 const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)), pick=a=>a[R(0,a.length-1)];
@@ -180,7 +191,7 @@ const T=k=>S.topics[k]??(S.topics[k]={done:0,ok:0,bad:0,hints:0,level:1,streak:0
 const persist=()=>{S.cur=(typeof cur!=='undefined'&&cur)?{cur,hintN}:null;ls.set('st',S)};
 const save=()=>{S.cur=(typeof cur!=='undefined'&&cur)?{cur,hintN}:null;S.ts=Date.now();(S.xpd??={})[today()]=S.xp;ls.set('st',S);if(typeof user!=='undefined'&&user)push()};
 const today=()=>new Date().toISOString().slice(0,10);
-const STUDY=['test','practice','drill','exam','chat'],IDLE=300000;
+const STUDY=['test','practice','drill','school','exam','chat'],IDLE=300000;
 let lastAct=Date.now(),actPend=0,actTk=Date.now();
 const actNow=()=>(S.act||0)+actPend;
 function actCommit(){if(actPend<=0)return;S.act=(S.act||0)+actPend;const m=actPend/60;S.minutes=(S.minutes||0)+m;(S.mind??={})[today()]=((S.mind||{})[today()]||0)+m;actPend=0;ls.set('st',S)}
@@ -190,14 +201,14 @@ function actStep(){const n=Date.now(),dt=Math.min(6,(n-actTk)/1000);actTk=n;if(d
 setInterval(actStep,5000);
 const acc=k=>{const t=S.topics[k];return t&&t.done?Math.round(100*t.ok/t.done):null};
 // Навигация
-const PAGES={home:'Главная',test:'Тест',plan:'План',practice:'Практика',drill:'Тренажёр',exam:'Экзамен',chat:'Чат',parent:'Родителю'};
+const PAGES={home:'Главная',school:'Школа',test:'Тест',plan:'План',practice:'Практика',drill:'Тренажёр',exam:'Экзамен',chat:'Чат',parent:'Родителю'};
 let page='home',cur=null,hintN=0;
 function nav(){const lg=$('#logo');lg.innerHTML=('<svg viewBox="0 0 32 32" fill="none" stroke="url(#g)" stroke-width="3"><defs><linearGradient id="g"><stop stop-color="#ff5a4d"/><stop offset="1" stop-color="#ffc857"/></linearGradient></defs><circle cx="16" cy="18" r="10"/><path d="M16 2v6"/></svg>')+'<span>Мой ИИ-репетитор</span>';$('#nav').innerHTML=Object.entries(PAGES).map(([k,v])=>`<button class="${k==page?'on':''}" onclick="go('${k}')">${v}${k=='parent'?' 🔒':''}</button>`).join('')+`<button onclick="theme()">◐</button><span id="sync">${synHTML()}</span>`}
-window.go=p=>{if(page=='parent'&&p!='parent')pinClear();page=p;S.page=p;persist();nav();render()};
+window.go=p=>{if(typeof histFlush=='function')histFlush();if(page=='parent'&&p!='parent')pinClear();page=p;S.page=p;persist();nav();render()};
 window.theme=()=>{const r=document.documentElement;r.dataset.t=r.dataset.t=='light'?'dark':'light'};
 const level=()=>Math.floor(S.xp/100)+1;
 const weak=()=>Object.keys(TOPICS).map(k=>[k,acc(k)]).sort((a,b)=>(a[1]??-1)-(b[1]??-1));
-function render(){({home,test,plan,practice:()=>practice(!(cur&&!cur.solved)),drill,exam,chat,parent})[page]()}
+function render(){({home,test,plan,practice:()=>practice(!(cur&&!cur.solved)),drill,school,exam,chat,parent})[page]()}
 
 const ELS=['Ласточка','Ангел','Русалка','Бабочка','Полумесяц','Мельница','Колыбель','Звезда'];
 const elNames=()=>(S.elements&&S.elements.length?S.elements:ELS);
@@ -282,7 +293,7 @@ const strip=h=>String(h||'').replace(/<sup>(.*?)<\/sup>&frasl;<sub>(.*?)<\/sub>/
 const TC={};
 const regTalk=c=>{TC[c.key]=c;return c.key};
 const talkOf=key=>(S.talks??=[]).find(t=>t.key==key);
-function talkGet(key){let t=talkOf(key);if(!t){const c=TC[key];t={key,ts:Date.now(),d:today(),t:c.t,q:c.q,cor:c.a,where:c.where,msgs:[],secs:0,last:Date.now(),err:!!(c.err&&c.err())};S.talks.push(t);S.talks=S.talks.slice(-60)}return t}
+function talkGet(key){let t=talkOf(key);if(!t){const c=TC[key];t={key,tn:c.tn,ts:Date.now(),d:today(),t:c.t,q:c.q,cor:c.a,where:c.where,msgs:[],secs:0,last:Date.now(),err:!!(c.err&&c.err())};S.talks.push(t);S.talks=S.talks.slice(-60)}return t}
 const tkAcct=t=>{const n=Date.now();t.secs=Math.round((t.secs||0)+Math.min(120,(n-(t.last||n))/1000));t.last=n};
 const hm=ts=>{const d=new Date(ts);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
 const bub=m=>`<div class="m ${m.r=='user'?'u':'a'}">${esc(m.c)}<span class="tm2">${hm(m.ts)}${m.fb?' · ответ без ИИ (шаблон)':''}</span></div>`;
@@ -296,14 +307,14 @@ window.tkChip=(key,k)=>{const i=$('#ti-'+key);if(k=='mine'&&i){i.value='Я ду�
 window.openTalk=(key,mode)=>{const c=TC[key];if(!c)return;const t=talkGet(key);t.last=Date.now();if(!t.msgs.length){t.msgs.push({r:'assistant',g:1,c:'Привет! Я рядом 🤗 Расскажи, что у тебя получилось или где застряла. Я скажу, верна ли мысль, и помогу найти способ. Решать будешь ты, а я подскажу.',ts:Date.now()})}save();drawTalk(key);
  if(mode=='rule')talkSend(key,'Найди правило для решения моего примера и объясни простыми словами.');else{const i=$('#ti-'+key);i&&i.focus()}};
 window.closeTalk=key=>{const t=talkOf(key),c=TC[key];if(t){tkAcct(t);save()}const h=c&&$(c.host);if(h)h.innerHTML=''};
-const talkSys=(c,t)=>`Ты — добрый, терпеливый репетитор по математике для ученицы 6 класса${S.name?' ('+S.name+')':''}, она готовится в физ-мат лицей и занимается воздушной гимнастикой. Вы обсуждаете ОДИН конкретный пример.
+const talkSys=(c,t)=>c.sys?c.sys(t):`Ты — добрый, терпеливый репетитор по математике для ученицы 6 класса${S.name?' ('+S.name+')':''}, она готовится в физ-мат лицей и занимается воздушной гимнастикой. Вы обсуждаете ОДИН конкретный пример.
 Пример: ${strip(c.q)}
 Тема: ${TOPICS[c.t]}. Верный ответ (знаешь только ты; не называй его, пока она сама к нему не придёт или не попросит решение после нескольких попыток): ${c.a}.
 Её ответы на этот пример: ${(c.ans&&c.ans().filter(Boolean).join(' | '))||'пока нет'}.
 Шаги верного решения (для тебя): ${(c.hints||[]).map(strip).join(' → ')}.
 Типичные причины ошибок в этой теме: ${WHY[c.t]||''}
 Правила общения: 1) Всегда начинай с короткой поддержки. 2) Когда она описывает мысль или ответ, чётко скажи: верно, частично верно или неверно, и почему; похвали верную часть. 3) Если неверно — не называй готовый ответ, задай один наводящий вопрос или дай одну подсказку, говори «давай проверим», не «ты ошиблась». 4) Если просит способы — предложи 2–3 коротко (по действиям, схема или рисунок, прикидка и проверка). 5) Если просит правило — сформулируй его одной строкой, затем объясни простыми словами и покажи по шагам на её примере. 6) Пиши коротко (до 6 предложений), без сложных терминов, формулы обычным текстом. 7) Один вопрос за раз.`;
-function localTalk(c,text){const r=RULES[c.t]||['Разбей пример на шаги и решай по порядку.','Начни с самого простого действия.'],low=text.toLowerCase();
+function localTalk(c,text){if(c.local)return c.local(text);const r=RULES[c.t]||['Разбей пример на шаги и решай по порядку.','Начни с самого простого действия.'],low=text.toLowerCase();
  if(/правил/.test(low))return`Конечно! Правило: ${r[0]}\n\nПростыми словами: ${r[1]}\n\nПопробуй применить его к своему примеру — с какого шага начнёшь?`;
  if(/способ/.test(low))return WAYS;
  if(/проще|не понима|непонятно/.test(low))return`Давай проще. ${r[1]}\nПервый шаг: ${strip((c.hints||[])[0]||'разбери условие по частям')}. Что получится?`;
@@ -478,6 +489,73 @@ window.drClose=()=>{D=null;ls.set('drill',null);drill()};
 function drillsHTML(){const ds=[...(S.drills||[])].reverse().slice(0,20);
  return`<div class="card"><h2>Тренажёр</h2><p class="mut">Какие темы тренировала, сколько времени потратила и сколько ошибок. Нажмите на тренировку, чтобы увидеть все примеры.</p>${ds.length?ds.map(r=>`<details class="wk"><summary><b>⚡ ${DR[r.type]?DR[r.type].n:r.type}</b> · ${dm(r.d)} · уровень ${r.l} · ⏱ ${fmtMs(r.ms)} · <span class="tag ${r.errors?'bad':'ok'}">ошибок: ${r.errors} из ${r.n}</span>${r.fixedN?` · исправлено: ${r.fixedN}`:''}${r.revealed?' · ответы показаны':''}</summary><div class="dlist" style="margin-top:8px">${r.items.map((x,i)=>`<div class="dr ${x.ok?'':'bad'}"><span class="dn">${i+1}</span><span class="dq">${x.q}</span><span>=</span><b>${esc(x.u||'—')}</b><span class="st ${x.ok||x.fixed?'ok':'bad'}">${x.ok?'✓':`✗ верно: ${esc(String(x.a).replace('.',','))}${x.fixed?' · исправлено':''}`}</span></div>`).join('')}</div></details>`).join(''):'<div style="padding:18px;text-align:center;color:var(--mut);border:1px dashed var(--line);border-radius:16px">Тренажёр ещё не запускали.</div>'}</div>`}
 
+// ---- Школа: предметы и история
+let schoolSub=null,schoolPar=null,histT0=0;
+const HS=()=>(S.hist??={});
+function histFlush(){if(schoolPar!=null&&page=='school'){const h=(HS()[schoolPar]??={ts:0,secs:0,ans:[],score:[],awarded:[]});const d=Math.round(actNow()-histT0);if(d>0&&d<3600){h.secs=(h.secs||0)+d;h.ts=Date.now();histT0=actNow();persist()}}}
+const SCENES={fall:`<svg class="hsv" viewBox="0 0 800 200" role="img" aria-label="Рим падает, вырастает церковь"><defs><linearGradient id="skyF" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#27325a"/><stop offset=".6" stop-color="#c0566a"/><stop offset="1" stop-color="#f3a35a"/></linearGradient></defs>
+<rect width="800" height="200" fill="url(#skyF)"/><circle cx="610" cy="60" r="26" fill="#ffe9a8" opacity=".9"/>
+<circle cx="95" cy="34" r="20" fill="#3a2f3f" opacity=".45"/><circle cx="118" cy="22" r="26" fill="#3a2f3f" opacity=".35"/><circle cx="150" cy="34" r="16" fill="#3a2f3f" opacity=".4"/>
+<path d="M70 92Q58 62 76 40Q82 62 94 72Q100 52 114 56Q106 76 116 92Z" fill="#ff8a3d" opacity=".9"/><path d="M82 92Q80 76 88 66Q92 78 100 82Q104 88 100 92Z" fill="#ffd166"/>
+<path d="M0 160Q150 132 300 156T600 150T800 152V200H0Z" fill="#2a1a2c"/>
+<g fill="#eadbc2"><rect x="44" y="76" width="82" height="8" rx="2"/><g id="c"><rect x="46" y="86" width="18" height="72"/><rect x="42" y="82" width="26" height="6" rx="2"/><rect x="42" y="156" width="26" height="6" rx="2"/></g><use href="#c" x="50"/>
+<path d="M146 158V128L152 122L157 128L161 120L168 126V158Z"/><rect x="142" y="156" width="26" height="6" rx="2"/><rect x="198" y="146" width="76" height="14" rx="4" transform="rotate(-7 236 153)"/><ellipse cx="200" cy="152" rx="6" ry="8" fill="#cbb89a"/></g>
+<text x="400" y="86" text-anchor="middle" font-size="58" font-weight="800" fill="#fff" opacity=".92" font-family="Georgia,serif">476</text><text x="395" y="112" text-anchor="middle" font-size="15" fill="#ffe9d0" font-family="system-ui,sans-serif">конец Древнего мира</text><text x="395" y="132" text-anchor="middle" font-size="15" fill="#ffe9d0" font-family="system-ui,sans-serif">начало Средних веков</text>
+<path d="M300 162Q420 150 520 160" stroke="#d9b98a" stroke-width="5" fill="none" stroke-dasharray="2 10" stroke-linecap="round"/>
+<g><rect x="545" y="104" width="112" height="56" fill="#d8c7a6"/><polygon points="535,104 601,64 667,104" fill="#8a3b3b"/><rect x="667" y="52" width="40" height="108" fill="#cdb893"/><polygon points="662,52 687,24 712,52" fill="#8a3b3b"/><path d="M687 6V24M680 13H694" stroke="#ffd166" stroke-width="3" stroke-linecap="round"/>
+<rect x="580" y="124" width="32" height="36" rx="16" fill="#4a2a2a"/><rect x="560" y="116" width="12" height="20" rx="6" fill="#ffd166"/><rect x="630" y="116" width="12" height="20" rx="6" fill="#ffd166"/><rect x="681" y="78" width="12" height="22" rx="6" fill="#3b2a4a"/></g>
+<path d="M0 182Q200 170 400 182T800 180V200H0Z" fill="#1a0f1d"/></svg>`};
+function school(){if(schoolPar!=null)return histView(schoolPar);if(schoolSub=='history')return histList();
+ const H=window.HIST||[],done=H.filter(p=>HS()[p.id]&&HS()[p.id].read).length;
+ $('#app').innerHTML=`<div class="ph"><div><span class="tag">Школа</span><h1>Предметы</h1><p class="mut" style="margin:0">Выбери предмет. Новые параграфы и предметы будут добавляться.</p></div></div>
+ <div class="sub" style="margin-top:12px"><div class="card"><div class="em">📜</div><h2>История</h2><p class="mut">6 класс. Прочитано параграфов: <b>${done} из ${H.length}</b></p><button class="pri" onclick="schoolSub='history';school()">Открыть</button></div>
+ <div class="card"><div class="em">➗</div><h2>Математика</h2><p class="mut">Подготовка в физ-мат лицей: тест, практика, тренажёр, экзамен.</p><div class="row"><button class="pri" onclick="go('practice')">Практика</button><button onclick="go('drill')">Тренажёр</button><button onclick="go('exam')">Экзамен</button></div></div>
+ <div class="card" style="opacity:.6"><div class="em">➕</div><h2>Другие предметы</h2><p class="mut">Появятся позже.</p></div></div>`}
+function histList(){const H=window.HIST||[];
+ $('#app').innerHTML=`<div class="ph"><div><button onclick="schoolSub=null;school()">← Предметы</button><h1 style="margin-top:12px">📜 История · 6 класс</h1></div></div>${H.map(p=>{const h=HS()[p.id]||{},qz=p.blocks.find(b=>b.type=='quiz');return`<div class="card"><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><div style="font-size:40px">${p.emoji}</div><div style="flex:1;min-width:200px"><span class="tag">${p.n}</span><h2 style="margin:6px 0">${p.title}</h2><p class="mut" style="margin:0">${h.read?'✅ прочитан':'не прочитан'} · вопросы: ${(h.ans||[]).filter(Boolean).length}/${qz?qz.q.length:0}${h.secs?' · ⏱ '+fmtT(h.secs):''}</p></div><button class="pri" onclick="openPar(${p.id})">${h.secs||h.read?'Продолжить':'Читать'}</button></div></div>`}).join('')||'<div class="card mut">Параграфов пока нет.</div>'}`}
+window.openPar=id=>{schoolPar=id;histT0=actNow();school()};
+window.parBack=()=>{histFlush();schoolPar=null;school()};
+window.lightbox=src=>{const o=document.createElement('div');o.className='lbox';o.innerHTML=`<img src="${src}">`;o.onclick=()=>o.remove();document.body.appendChild(o)};
+window.tribe=i=>{const it=window._tr[i];$('#trb').innerHTML=`<div class="htrd"><b>${it[0]} ${it[1]}.</b> ${it[2]}</div>`};
+const wrapT=(t,n)=>{const w=t.split(' '),L=[''];w.forEach(x=>{if((L[L.length-1]+' '+x).trim().length>n)L.push(x);else L[L.length-1]=(L[L.length-1]+' '+x).trim()});return L};
+function histMap(b){const nodes=b.nodes,W=720,Hh=290,C=nodes[nodes.length-1];let g=`<defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#ffc857"/></marker><marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#ef4444"/></marker></defs>`;
+ nodes.slice(0,-1).forEach(n=>{g+=`<path d="M${C[2]} ${C[3]+35}L${n[2]+206} ${n[3]+35}" stroke="#ffc857" stroke-width="2.5" fill="none" marker-end="url(#ar)" stroke-dasharray="6 5"/>`});
+ nodes.forEach(n=>{const w=n==C?190:200,L=wrapT(n[0],16);g+=`<rect x="${n[2]}" y="${n[3]}" width="${w}" height="70" rx="16" fill="${n[4]}33" stroke="${n[4]}" stroke-width="2"/>`+L.map((l,i)=>`<text x="${n[2]+w/2}" y="${n[3]+28+i*18}" text-anchor="middle" font-weight="800" font-size="16" style="fill:var(--tx)">${l}</text>`).join('')+`<text x="${n[2]+w/2}" y="${n[3]+(L.length>1?64:52)}" text-anchor="middle" font-size="13" style="fill:var(--mut)">${n[1]}</text>`});
+ const ex=C[2]+190,L2=wrapT(b.from,15);g+=`<path d="M${W-8} ${C[3]+35}L${ex+8} ${C[3]+35}" stroke="#ef4444" stroke-width="3" fill="none" marker-end="url(#ar2)"/>`+L2.map((l,i)=>`<text x="${(ex+W)/2}" y="${C[3]+20-(L2.length-1-i)*15}" text-anchor="middle" font-size="12" style="fill:var(--mut)">${l}</text>`).join('');
+ return`<svg class="hsv" viewBox="0 0 ${W} ${Hh}" style="width:100%;height:auto" role="img" aria-label="${esc(b.h)}">${g}</svg>`}
+const qScore=(qq,txt)=>{const t=' '+txt.toLowerCase()+' ',m=qq.groups.filter(g=>g.some(k=>t.includes(k))).length;return m>=qq.full?2:m>=1?1:0};
+function showQ(id,i){const p=(window.HIST||[]).find(x=>x.id==id),qq=p.blocks.find(b=>b.type=='quiz').q[i],h=HS()[id]||{},sc=(h.score||[])[i],e=$('#hqf'+i);if(!e||sc==null)return;
+ e.innerHTML=sc==2?`<div class="okpop"><b>✅ Верно! Молодец!</b></div>`:`<div class="hint" style="border-color:${sc?'var(--acc2)':'var(--bad)'}"><b>${sc?'🟡 Почти: главное есть, но не всё.':'🤔 Пока не то.'}</b> Подсказка: ${qq.hint}</div>`}
+window.histCheck=(id,i)=>{const p=(window.HIST||[]).find(x=>x.id==id),qq=p.blocks.find(b=>b.type=='quiz').q[i],txt=($('#hq'+i).value||'').trim();if(!txt)return toast('Сначала напиши ответ');const h=HS()[id]??={ts:0,secs:0,ans:[],score:[],awarded:[]};
+ const sc=qScore(qq,txt);(h.ans??=[])[i]=txt;(h.score??=[])[i]=sc;(h.awarded??=[]);h.ts=Date.now();let xp=0;if(sc==2&&!h.awarded[i]){h.awarded[i]=true;xp=5}histFlush();save();if(xp)giveXp(xp);showQ(id,i);if(sc==2)burst($('#hqf'+i))};
+window.histSample=(id,i)=>{const p=(window.HIST||[]).find(x=>x.id==id),qq=p.blocks.find(b=>b.type=='quiz').q[i];$('#hqf'+i).insertAdjacentHTML('beforeend',`<div class="hint" style="border-color:var(--ok)"><b>Образец ответа:</b> ${qq.sample}</div>`)};
+window.histRead=id=>{const h=HS()[id]??={ts:0,secs:0,ans:[],score:[],awarded:[]};if(!h.read){h.read=true;h.ts=Date.now();histFlush();save();giveXp(10);toast('✅ Параграф прочитан! +10 очков');histView(id)}else toast('Параграф уже отмечен прочитанным')};
+function histCtx(p,i){const qz=p.blocks.find(b=>b.type=='quiz'),qq=i>=0?qz.q[i]:null,body=p.blocks.filter(b=>b.type=='text').map(b=>b.h+': '+b.t).join('\n');
+ return regTalk({key:'h'+p.id+(qq?'q'+i:'p'),host:qq?'#hqt'+i:'#hqt-p',t:'hist',tn:'История · '+p.n,q:qq?qq.q:'Параграф: '+p.title,a:qq?qq.sample:'',hints:qq?[qq.hint]:[],where:'history',err:()=>false,ans:()=>qq?[((HS()[p.id]||{}).ans||[])[i]||'']:[],
+ sys:t=>`Ты — добрый, терпеливый репетитор по истории для ученицы 6 класса${S.name?' ('+S.name+')':''}. Вы обсуждаете параграф «${p.title}».
+Текст параграфа (для тебя): ${strip(body).slice(0,2500)}
+${qq?`Вопрос для самопроверки: ${qq.q}\nОбразцовый ответ (не зачитывай сразу, пусть вспомнит сама): ${qq.sample}\nЕё ответ: ${((HS()[p.id]||{}).ans||[])[i]||'ещё нет'}`:'Она может задавать любые вопросы по параграфу.'}
+Правила: 1) Начинай с короткой поддержки. 2) Оценивай её мысль: верно, частично или нет, и почему. 3) Не давай готовый ответ сразу: задай наводящий вопрос или отправь к нужному разделу параграфа. 4) Объясняй простыми словами, с примерами и сравнениями из жизни. 5) Не выдумывай факты: если в тексте этого нет, скажи честно и осторожно добавь общеизвестный факт. 6) Коротко (до 6 предложений), один вопрос за раз.`,
+ local:()=>qq?`Хороший вопрос! Давай вспомним: ${qq.hint} Попробуй ответить своими словами.`:'Хороший вопрос! Перечитай раздел параграфа, который с ним связан, и напиши, что ты поняла: я помогу проверить мысль.'})}
+window.histTalk=(id,i,mode)=>{const p=(window.HIST||[]).find(x=>x.id==id);openTalk(histCtx(p,i),mode)};
+function histView(id){const p=(window.HIST||[]).find(x=>x.id==id);if(!p){schoolPar=null;return school()}const h=HS()[id]||{};
+ const B={
+ banner:b=>`<div class="banner">${SCENES[b.scene]||''}</div>`,
+ image:b=>`<img class="himg" src="${b.src}" alt="${esc(b.cap)}" onclick="lightbox(this.src)" loading="lazy"><div class="hcap">${b.cap}</div>`,
+ text:b=>`<div class="htxt"><h2><span class="ic">${b.icon||''}</span>${b.h}</h2><p style="margin:0">${b.t}</p></div>`,
+ causes:b=>`<h2>${b.h}</h2><div class="hcauses">${b.items.map(c=>`<div class="c"><i>${c[0]}</i>${c[1]}</div>`).join('')}</div><div class="harrow">⬇</div><div class="hres">${b.result}</div>`,
+ timeline:b=>`<h2>${b.h}</h2><div class="htl">${b.ev.map(e=>`<div class="e ${e[0]=='476'?'big':''}"><b>${e[0]}</b>${e[1]}</div>`).join('')}</div><p class="mut" style="margin:0;font-size:13px">${b.note||''}</p>`,
+ tribes:b=>{window._tr=b.items.map(x=>[x[0],x[1],x[2]]);return`<h2>${b.h}</h2><div class="htr">${b.items.map((x,i)=>`<button onclick="tribe(${i})">${x[0]} ${x[1]}</button>`).join('')}</div><div id="trb"></div>`},
+ map:b=>`<h2>${b.h}</h2>${histMap(b)}<p class="mut" style="margin:0;font-size:13px">${b.note||''}</p>`,
+ chain:b=>`<h2>💡 ${b.h}</h2><div class="hchain">${b.steps.map((x,i)=>(i?'<span class="a">→</span>':'')+`<span class="s">${x}</span>`).join('')}</div>`,
+ quiz:b=>`<h2>✍️ ${b.h}</h2><p class="mut" style="margin:0 0 6px">Напиши ответы своими словами. Я проверю, подскажу, а образец можно посмотреть после попытки.</p>${b.q.map((q,i)=>`<div class="hq"><b>${i+1}. ${q.q}</b><textarea id="hq${i}" placeholder="Твой ответ" style="margin-top:8px">${esc(((h.ans||[])[i])||'')}</textarea><div class="row"><button class="pri" onclick="histCheck(${p.id},${i})">Проверить</button><button onclick="histSample(${p.id},${i})">Образец ответа</button><button onclick="histTalk(${p.id},${i})">💬 Обсудить с репетитором</button></div><div class="fb" id="hqf${i}"></div><div id="hqt${i}"></div></div>`).join('')}`};
+ $('#app').innerHTML=`<div class="hv"><div class="row" style="margin:0 0 8px"><button onclick="parBack()">← Все параграфы</button><span class="tag" style="align-self:center">${p.n}</span></div><h1>${p.emoji} ${p.title}</h1>${p.blocks.map(b=>b.type=='banner'?B.banner(b):`<div class="card">${(B[b.type]||(()=>''))(b)}</div>`).join('')}
+ <div class="card"><h2>Готово?</h2><div class="row"><button class="pri" onclick="histRead(${p.id})">${h.read?'✅ Параграф прочитан':'Я прочитала параграф'}</button><button onclick="histTalk(${p.id},-1)">💬 Задать вопрос по параграфу</button></div><div id="hqt-p"></div></div></div>`;
+ const qz=p.blocks.find(b=>b.type=='quiz');if(qz)qz.q.forEach((_,i)=>showQ(id,i))}
+function histReportHTML(){const H=window.HIST||[],rows=H.filter(p=>{const h=HS()[p.id];return h&&(h.secs||h.read||(h.ans||[]).some(Boolean))});
+ return`<div class="card"><h2>Школа: история</h2><p class="mut">Какие параграфы читала, сколько времени потратила, как ответила на вопросы и о чём спрашивала репетитора.</p>${rows.length?rows.map(p=>{const h=HS()[p.id],qz=p.blocks.find(b=>b.type=='quiz'),tk=(S.talks||[]).filter(t=>t.key&&t.key.indexOf('h'+p.id)==0&&t.msgs.some(m=>m.r=='user'));
+ return`<details class="wk"><summary><b>📜 ${p.n}: ${p.title}</b><br>${h.read?'✅ прочитан':'не отмечен прочитанным'} · ⏱ ${fmtT(h.secs||0)} · ответов на вопросы: ${(h.ans||[]).filter(Boolean).length}/${qz?qz.q.length:0}${tk.length?` · 💬 обсуждений: ${tk.length}`:''}</summary>${qz?qz.q.map((qq,i)=>{const a=(h.ans||[])[i],sc=(h.score||[])[i];return`<div class="hq"><b>${i+1}. ${qq.q}</b><br>${a?`Ответ: <mark>${esc(a)}</mark> ${sc==2?'<span class="ok">✓ верно</span>':sc==1?'<span class="w">почти верно</span>':'<span class="bad">не совпало с образцом</span>'}`:'<span class="mut">ответа нет</span>'}<br><span class="mut">Образец: ${qq.sample}</span></div>`}).join(''):''}${tk.map(t=>`<details class="in"><summary>💬 ${esc(strip(t.q).slice(0,70))} (${fmtT(t.secs)})</summary>${talkLog(t)}</details>`).join('')}</details>`}).join(''):'<div style="padding:18px;text-align:center;color:var(--mut);border:1px dashed var(--line);border-radius:16px">Историю ещё не изучали.</div>'}</div>`}
+
 // Чат
 const SYS=()=>`Ты добрый репетитор по математике для ученицы, которая только перешла в 6 класс${S.name?' ('+S.name+')':''} и готовится к поступлению в физ-мат лицей. В школе учебник Петерсона; в 3–4 классах были пробелы, поэтому при непонимании возвращайся к базе (столбик, порядок действий, доли, величины). Она занимается воздушной гимнастикой — объясняй через кольцо, вращения, время и длину окружности. Иногда давай нестандартные задачи лицейского уровня. Вступительная работа в физ-мат 6 класс: 9 заданий за 40 минут (вычисления с дробями и десятичными, уравнение со смешанными числами, единицы длины, объём с процентами и долями, движение навстречу/вдогонку, упрощение выражений, дроби с буквами, перевод на математический язык, число k из 1/k≈). Пиши коротко, простыми словами. НИКОГДА не давай готовый ответ сразу: задай наводящий вопрос или дай одну подсказку, дай ответ только если ученица просит после 3 подсказок. Слабые темы: ${weak().slice(0,3).map(x=>TOPICS[x[0]]).join(', ')}.`;
 function chat(){$('#app').innerHTML=`<div class="card"><h2>Чат с репетитором</h2><div class="chat" id="ch"></div><div class="row"><input id="ci" placeholder="Напиши вопрос или свой ответ…" onkeydown="event.key=='Enter'&&send()"><button class="pri" onclick="send()">Отправить</button></div>${S.cfg.url?'':'<p class="mut">ИИ не подключён: чат отвечает по шаблону. Подключить — в разделе «Родителю» → Настройки.</p>'}</div>`;
@@ -619,7 +697,7 @@ function talksHTML(){const ts=[...(S.talks||[])].filter(t=>t.msgs.some(m=>m.r=='
  const secs=ts.reduce((z,t)=>z+(t.secs||0),0),qn=ts.reduce((z,t)=>z+t.msgs.filter(m=>m.r=='user').length,0);
  return`<div class="card"><h2>Вопросы к репетитору</h2><p class="mut">В каких примерах возникли вопросы и сколько длилось обсуждение. Нажмите на пример, чтобы прочитать переписку.</p>
  ${ts.length?`<div class="kpis"><div class="kpi"><small>Обсуждено примеров</small><b style="font-size:22px">${ts.length}</b></div><div class="kpi"><small>Время обсуждений</small><b style="font-size:22px">${fmtT(secs)}</b></div><div class="kpi"><small>Вопросов и реплик</small><b style="font-size:22px">${qn}</b></div></div>
- ${ts.slice(0,20).map(t=>`<details class="wk"><summary><b>💬 ${dm(t.d)}</b> · <span class="tag">${TOPICS[t.t]}</span> · ⏱ ${fmtT(t.secs)} · ${t.msgs.filter(m=>m.r=='user').length} реплик${t.err?' · <span class="bad">после ошибки</span>':''}<br><span class="mut">${esc(strip(t.q).slice(0,90))}</span></summary><div class="exq">${t.q}</div><p class="mut">Верный ответ: <b>${esc(String(t.cor).replace('.',','))}</b></p><h3>История общения</h3>${talkLog(t)}</details>`).join('')}`:'<div style="padding:18px;text-align:center;color:var(--mut);border:1px dashed var(--line);border-radius:16px">Вопросов к репетитору пока не было.</div>'}</div>`}
+ ${ts.slice(0,20).map(t=>`<details class="wk"><summary><b>💬 ${dm(t.d)}</b> · <span class="tag">${TOPICS[t.t]||t.tn||'История'}</span> · ⏱ ${fmtT(t.secs)} · ${t.msgs.filter(m=>m.r=='user').length} реплик${t.err?' · <span class="bad">после ошибки</span>':''}<br><span class="mut">${esc(strip(t.q).slice(0,90))}</span></summary><div class="exq">${t.q}</div>${t.cor?`<p class="mut">Верный ответ: <b>${esc(String(t.cor).replace('.',','))}</b></p>`:''}<h3>История общения</h3>${talkLog(t)}</details>`).join('')}`:'<div style="padding:18px;text-align:center;color:var(--mut);border:1px dashed var(--line);border-radius:16px">Вопросов к репетитору пока не было.</div>'}</div>`}
 function stepsH(it,hl){return`<ol class="steps">${(it.h||[]).map((h,k)=>`<li class="${k===hl?'hl':''}">${h}${k===hl?' <b class="bad">← здесь ошибка</b>':''}</li>`).join('')}</ol>`}
 function errHTML(it){const dg=(it.dg||[]).find(Boolean)||{cat:'method',step:0,why:'',tip:''},ans=esc((it.ans||[]).filter(Boolean).join('; ')||'—'),cor=esc((it.cor||[]).join('; '));
  return`<details class="er"><summary><span class="tag">${TOPICS[it.t]}</span> <span class="mut">${CATS[dg.cat]||''}</span> <span class="bad">${ans}</span> → <b>${cor}</b>${it.fixed?' <span class="tag ok">исправлено</span>':it.revealed?' <span class="tag">решение показано</span>':''}</summary>
@@ -647,6 +725,7 @@ function parent0(){const st=stats(),rows=Object.entries(TOPICS).map(([k,v])=>{co
  ${worksHTML()}
  ${talksHTML()}
  ${drillsHTML()}
+ ${histReportHTML()}
  <div id="charts"></div>
  <div class="card"><h2>Все темы</h2><div style="overflow:auto"><table><tr><th>Тема<th>Задач<th>Верно<th>Подсказок<th>Уровень<th>Последний раз</tr>${rows}</table></div></div>
  <div class="card"><h2>Отчёт для пересылки</h2><textarea id="rp" rows="8" readonly>${reportText()}</textarea><div class="row"><button class="pri" onclick="$('#rp').select();document.execCommand('copy');toast('Скопировано')">Скопировать</button></div></div>
@@ -667,7 +746,7 @@ const loadSb=()=>new Promise(r=>{if(window.supabase)return r(true);const sc=docu
 
 // ---- Слияние прогресса с облаком (чтобы устаревшее устройство не затирало новое)
 function mergeS(a,b){const c={...b,...a},mx=(p,q)=>{const o={...(p||{})};for(const k in (q||{}))o[k]=Math.max(o[k]||0,q[k]);return o};
- c.xp=Math.max(a.xp||0,b.xp||0);c.act=Math.max(a.act||0,b.act||0);{const dmap=new Map();[...(b.drills||[]),...(a.drills||[])].forEach(r=>{const o=dmap.get(r.id);if(!o||(r.fixedN||0)>=(o.fixedN||0))dmap.set(r.id,r)});c.drills=[...dmap.values()].slice(-60);const bb={...(b.drillBest||{})};for(const k in (a.drillBest||{}))bb[k]=Math.min(bb[k]||1e12,a.drillBest[k]);c.drillBest=bb}c.minutes=Math.max(a.minutes||0,b.minutes||0);c.ts=Math.max(a.ts||0,b.ts||0);
+ c.xp=Math.max(a.xp||0,b.xp||0);c.act=Math.max(a.act||0,b.act||0);{const h={...(b.hist||{})};for(const k in (a.hist||{}))if(!h[k]||(a.hist[k].ts||0)>=(h[k].ts||0))h[k]=a.hist[k];c.hist=h}{const dmap=new Map();[...(b.drills||[]),...(a.drills||[])].forEach(r=>{const o=dmap.get(r.id);if(!o||(r.fixedN||0)>=(o.fixedN||0))dmap.set(r.id,r)});c.drills=[...dmap.values()].slice(-60);const bb={...(b.drillBest||{})};for(const k in (a.drillBest||{}))bb[k]=Math.min(bb[k]||1e12,a.drillBest[k]);c.drillBest=bb}c.minutes=Math.max(a.minutes||0,b.minutes||0);c.ts=Math.max(a.ts||0,b.ts||0);
  c.topics={...(b.topics||{})};for(const k in (a.topics||{}))if(!c.topics[k]||(a.topics[k].done||0)>=(c.topics[k].done||0))c.topics[k]=a.topics[k];
  const cnt=m=>{const o={};(m||[]).forEach(x=>{const k=JSON.stringify(x);(o[k]??=[0,x])[0]++});return o},la=cnt(a.log),lb=cnt(b.log),lo=[];
  new Set([...Object.keys(la),...Object.keys(lb)]).forEach(k=>{const n=Math.max(la[k]?la[k][0]:0,lb[k]?lb[k][0]:0),x=(la[k]||lb[k])[1];for(let i=0;i<n;i++)lo.push(x)});c.log=lo.sort((p,q)=>p.d<q.d?-1:p.d>q.d?1:0);

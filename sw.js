@@ -1,6 +1,6 @@
 // Сеть в приоритете, при отсутствии интернета — копия из кэша (сайт открывается офлайн).
-const C = "tutor-v1";
-self.addEventListener("install", e => { e.waitUntil(caches.open(C).then(c => c.addAll(["./", "./index.html"]))); self.skipWaiting(); });
+const C = "tutor-v2";
+self.addEventListener("install", e => { e.waitUntil(caches.open(C).then(c => c.addAll(["./", "./index.html", "./history.js", "./assets/hist-1-fall-of-rome.webp"]))); self.skipWaiting(); });
 self.addEventListener("activate", e => e.waitUntil(clients.claim()));
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
