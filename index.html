@@ -445,6 +445,7 @@ function examResult(){const w=examWork(),sc=EXAM.ok.filter(Boolean).length;EXAM.
 const frs=(n,d)=>{const g=fg(n,d);return d/g==1?String(n/g):`${n/g}/${d/g}`};
 const rnd=(x,k)=>String(Math.round(x*k)/k);
 const DR={
+ mix:{n:'Смешанный',e:'🎲',g:()=>{const ks=Object.keys(DR).filter(k=>k!='mix'),k=pick(ks),x=DR[k].g(R(1,3));return{...x,e:DR[k].e}}},
  add:{n:'Сложение',e:'➕',g:l=>{const[a,b]=l==1?[R(12,89),R(11,89)]:l==2?[R(101,899),R(12,98)]:[R(101,899),R(101,899)];return{q:`${a} + ${b}`,a:String(a+b)}}},
  sub:{n:'Вычитание',e:'➖',g:l=>{let a,b;if(l==1){a=R(30,99);b=R(11,a-1)}else if(l==2){a=R(101,999);b=R(12,99)}else{a=R(300,999);b=R(101,a-1)}return{q:`${a} − ${b}`,a:String(a-b)}}},
  mul:{n:'Умножение',e:'✖️',g:l=>{const[a,b]=l==1?[R(12,49),R(2,9)]:l==2?[R(12,29),R(11,29)]:[R(101,399),R(12,49)];return{q:`${a} · ${b}`,a:String(a*b)}}},
@@ -458,15 +459,15 @@ const svD=()=>ls.set('drill',D);
 const fmtMs=ms=>{const s=ms/1000,m=Math.floor(s/60);return m?`${m}:${(s%60).toFixed(1).padStart(4,'0')}`:`${s.toFixed(1)} с`};
 function giveXp(n){const L0=level();S.xp+=n;if(level()>L0){(S.lvlAt??={})[level()]=today();save();setTimeout(()=>levelFx(level()),800)}else save()}
 function drill(){if(D&&D.phase)return drillView();drillMenu()}
-function drillMenu(){const keyOf=t=>t+'|'+drCfg.l+'|'+drCfg.n;
+function drillMenu(){const keyOf=t=>t=='mix'?'mix|0|'+drCfg.n:t+'|'+drCfg.l+'|'+drCfg.n;
  $('#app').innerHTML=`<div class="card"><h1>⚡ Тренажёр на скорость</h1><p class="mut">Выбери тему. Появится столбик примеров, время пойдёт сразу. Отвечай в любом порядке. Когда запишешь последний ответ, время остановится, а проверка будет после этого.</p>
  <div class="row" style="align-items:center"><span class="mut">Примеров:</span>${[10,15,20].map(n=>`<button class="${drCfg.n==n?'on':''}" onclick="drCfg.n=${n};drill()">${n}</button>`).join('')}<span class="mut" style="margin-left:10px">Сложность:</span>${[[1,'Лёгкий'],[2,'Средний'],[3,'Сложный']].map(([l,t])=>`<button class="${drCfg.l==l?'on':''}" onclick="drCfg.l=${l};drill()">${t}</button>`).join('')}</div></div>
- <div class="grid">${Object.entries(DR).map(([k,v])=>{const b=(S.drillBest||{})[keyOf(k)];return`<div class="card" style="margin:6px 0"><div style="font-size:30px">${v.e}</div><h2>${v.n}</h2><p class="mut" style="margin:0 0 8px">${b?'🏆 Рекорд без ошибок: '+fmtMs(b):'Рекорда пока нет'}</p><button class="pri" onclick="drStart('${k}')">Начать</button></div>`}).join('')}</div>`}
+ <div class="grid">${Object.entries(DR).map(([k,v])=>{const b=(S.drillBest||{})[keyOf(k)];return`<div class="card" style="margin:6px 0"><div style="font-size:30px">${v.e}</div><h2>${v.n}</h2>${k=='mix'?'<p class="mut" style="margin:0 0 6px;font-size:14px">Каждый раз разные примеры: все темы и все уровни вперемешку</p>':''}<p class="mut" style="margin:0 0 8px">${b?'🏆 Рекорд без ошибок: '+fmtMs(b):'Рекорда пока нет'}</p><button class="pri" onclick="drStart('${k}')">Начать</button></div>`}).join('')}</div>`}
 window.drStart=k=>{const seen=new Set(),items=[];let guard=0;while(items.length<drCfg.n&&guard++<500){const x=DR[k].g(+drCfg.l);if(seen.has(x.q))continue;seen.add(x.q);items.push(x)}
- D={id:Date.now(),type:k,l:+drCfg.l,n:items.length,items,ans:items.map(()=>''),ans2:[],t0:Date.now(),t1:null,phase:'run',res:[],fixed:[],reveal:false};svD();drill()};
+ D={id:Date.now(),type:k,l:k=='mix'?0:+drCfg.l,n:items.length,items,ans:items.map(()=>''),ans2:[],t0:Date.now(),t1:null,phase:'run',res:[],fixed:[],reveal:false};svD();drill()};
 const drFilled=()=>D.ans.filter(v=>String(v).trim()!=='').length;
 function drRows(){const chk=D.phase!='run';return`<div class="dlist">${D.items.map((x,i)=>{const ok=chk&&D.res[i],fx=chk&&D.fixed[i],bad=chk&&!ok&&!fx,edit=D.phase=='run'||(D.phase=='fix'&&bad),val=D.phase=='fix'&&bad?(D.ans2[i]||''):(fx?(D.ans2[i]||''):D.ans[i]);
-  return`<div class="dr ${bad?'bad':''}"><span class="dn">${i+1}</span><span class="dq">${x.q}</span><span>=</span><input id="d${i}" class="${ok||fx?'okfield':bad?'badfield':''}" inputmode="decimal" autocomplete="off" value="${esc(val)}" ${edit?'':'disabled'} oninput="drIn(${i},this.value)" onkeydown="drKey(event,${i})"><span class="st ${ok||fx?'ok':'bad'}">${ok?'✓':fx?'✓ исправлено':bad?(D.reveal?'верно: '+esc(String(x.a).replace('.',',')):'✗'):''}</span></div>`}).join('')}</div>`}
+  return`<div class="dr ${bad?'bad':''}"><span class="dn">${i+1}</span><span class="dq">${x.e?`<small style="opacity:.7">${x.e}</small> `:''}${x.q}</span><span>=</span><input id="d${i}" class="${ok||fx?'okfield':bad?'badfield':''}" inputmode="decimal" autocomplete="off" value="${esc(val)}" ${edit?'':'disabled'} oninput="drIn(${i},this.value)" onkeydown="drKey(event,${i})"><span class="st ${ok||fx?'ok':'bad'}">${ok?'✓':fx?'✓ исправлено':bad?(D.reveal?'верно: '+esc(String(x.a).replace('.',',')):'✗'):''}</span></div>`}).join('')}</div>`}
 function drillView(){const n=D.n,msNow=(D.t1||Date.now())-D.t0;
  if(D.phase=='run'){$('#app').innerHTML=`<div class="tm" id="dtm"><span>${DR[D.type].e} ${DR[D.type].n}</span><b id="dt">${fmtMs(msNow)}</b><span id="dfill" class="mut"></span><button class="pri" id="dchk" onclick="drCheck()" style="display:none">Проверить</button></div><div class="card">${drRows()}</div>`;drUpd();return}
  const errs=D.res.filter(x=>!x).length,left=D.items.filter((_,i)=>!D.res[i]&&!D.fixed[i]).length;
@@ -478,7 +479,7 @@ window.drKey=(e,i)=>{if(e.key=='Enter'||e.key=='ArrowDown'){e.preventDefault();c
 setInterval(()=>{if(page=='drill'&&D&&D.phase=='run'&&!D.t1){const t=$('#dt');if(t)t.textContent=fmtMs(Date.now()-D.t0)}},100);
 window.drCheck=()=>{if(drFilled()<D.n)return;if(!D.t1)D.t1=Date.now();D.res=D.items.map((x,i)=>same(D.ans[i],x.a));D.phase='checked';
  const errs=D.res.filter(x=>!x).length,ms=D.t1-D.t0,key=D.type+'|'+D.l+'|'+D.n;
- (S.drills??=[]).push({id:D.id,ts:Date.now(),d:today(),type:D.type,l:D.l,n:D.n,ms,errors:errs,fixedN:0,items:D.items.map((x,i)=>({q:x.q,a:x.a,u:D.ans[i],ok:D.res[i]}))});S.drills=S.drills.slice(-60);
+ (S.drills??=[]).push({id:D.id,ts:Date.now(),d:today(),type:D.type,l:D.l,n:D.n,ms,errors:errs,fixedN:0,items:D.items.map((x,i)=>({q:x.q,a:x.a,u:D.ans[i],ok:D.res[i],e:x.e||''}))});S.drills=S.drills.slice(-60);
  let msg='';if(!errs){const b=(S.drillBest??={})[key];if(!b||ms<b){S.drillBest[key]=ms;msg=b?'🏆 Новый рекорд!':'🏆 Первый рекорд!'}}
  giveXp(D.n-errs+(errs?0:10));svD();drill();if(msg){toast(msg);burst($('#app .card'))}};
 const drRec=()=>(S.drills||[]).find(r=>r.id==D.id);
@@ -488,7 +489,7 @@ window.drRecheck=()=>{const r=drRec();D.items.forEach((x,i)=>{if(!D.res[i]&&!D.f
 window.drReveal=()=>{D.reveal=true;const r=drRec();if(r)r.revealed=true;save();svD();drill()};
 window.drClose=()=>{D=null;ls.set('drill',null);drill()};
 function drillsHTML(){const ds=[...(S.drills||[])].reverse().slice(0,20);
- return`<div class="card"><h2>Тренажёр</h2><p class="mut">Какие темы тренировала, сколько времени потратила и сколько ошибок. Нажмите на тренировку, чтобы увидеть все примеры.</p>${ds.length?ds.map(r=>`<details class="wk"><summary><b>⚡ ${DR[r.type]?DR[r.type].n:r.type}</b> · ${dm(r.d)} · уровень ${r.l} · ⏱ ${fmtMs(r.ms)} · <span class="tag ${r.errors?'bad':'ok'}">ошибок: ${r.errors} из ${r.n}</span>${r.fixedN?` · исправлено: ${r.fixedN}`:''}${r.revealed?' · ответы показаны':''}</summary><div class="dlist" style="margin-top:8px">${r.items.map((x,i)=>`<div class="dr ${x.ok?'':'bad'}"><span class="dn">${i+1}</span><span class="dq">${x.q}</span><span>=</span><b>${esc(x.u||'—')}</b><span class="st ${x.ok||x.fixed?'ok':'bad'}">${x.ok?'✓':`✗ верно: ${esc(String(x.a).replace('.',','))}${x.fixed?' · исправлено':''}`}</span></div>`).join('')}</div></details>`).join(''):'<div style="padding:18px;text-align:center;color:var(--mut);border:1px dashed var(--line);border-radius:16px">Тренажёр ещё не запускали.</div>'}</div>`}
+ return`<div class="card"><h2>Тренажёр</h2><p class="mut">Какие темы тренировала, сколько времени потратила и сколько ошибок. Нажмите на тренировку, чтобы увидеть все примеры.</p>${ds.length?ds.map(r=>`<details class="wk"><summary><b>⚡ ${DR[r.type]?DR[r.type].n:r.type}</b> · ${dm(r.d)} · ${r.l?'уровень '+r.l:'разные темы и уровни'} · ⏱ ${fmtMs(r.ms)} · <span class="tag ${r.errors?'bad':'ok'}">ошибок: ${r.errors} из ${r.n}</span>${r.fixedN?` · исправлено: ${r.fixedN}`:''}${r.revealed?' · ответы показаны':''}</summary><div class="dlist" style="margin-top:8px">${r.items.map((x,i)=>`<div class="dr ${x.ok?'':'bad'}"><span class="dn">${i+1}</span><span class="dq">${x.e?`<small style="opacity:.7">${x.e}</small> `:''}${x.q}</span><span>=</span><b>${esc(x.u||'—')}</b><span class="st ${x.ok||x.fixed?'ok':'bad'}">${x.ok?'✓':`✗ верно: ${esc(String(x.a).replace('.',','))}${x.fixed?' · исправлено':''}`}</span></div>`).join('')}</div></details>`).join(''):'<div style="padding:18px;text-align:center;color:var(--mut);border:1px dashed var(--line);border-radius:16px">Тренажёр ещё не запускали.</div>'}</div>`}
 
 // ---- Школа: предметы и история
 let schoolSub=null,schoolPar=null,histT0=0,histResume=false;
