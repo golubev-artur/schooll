@@ -42,6 +42,43 @@ cone(){const g=new THREE.Group(),sc=M(0x8a5a2e,{roughness:.8}),c=new THREE.Group
  for(let i=0;i<70;i++){const x=-2+i*.04,z=(Math.random()-.5)*.1;for(const s of[-1,1]){g.add(tube([[x,1.2,0],[x+.1,1.2+s*.1,s*.5],[x+.2,1.2+s*.15,s*1]],.008,M(0x2e7d32),4))}}
  const sd=new THREE.Group();sd.add(ell(0,0,0,M(0x5a3a1a),.12,.2,.08));const w=ell(.05,.35,0,M(0xc9a36b,{side:THREE.DoubleSide}),.2,.5,.01);w.rotation.z=-.3;sd.add(w);sd.position.set(1.7,-1.1,.3);sd.rotation.z=.9;g.add(sd);
  return g}};
+
+const GL=(c,o=.55,x={})=>M(c,Object.assign({transparent:true,opacity:o,roughness:.2,side:THREE.DoubleSide,depthWrite:false},x));
+const box=(w,h,d,mat,x=0,y=0,z=0)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);return m};
+const rnd=(a,b)=>a+Math.random()*(b-a);
+Object.assign(MODELS,{
+wall(){const g=new THREE.Group();
+ g.add(box(3,2,.9,GL(0x3d9a2a,.28)));
+ g.add(box(2.7,1.7,.78,GL(0xe6d84a,.45)));
+ g.add(box(2.55,1.55,.7,GL(0x5ec8f0,.55)));
+ for(let i=0;i<14;i++)g.add(ell(rnd(-1,1),rnd(-.6,.6),rnd(-.25,.25),M(0x3fae3f),.08,.05,.05));
+ for(const [x,y] of[[1.5,1],[-1.5,1],[1.5,-1],[-1.5,-1]])g.add(box(.2,.2,1,M(0x2f8a22),x,y,0));
+ return g},
+vacuole(){const g=new THREE.Group();g.add(ell(0,0,0,GL(0x6fc8f2,.62,{roughness:.1}),1.7,1.25,1.1));
+ g.add(ell(-.5,.45,.7,GL(0xffffff,.35),.5,.3,.2));
+ for(let i=0;i<30;i++)g.add(ell(rnd(-1,1),rnd(-.7,.7),rnd(-.5,.5),M(0xd6eefc),.04,.04,.04));return g},
+cytoplasm(){const g=new THREE.Group();g.add(box(3,2,1.6,GL(0x7ccff2,.3)));
+ for(let i=0;i<70;i++)g.add(ell(rnd(-1.4,1.4),rnd(-.9,.9),rnd(-.7,.7),M(new THREE.Color().setHSL(rnd(.3,.62),.5,.5)),.05,.05,.05));
+ g.add(ell(.6,.3,0,M(0xc9a3f0),.25,.25,.25));g.add(ell(-.7,-.3,.2,M(0x4aa845),.3,.18,.18));return g},
+nucleus(){const g=new THREE.Group();g.add(ell(0,0,0,GL(0xb07fe0,.42,{roughness:.3}),1.5,1.5,1.5));
+ g.add(ell(.1,.1,0,M(0x5b1d9a),.5,.5,.5));
+ for(let i=0;i<12;i++){const p=[];let x=rnd(-.9,.9),y=rnd(-.9,.9),z=rnd(-.5,.5);for(let k=0;k<7;k++){p.push([x,y,z]);x+=rnd(-.3,.3);y+=rnd(-.3,.3);z+=rnd(-.3,.3)}g.add(tube(p,.025,M(0x6a2db0),14))}
+ for(let i=0;i<20;i++){const a=Math.random()*6.28,b=Math.acos(rnd(-1,1));g.add(ell(1.5*Math.sin(b)*Math.cos(a),1.5*Math.cos(b),1.5*Math.sin(b)*Math.sin(a),M(0x8a55c8),.06,.06,.06))}return g},
+nucleolus(){const g=new THREE.Group();g.add(ell(0,0,0,M(0x4b1580,{roughness:.8}),.9,.9,.9));
+ for(let i=0;i<120;i++){const a=Math.random()*6.28,b=Math.acos(rnd(-1,1));g.add(ell(.9*Math.sin(b)*Math.cos(a),.9*Math.cos(b),.9*Math.sin(b)*Math.sin(a),M(0x7a3cc0),.07,.07,.07))}return g},
+chromosomes(){const g=new THREE.Group(),m=M(0x3548c8,{roughness:.4}),cap=(x,y,z,l,rz)=>{const c=new THREE.Mesh(new THREE.CapsuleGeometry?new THREE.CapsuleGeometry(.09,l,6,12):new THREE.CylinderGeometry(.09,.09,l,12),m);c.position.set(x,y,z);c.rotation.z=rz;return c};
+ for(const [x,y,z] of[[-.9,.5,0],[.9,.6,.2],[-.6,-.7,-.2],[.8,-.6,0]]){const X=new THREE.Group();X.add(cap(0,0,0,1,.45));X.add(cap(0,0,0,1,-.45));X.position.set(x,y,z);X.rotation.y=rnd(0,3);g.add(X)}return g},
+chloroplast(){const g=new THREE.Group();g.add(ell(0,0,0,GL(0x3fae3f,.4,{roughness:.3}),2.1,1.15,1.15));
+ for(const [x,z] of[[-.9,-.2],[-.3,.3],[.35,-.25],[.95,.2]]){const st=new THREE.Group();for(let k=0;k<7;k++){const d=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.07,20),M(0x1f7a2a));d.position.y=-.3+k*.1;st.add(d)}st.position.set(x,0,z);g.add(st)}
+ g.add(tube([[-1.2,0,0],[-.6,.1,.1],[0,0,-.1],[.6,.1,0],[1.2,0,0]],.02,M(0x8fd18a)));return g},
+mito(){const g=new THREE.Group();g.add(ell(0,0,0,GL(0xff8a1f,.4,{roughness:.3}),2.1,1,1));
+ for(let k=-4;k<=4;k++){const w=1-Math.abs(k)*.1,f=new THREE.Mesh(new THREE.TorusGeometry(.62*w,.08,8,24,Math.PI*1.3),M(0xd2501a));f.position.x=k*.22;f.rotation.y=Math.PI/2;f.rotation.z=(k%2?1:-1)*.9;g.add(f)}
+ g.add(ell(0,0,0,GL(0xffc27a,.3),1.9,.85,.85));return g},
+leuko(){const g=new THREE.Group();g.add(ell(0,0,0,GL(0xdfe3e8,.5,{roughness:.2}),1.9,1.1,1.1));
+ for(let i=0;i<14;i++)g.add(ell(rnd(-1,1),rnd(-.5,.5),rnd(-.4,.4),M(0xf6f6f2,{roughness:.3}),rnd(.16,.3),rnd(.14,.24),rnd(.14,.24)));return g},
+chromo(){const g=new THREE.Group();g.add(ell(0,0,0,GL(0xffb02e,.45,{roughness:.25}),1.9,1.15,1.15));
+ for(let i=0;i<26;i++)g.add(ell(rnd(-1.1,1.1),rnd(-.6,.6),rnd(-.5,.5),M(new THREE.Color().setHSL(rnd(.02,.08),.95,.5)),.14,.14,.14));return g}
+});
 window.open3D=(key,host)=>{
  const W=host.clientWidth||400,H=host.clientHeight||360,r=new THREE.WebGLRenderer({antialias:true,alpha:true});r.setPixelRatio(Math.min(devicePixelRatio,2));r.setSize(W,H);host.appendChild(r.domElement);
  const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,W/H,.1,100);cam.position.set(0,.4,7);
