@@ -79,6 +79,13 @@ leuko(){const g=new THREE.Group();g.add(ell(0,0,0,GL(0xdfe3e8,.5,{roughness:.2})
 chromo(){const g=new THREE.Group();g.add(ell(0,0,0,GL(0xffb02e,.45,{roughness:.25}),1.9,1.15,1.15));
  for(let i=0;i<26;i++)g.add(ell(rnd(-1.1,1.1),rnd(-.6,.6),rnd(-.5,.5),M(new THREE.Color().setHSL(rnd(.02,.08),.95,.5)),.14,.14,.14));return g}
 });
+
+Object.assign(MODELS,{
+membrane(){const g=new THREE.Group(),hm=M(0xf0a020),tm=M(0xe8d9a0,{roughness:.8});
+ for(const side of[1,-1])for(let i=-7;i<=7;i++)for(let j=-3;j<=3;j++){const x=i*.3,z=j*.3,y=side*.55;g.add(ell(x,y,z,hm,.11,.11,.11));for(const dx of[-.045,.045]){const t=new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,.5,6),tm);t.position.set(x+dx,side*.28,z);g.add(t)}}
+ for(const [x,z] of[[-1.2,.3],[.4,-.3],[1.7,.2]]){const p=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,1.5,16,1,true),GL(0x7a4fd0,.75));p.position.set(x,0,z);g.add(p)}
+ g.rotation.x=.5;return g}
+});
 window.open3D=(key,host)=>{
  const W=host.clientWidth||400,H=host.clientHeight||360,r=new THREE.WebGLRenderer({antialias:true,alpha:true});r.setPixelRatio(Math.min(devicePixelRatio,2));r.setSize(W,H);host.appendChild(r.domElement);
  const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,W/H,.1,100);cam.position.set(0,.4,7);
