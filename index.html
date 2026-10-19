@@ -499,7 +499,7 @@ function drillsHTML(){const ds=[...(S.drills||[])].reverse().slice(0,20);
 let schoolSub=null,schoolPar=null,histT0=0,histResume=false;
 const sch=()=>{S.sch={sub:schoolSub,par:schoolPar};persist()};
 const blockTitle=b=>strip(b.h||b.cap||'Начало параграфа').replace(/\s*\(нажми.*$/,'');
-const SUBS={history:{k:'hist',last:'histLast',pre:'h',nm:'История',nm2:'истории',em:'📜',get d(){return SB().d}},biology:{k:'bio',last:'bioLast',pre:'b',nm:'Биология',nm2:'биологии',em:'🌿',get d(){return window.BIO||[]}}};
+const SUBS={history:{k:'hist',last:'histLast',pre:'h',nm:'История',nm2:'истории',em:'📜',get d(){return window.HIST||[]}},biology:{k:'bio',last:'bioLast',pre:'b',nm:'Биология',nm2:'биологии',em:'🌿',get d(){return window.BIO||[]}}};
 const SB=()=>SUBS[schoolSub]||SUBS.history;
 const HS=sub=>(S[(SUBS[sub]||SB()).k]??={});
 function histFlush(){if(schoolPar!=null&&page=='school'){const h=(HS()[schoolPar]??={ts:0,secs:0,ans:[],score:[],awarded:[]});const d=Math.round(actNow()-histT0);if(d>0&&d<3600){h.secs=(h.secs||0)+d;h.ts=Date.now();histT0=actNow();persist()}}}
