@@ -86,6 +86,24 @@ membrane(){const g=new THREE.Group(),hm=M(0xf0a020),tm=M(0xe8d9a0,{roughness:.8}
  for(const [x,z] of[[-1.2,.3],[.4,-.3],[1.7,.2]]){const p=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,1.5,16,1,true),GL(0x7a4fd0,.75));p.position.set(x,0,z);g.add(p)}
  g.rotation.x=.5;return g}
 });
+
+const PUR=()=>new THREE.MeshPhysicalMaterial({color:0x8a4fe0,roughness:.35,metalness:0,clearcoat:1,clearcoatRoughness:.2,side:THREE.DoubleSide});
+const fib=(n,f)=>{for(let i=0;i<n;i++){const y=1-2*(i+.5)/n,r=Math.sqrt(1-y*y),a=i*2.39996;f(new THREE.Vector3(Math.cos(a)*r,y,Math.sin(a)*r))}};
+const poreRings=(g,R,n,sz,wedge)=>fib(n,v=>{let ph=Math.atan2(v.z,v.x);if(ph<0)ph+=Math.PI*2;if(wedge&&ph>Math.PI*1.5)return;const p=new THREE.Group(),t=new THREE.Mesh(new THREE.TorusGeometry(sz,sz*.38,8,14),M(0x5a1fa8,{roughness:.5}));p.add(t);const c=ell(0,0,0,M(0x2a0a60),sz*.5,sz*.5,sz*.25);p.add(c);p.position.copy(v.clone().multiplyScalar(R*1.004));p.lookAt(v.clone().multiplyScalar(R*2));g.add(p)});
+const chroThreads=(g,R,cnt,col)=>{for(let i=0;i<cnt;i++){const p=[];const v=new THREE.Vector3(rnd(-1,1),rnd(-1,1),rnd(-1,1)).normalize().multiplyScalar(R*rnd(.5,.97));for(let k=0;k<8;k++){p.push([v.x,v.y,v.z]);v.add(new THREE.Vector3(rnd(-.28,.28),rnd(-.28,.28),rnd(-.28,.28)));if(v.length()>R)v.setLength(R*.95)}g.add(tube(p,.02,M(col,{roughness:.4}),16))}};
+const shell=(R,mat,wedge)=>new THREE.Mesh(new THREE.SphereGeometry(R,56,40,0,wedge?Math.PI*1.5:Math.PI*2),mat);
+Object.assign(MODELS,{
+nucleus(){const g=new THREE.Group();
+ g.add(shell(1.5,PUR(),true));g.add(shell(1.4,new THREE.MeshPhysicalMaterial({color:0x6f3fd0,roughness:.5,side:THREE.DoubleSide}),true));
+ g.add(shell(1.3,new THREE.MeshStandardMaterial({color:0x2d8be6,roughness:.4,side:THREE.DoubleSide}),true));
+ chroThreads(g,1.28,150,0x7fd4ff);
+ g.add(ell(0,0,0,M(0x4a1a90,{roughness:.25}),.5,.5,.5));
+ poreRings(g,1.5,70,.075,true);
+ for(const a of[0,Math.PI*1.5]){const w=box(1.5,.02,.02,M(0));w.visible=false}
+ g.rotation.set(.45,2.0,0);return g},
+pores(){const g=new THREE.Group();g.add(shell(1.5,PUR(),false));poreRings(g,1.5,90,.085,false);g.add(ell(-1.45,0,.2,M(0x4a1a90,{roughness:.25}),.45,.45,.45));g.rotation.y=2;return g},
+chromatin(){const g=new THREE.Group();g.add(ell(0,0,0,GL(0x5ab4ff,.2),1.35,1.35,1.35));chroThreads(g,1.3,320,0x6fd0ff);return g}
+});
 window.open3D=(key,host)=>{
  const W=host.clientWidth||400,H=host.clientHeight||360,r=new THREE.WebGLRenderer({antialias:true,alpha:true});r.setPixelRatio(Math.min(devicePixelRatio,2));r.setSize(W,H);host.appendChild(r.domElement);
  const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,W/H,.1,100);cam.position.set(0,.4,7);
