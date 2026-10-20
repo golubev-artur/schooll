@@ -130,6 +130,21 @@ cholesterol(){const g=new THREE.Group();g.add(chol(0,0,0,.4));g.scale.setScalar(
 carb(){const g=new THREE.Group();g.add(carbChain(0,-.3,0));g.scale.setScalar(3.5);return g},
 phospholipid(){const g=new THREE.Group(),hm=M(BLUE,{roughness:.3}),tm=M(YEL,{roughness:.6});g.add(ell(0,.9,0,hm,.45,.45,.45));for(const dx of[-.17,.17])g.add(tube([[dx,.5,0],[dx+.08,.1,0],[dx-.06,-.3,0],[dx+.07,-.7,0],[dx,-1.1,0]],.07,tm,20));g.rotation.set(.15,.5,0);return g}
 });
+
+Object.assign(MODELS,{
+mito(){const L=1.9,R=.95,c=L-R*1.15,pts=n=>{const p=[];for(let i=0;i<=44;i++){const y=-L+2*L*i/44,d=Math.max(Math.abs(y)-c,0)/(L-c);p.push(new THREE.Vector2(Math.max(.001,R*n*Math.sqrt(Math.max(0,1-d*d))),y))}return p};
+ const lathe=(n,mat)=>new THREE.Mesh(new THREE.LatheGeometry(pts(n),64,Math.PI*.5,Math.PI*1.5),mat);
+ const m=new THREE.Group();
+ m.add(lathe(1,new THREE.MeshPhysicalMaterial({color:0xf26a1b,roughness:.55,clearcoat:.4,side:THREE.DoubleSide})));
+ m.add(lathe(.93,new THREE.MeshStandardMaterial({color:0xf5c22e,roughness:.4,side:THREE.DoubleSide})));
+ m.add(lathe(.86,new THREE.MeshStandardMaterial({color:0x3f95e8,roughness:.45,side:THREE.DoubleSide})));
+ const rr=y=>{const d=Math.max(Math.abs(y)-c,0)/(L-c);return R*Math.sqrt(Math.max(0,1-d*d))};
+ for(let k=0;k<9;k++){const y=-1.45+k*.36,r=rr(y)*.86,cr=new THREE.Mesh(new THREE.CylinderGeometry(r,r,.09,40,1,false,(k%2?0:Math.PI),Math.PI),new THREE.MeshStandardMaterial({color:0xf2b524,roughness:.4,side:THREE.DoubleSide}));cr.position.y=y;m.add(cr);
+  const e=new THREE.Mesh(new THREE.CylinderGeometry(r*.995,r*.995,.1,40,1,true,(k%2?0:Math.PI),Math.PI),M(0xe8861e,{side:THREE.DoubleSide}));e.position.y=y;m.add(e)}
+ for(let i=0;i<46;i++){const y=rnd(-1.5,1.5),a=rnd(0,6.28),r=rr(y)*.7*Math.sqrt(Math.random());m.add(ell(Math.sin(a)*r,y,Math.cos(a)*r,M(0x6a3fd0),.035,.035,.035))}
+ for(const y of[-.5,.7]){const k=new THREE.Mesh(new THREE.TorusKnotGeometry(.1,.025,40,6,2,3),M(0xf08a1c));k.position.set(.1,y,-.1);m.add(k)}
+ m.rotation.z=Math.PI/2;const g=new THREE.Group();g.add(m);g.rotation.set(.55,-.35,0);return g}
+});
 window.open3D=(key,host)=>{
  const W=host.clientWidth||400,H=host.clientHeight||360,r=new THREE.WebGLRenderer({antialias:true,alpha:true});r.setPixelRatio(Math.min(devicePixelRatio,2));r.setSize(W,H);host.appendChild(r.domElement);
  const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,W/H,.1,100);cam.position.set(0,.4,7);
