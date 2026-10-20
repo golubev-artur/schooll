@@ -104,6 +104,32 @@ nucleus(){const g=new THREE.Group();
 pores(){const g=new THREE.Group();g.add(shell(1.5,PUR(),false));poreRings(g,1.5,90,.085,false);g.add(ell(-1.45,0,.2,M(0x4a1a90,{roughness:.25}),.45,.45,.45));g.rotation.y=2;return g},
 chromatin(){const g=new THREE.Group();g.add(ell(0,0,0,GL(0x5ab4ff,.2),1.35,1.35,1.35));chroThreads(g,1.3,320,0x6fd0ff);return g}
 });
+
+const BLUE=0x2a7fe0,YEL=0xf0c040,PURP=0x8a4fe0,ORG=0xf29a2a,GRN=0x2f9e44;
+const carbChain=(x,y,z)=>{const c=new THREE.Group(),m=M(GRN,{roughness:.4});c.add(tube([[0,0,0],[0,.18,0],[.02,.34,0]],.03,m));
+ for(const s of[-1,1]){c.add(tube([[.02,.34,0],[s*.1,.46,0],[s*.16,.55,0]],.025,m));for(const d of[[0,.08],[.08,.04]]){const o=new THREE.Mesh(new THREE.IcosahedronGeometry(.055,0),m);o.position.set(s*.16+s*d[0],.57+d[1],0);c.add(o)}}
+ c.position.set(x,y,z);return c};
+const protIntegral=(x,z)=>{const g=new THREE.Group(),m=M(PURP,{roughness:.35});for(const s of[-1,1]){const a=ell(s*.2,0,0,m,.19,.85,.3);g.add(a);g.add(ell(s*.2,.75,0,m,.2,.12,.3));g.add(ell(s*.2,-.75,0,m,.2,.12,.3))}
+ g.add(ell(0,.1,0,M(0xb89af0,{roughness:.3}),.06,.5,.2));g.position.set(x,0,z);return g};
+const protPeriph=(x,y,z)=>{const g=new THREE.Group(),m=M(0xa86be8,{roughness:.35});g.add(ell(0,0,0,m,.32,.2,.3));g.add(ell(-.15,.1,.05,m,.2,.18,.2));g.add(ell(.17,.08,-.05,m,.18,.16,.2));g.position.set(x,y,z);return g};
+const chol=(x,y,z,r)=>{const g=new THREE.Group(),m=M(ORG,{roughness:.4});g.add(ell(0,0,0,m,.1,.28,.1));g.add(ell(.05,-.2,0,m,.09,.1,.09));g.add(ell(-.04,.26,0,m,.07,.07,.07));g.position.set(x,y,z);g.rotation.z=r;return g};
+const lipid=(x,z,side,hm,tm)=>{const g=new THREE.Group();g.add(ell(x,side*.62,z,hm,.105,.105,.105));for(const dx of[-.035,.035]){const p=[[x+dx,side*.52,z],[x+dx+rnd(-.03,.03),side*.4,z],[x+dx+rnd(-.03,.03),side*.28,z],[x+dx+rnd(-.02,.02),side*.16,z]];g.add(tube(p,.026,tm,6))}return g};
+const buildMembrane=()=>{const g=new THREE.Group(),hm=M(BLUE,{roughness:.3}),tm=M(YEL,{roughness:.6}),prot=[[-.75,.15],[.8,-.1]];
+ for(let i=-5;i<=5;i++)for(let j=-3;j<=3;j++){const x=i*.27,z=j*.27;if(prot.some(p=>Math.hypot(x-p[0],(z-p[1])*1.2)<.38))continue;for(const side of[1,-1])g.add(lipid(x,z,side,hm,tm))}
+ for(const p of prot)g.add(protIntegral(p[0],p[1]));
+ g.add(protPeriph(.1,.78,.3));
+ for(const [x,y,z,r] of[[-.2,0,.55,.1],[.35,0,-.5,-.1],[1.3,0,.4,.05],[-1.2,0,-.45,-.1],[.2,0,.05,.15]])g.add(chol(x,y,z,r));
+ for(const [x,z] of[[-.95,.5],[.1,-.55],[1.15,.45]])g.add(carbChain(x,.67,z));
+ return g};
+Object.assign(MODELS,{
+membrane(){const g=buildMembrane();g.rotation.set(.5,-.45,0);return g},
+membraneTop(){const g=buildMembrane();g.rotation.set(1.35,0,0);return g},
+integral(){const g=new THREE.Group();g.add(protIntegral(0,0));g.scale.setScalar(1.5);g.rotation.set(.3,.6,0);return g},
+peripheral(){const g=new THREE.Group();g.add(protPeriph(0,0,0));g.scale.setScalar(3);return g},
+cholesterol(){const g=new THREE.Group();g.add(chol(0,0,0,.4));g.scale.setScalar(4);return g},
+carb(){const g=new THREE.Group();g.add(carbChain(0,-.3,0));g.scale.setScalar(3.5);return g},
+phospholipid(){const g=new THREE.Group(),hm=M(BLUE,{roughness:.3}),tm=M(YEL,{roughness:.6});g.add(ell(0,.9,0,hm,.45,.45,.45));for(const dx of[-.17,.17])g.add(tube([[dx,.5,0],[dx+.08,.1,0],[dx-.06,-.3,0],[dx+.07,-.7,0],[dx,-1.1,0]],.07,tm,20));g.rotation.set(.15,.5,0);return g}
+});
 window.open3D=(key,host)=>{
  const W=host.clientWidth||400,H=host.clientHeight||360,r=new THREE.WebGLRenderer({antialias:true,alpha:true});r.setPixelRatio(Math.min(devicePixelRatio,2));r.setSize(W,H);host.appendChild(r.domElement);
  const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,W/H,.1,100);cam.position.set(0,.4,7);
